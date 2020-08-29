@@ -24,4 +24,6 @@ public:
 	virtual ~IGameApp() {};
 };
 
+extern HWND g_coreWindow;
+
 void RunApplication(IGameApp& app, HINSTANCE instance, const wchar_t* className);

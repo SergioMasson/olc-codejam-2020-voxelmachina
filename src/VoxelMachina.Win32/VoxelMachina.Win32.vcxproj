@@ -174,7 +174,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
+    <ClInclude Include="colors.h" />
     <ClInclude Include="coreGraphics.h" />
+    <ClInclude Include="dxassert.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="systemTime.h" />

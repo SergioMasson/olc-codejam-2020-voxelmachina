@@ -40,5 +40,7 @@
     <ClInclude Include="voxelMachina.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="systemTime.h" />
+    <ClInclude Include="dxassert.h" />
+    <ClInclude Include="colors.h" />
   </ItemGroup>
 </Project>

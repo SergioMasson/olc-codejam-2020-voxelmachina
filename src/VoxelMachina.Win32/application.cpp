@@ -18,7 +18,7 @@ HWND g_coreWindow;
 
 void InitializeApplication(IGameApp& app)
 {
-	graphics::Initialize();
+	graphics::Initialize(defaultWidth, defaultHeight);
 	SystemTime::Initialize();
 	Input::Initialize();
 	app.Startup();
@@ -27,12 +27,16 @@ void InitializeApplication(IGameApp& app)
 bool UpdateApplication(IGameApp& app)
 {
 	auto currentTick = SystemTime::GetCurrentTick();
-	auto deltaTime = SystemTime::TimeBetweenTicks(previewsFrameTick, currentTick);
+	float deltaTime = static_cast<float>(SystemTime::TimeBetweenTicks(previewsFrameTick, currentTick));
 	previewsFrameTick = currentTick;
 
 	Input::Update(deltaTime);
 	app.Update(deltaTime);
+
+	//Render scene.
+	graphics::BeginDraw();
 	app.RenderScene();
+	graphics::Present();
 
 	double fps = 1.0 / deltaTime;
 	std::string titlebar = "FPS: " + std::to_string(fps);
@@ -66,7 +70,7 @@ void RunApplication(IGameApp& app, HINSTANCE instance, const wchar_t* className)
 	wcex.lpszClassName = className;
 	wcex.hIconSm = LoadIcon(instance, IDI_APPLICATION);
 
-	assert(0 != RegisterClassEx(&wcex), "Unable to register a window");
+	ASSERT(0 != RegisterClassEx(&wcex), "Unable to register a window");
 
 	// Create window
 	RECT rc = { 0, 0, defaultWidth, defaultHeight };
@@ -96,20 +100,20 @@ void RunApplication(IGameApp& app, HINSTANCE instance, const wchar_t* className)
 	TerminateApplication(app);
 }
 
-// Called every time the application receives a message
+// Called every time the application receives event from windows.
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
-	case WM_SIZE:
+	case WM_SIZE:		//This will be called on window resize. Both width and height will be on the lParam
 		graphics::Resize((UINT)(UINT64)lParam & 0xFFFF, (UINT)(UINT64)lParam >> 16);
 		break;
 
-	case WM_KEYDOWN:
+	case WM_KEYDOWN:	//This will be called on key first press.
 		Input::SetKey(wParam, true);
 		break;
 
-	case WM_CHAR:
+	case WM_CHAR:		//This will be called every frame when the key is pressed.
 		Input::SetKey(wParam, false);
 		break;
 

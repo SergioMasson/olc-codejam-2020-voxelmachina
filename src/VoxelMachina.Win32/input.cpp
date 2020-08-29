@@ -19,6 +19,7 @@ static std::map<WPARAM, Input::KeyCode> windowToKeyMap;
 
 void KbmBuildKeyMapping()
 {
+	//Maps the WPARAM to their keycodes. See (https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes)
 	windowToKeyMap = std::map<WPARAM, Input::KeyCode>
 	{
 		{0x1B,Input::KeyCode::Key_escape },
@@ -91,6 +92,7 @@ void Input::Shutdown()
 {
 }
 
+//Reads all XINPUT values and updated the input table.
 void Input::Update(float frameDelta)
 {
 	XINPUT_STATE newInputState;
@@ -139,6 +141,7 @@ void Input::Update(float frameDelta)
 	}
 }
 
+//Cleans up everthing for the next frame.
 void Input::PostUpdate()
 {
 	memcpy(s_Buttons[1], s_Buttons[0], sizeof(s_Buttons[0]));
