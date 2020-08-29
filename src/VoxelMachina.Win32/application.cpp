@@ -2,19 +2,35 @@
 #include "assert.h"
 #include "application.h"
 #include "coreGraphics.h"
+#include "input.h"
+#include "systemTime.h"
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 LONG defaultWidth = 600;
 LONG defaultHeight = 400;
 
+int64_t previewsFrameTick = 0;
+
 void InitializeApplication(IGameApp& app)
 {
+	graphics::Initialize();
+	SystemTime::Initialize();
+	Input::Initialize();
+	app.Startup();
 }
 
 bool UpdateApplication(IGameApp& app)
 {
-	return true;
+	auto currentTick = SystemTime::GetCurrentTick();
+	auto deltaTime = SystemTime::TimeBetweenTicks(previewsFrameTick, currentTick);
+	previewsFrameTick = currentTick;
+
+	Input::Update(deltaTime);
+	app.Update(deltaTime);
+	app.RenderScene();
+
+	return !app.IsDone();
 }
 
 void TerminateApplication(IGameApp& app)
@@ -61,6 +77,7 @@ void RunApplication(IGameApp& app, HINSTANCE instance, const wchar_t* className)
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
+
 		if (msg.message == WM_QUIT)
 			break;
 	} while (UpdateApplication(app));    // Returns false to quit loop

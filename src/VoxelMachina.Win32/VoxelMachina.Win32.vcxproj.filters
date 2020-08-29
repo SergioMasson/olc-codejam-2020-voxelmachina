@@ -26,11 +26,19 @@
     <ClCompile Include="voxelMachina.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="systemTime.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="coreGraphics.h" />
     <ClInclude Include="voxelMachina.h" />
+    <ClInclude Include="input.h" />
+    <ClInclude Include="systemTime.h" />
   </ItemGroup>
 </Project>

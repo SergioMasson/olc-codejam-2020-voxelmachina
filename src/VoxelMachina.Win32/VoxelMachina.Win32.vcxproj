@@ -161,6 +161,7 @@
   <ItemGroup>
     <ClCompile Include="application.cpp" />
     <ClCompile Include="coreGraphics.cpp" />
+    <ClCompile Include="input.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -168,12 +169,15 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="systemTime.cpp" />
     <ClCompile Include="voxelMachina.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
     <ClInclude Include="coreGraphics.h" />
+    <ClInclude Include="input.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="systemTime.h" />
     <ClInclude Include="voxelMachina.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
