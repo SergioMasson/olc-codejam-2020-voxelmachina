@@ -1,14 +1,65 @@
 #include "pch.h"
 #include "input.h"
+#include "Winuser.h"
+#include <map>
 
 //use XInput to handle input.
 #include <XInput.h>
 #pragma comment(lib, "xinput9_1_0.lib")
 
+//Buffer for all buttons.
 static bool s_Buttons[2][(int)Input::KeyCode::NumDigitalInputs];
+
+//Buffer for all buttons hold durations.
 static float s_HoldDuration[(int)Input::KeyCode::NumDigitalInputs] = { 0.0f };
 static float s_Analogs[static_cast<uint32_t>(Input::AnalogInput::kNumAnalogInputs)];
 static float s_AnalogsTC[static_cast<uint32_t>(Input::AnalogInput::kNumAnalogInputs)];
+
+static std::map<WPARAM, Input::KeyCode> windowToKeyMap;
+
+void KbmBuildKeyMapping()
+{
+	windowToKeyMap = std::map<WPARAM, Input::KeyCode>
+	{
+		{0x1B,Input::KeyCode::Key_escape },
+		{0x30,Input::KeyCode::Key_0 },
+		{0x31,Input::KeyCode::Key_1 },
+		{0x32,Input::KeyCode::Key_2 },
+		{0x33,Input::KeyCode::Key_3 },
+		{0x34,Input::KeyCode::Key_4 },
+		{0x35,Input::KeyCode::Key_5 },
+		{0x36,Input::KeyCode::Key_6 },
+		{0x37,Input::KeyCode::Key_7 },
+		{0x38,Input::KeyCode::Key_8 },
+		{0x39,Input::KeyCode::Key_9 },
+		{0x41,Input::KeyCode::Key_a },
+		{0x42,Input::KeyCode::Key_b },
+		{0x43,Input::KeyCode::Key_c },
+		{0x44,Input::KeyCode::Key_d },
+		{0x45,Input::KeyCode::Key_e },
+		{0x46,Input::KeyCode::Key_f },
+		{0x47,Input::KeyCode::Key_g },
+		{0x48,Input::KeyCode::Key_h },
+		{0x49,Input::KeyCode::Key_i },
+		{0x4A,Input::KeyCode::Key_j },
+		{0x4B,Input::KeyCode::Key_k },
+		{0x4C,Input::KeyCode::Key_l },
+		{0x4D,Input::KeyCode::Key_m },
+		{0x4E,Input::KeyCode::Key_n },
+		{0x4F,Input::KeyCode::Key_o },
+		{0x50,Input::KeyCode::Key_p },
+		{0x51,Input::KeyCode::Key_q },
+		{0x52,Input::KeyCode::Key_r },
+		{0x53,Input::KeyCode::Key_s },
+		{0x54,Input::KeyCode::Key_t },
+		{0x55,Input::KeyCode::Key_u },
+		{0x56,Input::KeyCode::Key_v },
+		{0x57,Input::KeyCode::Key_w },
+		{0x58,Input::KeyCode::Key_x },
+		{0x59,Input::KeyCode::Key_x },
+		{0x60,Input::KeyCode::Key_z }
+	};
+}
 
 float FilterAnalogInput(int val, int deadZone)
 {
@@ -32,6 +83,8 @@ void Input::Initialize()
 {
 	ZeroMemory(s_Buttons, sizeof(s_Buttons));
 	ZeroMemory(s_Analogs, sizeof(s_Analogs));
+
+	KbmBuildKeyMapping();
 }
 
 void Input::Shutdown()
@@ -40,12 +93,6 @@ void Input::Shutdown()
 
 void Input::Update(float frameDelta)
 {
-	memcpy(s_Buttons[1], s_Buttons[0], sizeof(s_Buttons[0]));
-
-	//Cleans up buffers.
-	memset(s_Buttons[0], 0, sizeof(s_Buttons[0]));
-	memset(s_Analogs, 0, sizeof(s_Analogs));
-
 	XINPUT_STATE newInputState;
 
 	//Get the values for all controller buttons from XINPUT
@@ -92,6 +139,15 @@ void Input::Update(float frameDelta)
 	}
 }
 
+void Input::PostUpdate()
+{
+	memcpy(s_Buttons[1], s_Buttons[0], sizeof(s_Buttons[0]));
+
+	//Cleans up buffers.
+	memset(s_Buttons[0], 0, sizeof(s_Buttons[0]));
+	memset(s_Analogs, 0, sizeof(s_Analogs));
+}
+
 bool Input::IsAnyPressed(void)
 {
 	return s_Buttons[0] != 0;
@@ -130,4 +186,15 @@ float Input::GetAnalogInput(AnalogInput ai)
 float Input::GetTimeCorrectedAnalogInput(AnalogInput ai)
 {
 	return s_AnalogsTC[static_cast<uint32_t>(ai)];
+}
+
+void Input::SetKey(WPARAM key, bool isDown)
+{
+	auto keyFind = windowToKeyMap.find(key);
+
+	if (keyFind != windowToKeyMap.end())
+	{
+		auto targetKey = windowToKeyMap[key];
+		s_Buttons[0][static_cast<uint32_t>(targetKey)] = true;
+	}
 }

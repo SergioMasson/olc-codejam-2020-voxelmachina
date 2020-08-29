@@ -4,7 +4,9 @@ namespace Input
 {
 	void Initialize();
 	void Shutdown();
+
 	void Update(float frameDelta);
+	void PostUpdate();
 
 	enum class KeyCode
 	{
@@ -175,4 +177,6 @@ namespace Input
 
 	float GetAnalogInput(AnalogInput ai);
 	float GetTimeCorrectedAnalogInput(AnalogInput ai);
+
+	void SetKey(WPARAM key, bool isDown);
 }

@@ -4,6 +4,8 @@
 #include "coreGraphics.h"
 #include "input.h"
 #include "systemTime.h"
+#include <iostream>
+#include <string>
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
@@ -11,6 +13,8 @@ LONG defaultWidth = 600;
 LONG defaultHeight = 400;
 
 int64_t previewsFrameTick = 0;
+
+HWND g_coreWindow;
 
 void InitializeApplication(IGameApp& app)
 {
@@ -29,6 +33,13 @@ bool UpdateApplication(IGameApp& app)
 	Input::Update(deltaTime);
 	app.Update(deltaTime);
 	app.RenderScene();
+
+	double fps = 1.0 / deltaTime;
+	std::string titlebar = "FPS: " + std::to_string(fps);
+
+	SetWindowTextA(g_coreWindow, titlebar.c_str());
+
+	Input::PostUpdate();
 
 	return !app.IsDone();
 }
@@ -61,13 +72,13 @@ void RunApplication(IGameApp& app, HINSTANCE instance, const wchar_t* className)
 	RECT rc = { 0, 0, defaultWidth, defaultHeight };
 	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
 
-	auto g_hWnd = CreateWindow(className, className, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, instance, nullptr);
+	g_coreWindow = CreateWindow(className, className, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, instance, nullptr);
 
-	assert(g_hWnd != 0);
+	assert(g_coreWindow != 0);
 
 	InitializeApplication(app);
 
-	ShowWindow(g_hWnd, SW_SHOWDEFAULT);
+	ShowWindow(g_coreWindow, SW_SHOWDEFAULT);
 
 	do
 	{
@@ -92,6 +103,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_SIZE:
 		graphics::Resize((UINT)(UINT64)lParam & 0xFFFF, (UINT)(UINT64)lParam >> 16);
+		break;
+
+	case WM_KEYDOWN:
+		Input::SetKey(wParam, true);
+		break;
+
+	case WM_CHAR:
+		Input::SetKey(wParam, false);
 		break;
 
 	case WM_DESTROY:
