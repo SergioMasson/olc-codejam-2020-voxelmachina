@@ -5,6 +5,7 @@
 #include "colors.h"
 
 using namespace Microsoft::WRL;
+using namespace graphics;
 
 UINT							graphics::g_4xMsaaQuality;
 LONG							graphics::g_windowWidth;
@@ -21,7 +22,7 @@ ComPtr<ID3D11DeviceContext>		graphics::g_d3dImmediateContext = nullptr;
 ComPtr<IDXGISwapChain>			graphics::g_SwapChain = nullptr;
 ComPtr<ID3D11Texture2D>			graphics::g_DepthStencilBuffer = nullptr;
 
-void graphics::Initialize(uint32_t width, uint32_t heigth)
+void InitializeGraphicsInfra(uint32_t width, uint32_t heigth)
 {
 	// Create the device and device context.
 	UINT createDeviceFlags = 0;
@@ -98,12 +99,19 @@ void graphics::Initialize(uint32_t width, uint32_t heigth)
 	ASSERT_SUCCEEDED(dxgiAdapter->GetParent(__uuidof(IDXGIFactory), (void**)dxgiFactory.GetAddressOf()));
 
 	ASSERT_SUCCEEDED(dxgiFactory->CreateSwapChain(g_d3dDevice.Get(), &sd, &g_SwapChain));
+}
 
+void graphics::Initialize(uint32_t width, uint32_t heigth)
+{
+	InitializeGraphicsInfra(width, heigth);
 	graphics::Resize(g_windowWidth, g_windowHeight);
 }
 
 void graphics::Resize(uint32_t width, uint32_t heigth)
 {
+	if (width == 0 || heigth == 0)
+		return;
+
 	g_windowWidth = width;
 	g_windowHeight = heigth;
 
@@ -176,7 +184,7 @@ void graphics::Resize(uint32_t width, uint32_t heigth)
 
 void graphics::BeginDraw()
 {
-	g_d3dImmediateContext->ClearRenderTargetView(g_RenderTargetView.Get(), reinterpret_cast<const float*>(&colors::lightSteelBlue));
+	g_d3dImmediateContext->ClearRenderTargetView(g_RenderTargetView.Get(), reinterpret_cast<const float*>(&colors::black));
 	g_d3dImmediateContext->ClearDepthStencilView(g_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
 

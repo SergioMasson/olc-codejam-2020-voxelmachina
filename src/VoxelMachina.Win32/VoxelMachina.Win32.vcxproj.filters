@@ -42,5 +42,10 @@
     <ClInclude Include="systemTime.h" />
     <ClInclude Include="dxassert.h" />
     <ClInclude Include="colors.h" />
+    <ClInclude Include="mathHelpers.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="shaders\BoxVS.hlsl" />
+    <FxCompile Include="shaders\BoxPS.hlsl" />
   </ItemGroup>
 </Project>

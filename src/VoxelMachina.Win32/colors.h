@@ -1,7 +1,5 @@
 #pragma once
 
-#include "DirectXMath.h"
-
 namespace colors
 {
 	XMGLOBALCONST DirectX::XMFLOAT4 white = { 1.0f, 1.0f, 1.0f, 1.0f };
