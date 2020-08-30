@@ -3,6 +3,7 @@
 #include "coreGraphics.h"
 #include "input.h"
 #include "colors.h"
+#include "camera.h"
 #include "math.h"
 #include "BoxPS.h"
 #include "BoxVS.h"
@@ -19,7 +20,15 @@ struct Vertex
 	DirectX::XMFLOAT4 Color;
 };
 
-math::Vector3 cameraPosition{ 0.0f, 0.0f, -6.0f };
+struct ObjectConstBuffer
+{
+	DirectX::XMFLOAT4X4 ModelMatrix;
+};
+
+struct SceneConstBuffer
+{
+	DirectX::XMFLOAT4X4 ViewProjectMatrix;
+};
 
 void BuildShadersAndInputLayout(_Out_ ID3D11VertexShader** vertexShader, _Out_ ID3D11PixelShader** pixelShader, _Out_ ID3D11InputLayout** inputLayout)
 {
@@ -118,11 +127,12 @@ void BuildIndexAndVertexBuffer(_Out_ ID3D11Buffer** vertexBuffer, _Out_ ID3D11Bu
 	hr = graphics::g_d3dDevice->CreateBuffer(&ibd, &iinitData, indexBuffer);
 }
 
+template<class T>
 void BuildConstantBuffer(_Out_ ID3D11Buffer** constantBuffer)
 {
 	// constant colour buffer. TODO(Replace this with all camera and light buffers.)
 	D3D11_BUFFER_DESC bd = { 0 };
-	bd.ByteWidth = sizeof(XMFLOAT4X4);
+	bd.ByteWidth = sizeof(T);
 	bd.Usage = D3D11_USAGE_DEFAULT;
 	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
@@ -133,25 +143,26 @@ void VoxelMachinaApp::Startup(void)
 {
 	BuildShadersAndInputLayout(m_vertexShader.GetAddressOf(), m_pixelShader.GetAddressOf(), m_inputLayout.GetAddressOf());
 	BuildIndexAndVertexBuffer(m_vertexBuffer.GetAddressOf(), m_indexBuffer.GetAddressOf());
-	BuildConstantBuffer(m_constBuffer.GetAddressOf());
+
+	//Build model const buffer.
+	BuildConstantBuffer<ObjectConstBuffer>(m_ObjectConstBuffer.GetAddressOf());
+	BuildConstantBuffer<SceneConstBuffer>(m_sceneConstBuffer.GetAddressOf());
+
+	//Build scene const buffer.
 
 	//Initialize all matrix.
 	XMMATRIX I = XMMatrixIdentity();
 	XMStoreFloat4x4(&m_WorldMatrix, I);
-	XMStoreFloat4x4(&m_ViewMatrix, I);
-	XMStoreFloat4x4(&m_ProjMatrix, I);
 
-	// Build the view matrix.
-	XMVECTOR target = XMVectorZero();
-	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-	XMMATRIX V = XMMatrixLookAtLH(cameraPosition, target, up);
-	XMStoreFloat4x4(&m_ViewMatrix, V);
+	math::Vector3 cameraPosition{ 0.0f, 0.0f, -6.0f };
+	math::Vector3 target{ 0, 0, 0 };
+	math::Vector3 up{ 0.0f, 1.0f, 0.0f };
+
+	m_sceneCamera.SetEyeAtUp(cameraPosition, target, up);
 
 	auto aspectRation = static_cast<float>(graphics::g_windowWidth) / static_cast<float>(graphics::g_windowHeight);
 
-	// The window resized, so update the aspect ratio and recompute the projection matrix.
-	XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f * math::Pi, aspectRation, 1.0f, 1000.0f);
-	XMStoreFloat4x4(&m_ProjMatrix, P);
+	m_sceneCamera.SetPerspectiveMatrix(0.25f * math::Pi, aspectRation, 1.0f, 1000.0f);
 }
 
 void VoxelMachinaApp::Cleanup(void)
@@ -168,20 +179,14 @@ void VoxelMachinaApp::Update(float deltaT)
 	g_isDone = Input::IsPressed(Input::KeyCode::Key_escape);
 
 	if (Input::IsPressed(Input::KeyCode::Key_w))
-		cameraPosition += (math::Vector3{ 0, 0, 60 } *deltaT);
+		m_sceneCamera.SetPosition(m_sceneCamera.GetPosition() + (math::Vector3{ 0, 0, 60 } *deltaT));
 	else if (Input::IsPressed(Input::KeyCode::Key_s))
-		cameraPosition += (math::Vector3{ 0, 0, -60 } *deltaT);
+		m_sceneCamera.SetPosition(m_sceneCamera.GetPosition() - (math::Vector3{ 0, 0, 60 } *deltaT));
 
 	if (Input::IsPressed(Input::KeyCode::Key_a))
-		cameraPosition += (math::Vector3{ 60, 0, 0 } *deltaT);
+		m_sceneCamera.SetPosition(m_sceneCamera.GetPosition() + (math::Vector3{ 60, 0, 0 } *deltaT));
 	else if (Input::IsPressed(Input::KeyCode::Key_d))
-		cameraPosition += (math::Vector3{ -60, 0, 0 } *deltaT);
-
-	// Update the view matrix.
-	XMVECTOR target = XMVectorZero();
-	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-	XMMATRIX V = XMMatrixLookAtLH(cameraPosition, target, up);
-	XMStoreFloat4x4(&m_ViewMatrix, V);
+		m_sceneCamera.SetPosition(m_sceneCamera.GetPosition() - (math::Vector3{ 60, 0, 0 } *deltaT));
 }
 
 void VoxelMachinaApp::RenderScene(void)
@@ -194,21 +199,28 @@ void VoxelMachinaApp::RenderScene(void)
 
 	// Set constants
 	XMMATRIX world = XMLoadFloat4x4(&m_WorldMatrix);
-	XMMATRIX view = XMLoadFloat4x4(&m_ViewMatrix);
-	XMMATRIX proj = XMLoadFloat4x4(&m_ProjMatrix);
-	XMMATRIX worldViewProj = world * view * proj;
-	XMFLOAT4X4 vertexShaderMatrix;
+	XMFLOAT4X4 objectWorldMatrix;
 
-	XMStoreFloat4x4(&vertexShaderMatrix, worldViewProj);
+	//Update object world matrix.
+	XMStoreFloat4x4(&objectWorldMatrix, world);
+	graphics::g_d3dImmediateContext->UpdateSubresource(m_ObjectConstBuffer.Get(), 0, 0, &objectWorldMatrix, 0, 0);
 
-	graphics::g_d3dImmediateContext->UpdateSubresource(m_constBuffer.Get(), 0, 0, &vertexShaderMatrix, 0, 0);
+	XMFLOAT4X4 viewProjectionMatrix;
+	m_sceneCamera.StoreViewProjectionMatrix(&viewProjectionMatrix);
+
+	graphics::g_d3dImmediateContext->UpdateSubresource(m_sceneConstBuffer.Get(), 0, 0, &viewProjectionMatrix, 0, 0);
 
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
 
 	//Bind shaders to graphics context.
 	graphics::g_d3dImmediateContext->VSSetShader(m_vertexShader.Get(), nullptr, 0);
-	graphics::g_d3dImmediateContext->VSSetConstantBuffers(0, 1, m_constBuffer.GetAddressOf());
+
+	//Bind model matrix to slot b0
+	graphics::g_d3dImmediateContext->VSSetConstantBuffers(0, 1, m_ObjectConstBuffer.GetAddressOf());
+
+	//Bind view projection matrix to slot b1
+	graphics::g_d3dImmediateContext->VSSetConstantBuffers(1, 1, m_sceneConstBuffer.GetAddressOf());
 	graphics::g_d3dImmediateContext->PSSetShader(m_pixelShader.Get(), nullptr, 0);
 
 	//Binds vertex buffer and index buffer.

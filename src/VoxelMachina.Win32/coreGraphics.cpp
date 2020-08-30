@@ -130,10 +130,12 @@ void graphics::Resize(uint32_t width, uint32_t heigth)
 
 	ASSERT_SUCCEEDED(g_SwapChain->ResizeBuffers(1, g_windowWidth, g_windowHeight, DXGI_FORMAT_R8G8B8A8_UNORM, 0));
 
-	ComPtr<ID3D11Texture2D> backBuffer;
+	ID3D11Texture2D* backBuffer;
 
-	ASSERT_SUCCEEDED(g_SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(backBuffer.GetAddressOf())));
-	ASSERT_SUCCEEDED(g_d3dDevice->CreateRenderTargetView(backBuffer.Get(), nullptr, g_RenderTargetView.GetAddressOf()));
+	ASSERT_SUCCEEDED(g_SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backBuffer)));
+	ASSERT_SUCCEEDED(g_d3dDevice->CreateRenderTargetView(backBuffer, nullptr, g_RenderTargetView.GetAddressOf()));
+
+	backBuffer->Release();
 
 	// Create the depth/stencil buffer and view.
 	D3D11_TEXTURE2D_DESC depthStencilDesc;
@@ -163,15 +165,12 @@ void graphics::Resize(uint32_t width, uint32_t heigth)
 	depthStencilDesc.MiscFlags = 0;
 
 	ASSERT_SUCCEEDED(g_d3dDevice->CreateTexture2D(&depthStencilDesc, nullptr, g_DepthStencilBuffer.GetAddressOf()));
-
 	ASSERT_SUCCEEDED(g_d3dDevice->CreateDepthStencilView(g_DepthStencilBuffer.Get(), nullptr, g_DepthStencilView.GetAddressOf()));
 
 	// Bind the render target view and depth/stencil view to the pipeline.
-
 	g_d3dImmediateContext->OMSetRenderTargets(1, g_RenderTargetView.GetAddressOf(), g_DepthStencilView.Get());
 
 	// Set the viewport transform.
-
 	g_ScreenViewport.TopLeftX = 0;
 	g_ScreenViewport.TopLeftY = 0;
 	g_ScreenViewport.Width = static_cast<float>(g_windowWidth);

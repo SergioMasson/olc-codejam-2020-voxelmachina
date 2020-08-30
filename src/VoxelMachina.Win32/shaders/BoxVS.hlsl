@@ -1,6 +1,11 @@
-cbuffer cbPerObject
+cbuffer cbPerObject : register(b0)
 {
-	float4x4 gWorldViewProj;
+	float4x4 modelMatrix;
+};
+
+cbuffer cbScene : register(b1)
+{
+	float4x4 viewProjectMatrix;
 };
 
 struct Input
@@ -20,7 +25,10 @@ Output main(Input input)
 	Output output;
 
 	output.position = float4(input.position.x, input.position.y, input.position.z, 1);
-	output.position = mul(output.position, transpose(gWorldViewProj));
+
+	float4x4 mvpMatrix = mul(viewProjectMatrix, modelMatrix);
+
+	output.position = mul(output.position, transpose(mvpMatrix));
 	output.color = input.color;
 
 	return output;

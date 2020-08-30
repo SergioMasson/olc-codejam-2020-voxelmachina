@@ -32,6 +32,9 @@
     <ClCompile Include="systemTime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
@@ -43,6 +46,14 @@
     <ClInclude Include="dxassert.h" />
     <ClInclude Include="colors.h" />
     <ClInclude Include="mathHelpers.h" />
+    <ClInclude Include="camera.h" />
+    <ClInclude Include="math\scalar.h" />
+    <ClInclude Include="math\vector3.h" />
+    <ClInclude Include="math\quaternion.h" />
+    <ClInclude Include="math\matrix3.h" />
+    <ClInclude Include="math\matrix4.h" />
+    <ClInclude Include="math\transform.h" />
+    <ClInclude Include="math\common.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\BoxVS.hlsl" />

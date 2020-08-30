@@ -2,6 +2,7 @@
 
 #include "application.h"
 #include "mathHelpers.h"
+#include "camera.h"
 
 class VoxelMachinaApp : public IGameApp
 {
@@ -26,11 +27,13 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout = nullptr;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> m_vertexBuffer = nullptr;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> m_indexBuffer = nullptr;
-	Microsoft::WRL::ComPtr<ID3D11Buffer> m_constBuffer = nullptr;
+
+	Microsoft::WRL::ComPtr<ID3D11Buffer> m_ObjectConstBuffer = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> m_sceneConstBuffer = nullptr;
 
 	DirectX::XMFLOAT4X4 m_WorldMatrix = math::Identity4x4();
-	DirectX::XMFLOAT4X4 m_ViewMatrix = math::Identity4x4();
-	DirectX::XMFLOAT4X4 m_ProjMatrix = math::Identity4x4();
+
+	Camera m_sceneCamera{};
 
 	float mTheta = 1.5f * DirectX::XM_PI;
 	float mPhi = DirectX::XM_PIDIV4;

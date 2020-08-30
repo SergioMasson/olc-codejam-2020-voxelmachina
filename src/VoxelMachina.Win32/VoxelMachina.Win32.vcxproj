@@ -173,6 +173,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="camera.cpp" />
     <ClCompile Include="systemTime.cpp" />
     <ClCompile Include="voxelMachina.cpp" />
   </ItemGroup>
@@ -182,8 +183,16 @@
     <ClInclude Include="coreGraphics.h" />
     <ClInclude Include="dxassert.h" />
     <ClInclude Include="input.h" />
+    <ClInclude Include="math\common.h" />
+    <ClInclude Include="math\matrix3.h" />
+    <ClInclude Include="math\matrix4.h" />
+    <ClInclude Include="math\quaternion.h" />
+    <ClInclude Include="math\scalar.h" />
+    <ClInclude Include="math\transform.h" />
+    <ClInclude Include="math\vector3.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="mathHelpers.h" />
+    <ClInclude Include="camera.h" />
     <ClInclude Include="systemTime.h" />
     <ClInclude Include="voxelMachina.h" />
   </ItemGroup>
