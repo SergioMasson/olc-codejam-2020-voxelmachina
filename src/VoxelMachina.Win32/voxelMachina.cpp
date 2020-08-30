@@ -187,6 +187,8 @@ void VoxelMachinaApp::Update(float deltaT)
 		m_sceneCamera.SetPosition(m_sceneCamera.GetPosition() + (math::Vector3{ 60, 0, 0 } *deltaT));
 	else if (Input::IsPressed(Input::KeyCode::Key_d))
 		m_sceneCamera.SetPosition(m_sceneCamera.GetPosition() - (math::Vector3{ 60, 0, 0 } *deltaT));
+
+	m_sceneCamera.Update();
 }
 
 void VoxelMachinaApp::RenderScene(void)

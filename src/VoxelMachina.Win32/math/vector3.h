@@ -11,7 +11,7 @@ namespace math
 	{
 	public:
 		Vector3() { m_vec = DirectX::XMVectorSet(0, 0, 0, 1); }
-		Vector3(float x, float y, float z) { m_vec = DirectX::XMVectorSet(x, y, z, z); }
+		Vector3(float x, float y, float z) { m_vec = DirectX::XMVectorSet(x, y, z, 1); }
 		Vector3(const DirectX::XMFLOAT3& v) { m_vec = DirectX::XMLoadFloat3(&v); }
 		Vector3(const Vector3& v) { m_vec = v; }
 		Vector3(Scalar s) { m_vec = s; }
