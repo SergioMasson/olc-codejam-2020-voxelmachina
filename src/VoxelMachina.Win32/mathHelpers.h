@@ -4,6 +4,7 @@
 #include "math/transform.h"
 #include "math/matrix4.h"
 #include "DirectXMath.h"
+#include "math/functions.h"
 
 namespace math
 {

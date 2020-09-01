@@ -43,6 +43,24 @@ namespace math
 		void SetZ(Vector4 z) { m_mat.r[2] = z; }
 		void SetW(Vector4 w) { m_mat.r[3] = w; }
 
+		Matrix4 InverseTranspose() const
+		{
+			// Inverse-transpose is just applied to normals.  So zero out
+			// translation row so that it doesn't get into our inverse-transpose
+			// calculation--we don't want the inverse-transpose of the translation.
+			XMMATRIX A = m_mat;
+			A.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+
+			XMVECTOR det = XMMatrixDeterminant(A);
+			return Matrix4{ XMMatrixTranspose(XMMatrixInverse(&det, A)) };
+		}
+
+		Matrix4 Transpose() const
+		{
+			XMMATRIX A = m_mat;
+			return Matrix4{ XMMatrixTranspose(A) };
+		}
+
 		operator DirectX::XMMATRIX() const { return m_mat; }
 
 		Vector4 operator* (Vector3 vec) const { return Vector4(DirectX::XMVector3Transform(vec, m_mat)); }

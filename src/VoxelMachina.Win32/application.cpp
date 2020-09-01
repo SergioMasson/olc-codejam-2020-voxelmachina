@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "assert.h"
 #include "application.h"
-#include "coreGraphics.h"
+#include "graphics/coreGraphics.h"
 #include "input.h"
 #include "systemTime.h"
 #include <iostream>
@@ -9,18 +9,21 @@
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
-LONG defaultWidth = 600;
-LONG defaultHeight = 400;
+LONG defaultWidth = 1280;
+LONG defaultHeight = 720;
 
 int64_t previewsFrameTick = 0;
 
 HWND g_coreWindow;
+
+IGameApp* g_currentApp;
 
 void InitializeApplication(IGameApp& app)
 {
 	graphics::Initialize(defaultWidth, defaultHeight);
 	SystemTime::Initialize();
 	Input::Initialize();
+
 	app.Startup();
 }
 
@@ -58,7 +61,7 @@ void RunApplication(IGameApp& app, HINSTANCE instance, const wchar_t* className)
 	// Register class
 	WNDCLASSEX wcex;
 	wcex.cbSize = sizeof(WNDCLASSEX);
-	wcex.style = CS_HREDRAW | CS_VREDRAW;
+	wcex.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
 	wcex.lpfnWndProc = WndProc;
 	wcex.cbClsExtra = 0;
 	wcex.cbWndExtra = 0;
@@ -80,6 +83,8 @@ void RunApplication(IGameApp& app, HINSTANCE instance, const wchar_t* className)
 
 	assert(g_coreWindow != 0);
 
+	g_currentApp = &app;
+
 	InitializeApplication(app);
 
 	ShowWindow(g_coreWindow, SW_SHOWDEFAULT);
@@ -93,7 +98,7 @@ void RunApplication(IGameApp& app, HINSTANCE instance, const wchar_t* className)
 			DispatchMessage(&msg);
 		}
 
-		if (msg.message == WM_QUIT)
+		if (msg.message == WM_QUIT || msg.message == WM_DESTROY || msg.message == WM_CLOSE)
 			break;
 	} while (UpdateApplication(app));    // Returns false to quit loop
 
@@ -107,6 +112,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_SIZE:		//This will be called on window resize. Both width and height will be on the lParam
 		graphics::Resize((UINT)(UINT64)lParam & 0xFFFF, (UINT)(UINT64)lParam >> 16);
+		g_currentApp->Resize((UINT)(UINT64)lParam & 0xFFFF, (UINT)(UINT64)lParam >> 16);
 		break;
 
 	case WM_KEYDOWN:	//This will be called on key first press.
@@ -120,6 +126,33 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
+
+	case WM_LBUTTONDOWN:
+	case WM_MBUTTONDOWN:
+	case WM_RBUTTONDOWN:
+		Input::SetKey(wParam, true);
+		Input::UpdateMousePosition(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		return 0;
+	case WM_LBUTTONUP:
+	case WM_MBUTTONUP:
+	case WM_RBUTTONUP:
+		Input::SetKey(wParam, false);
+		Input::UpdateMousePosition(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		return 0;
+	case WM_MOUSEMOVE:
+		Input::SetKey(wParam, false);
+		Input::UpdateMousePosition(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		return 0;
+
+		//Double click.
+	case WM_LBUTTONDBLCLK:
+		return 0;
+
+	case WM_RBUTTONDBLCLK:
+		return 0;
+
+	case WM_MBUTTONDBLCLK:
+		return 0;
 
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);

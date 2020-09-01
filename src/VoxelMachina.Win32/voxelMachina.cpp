@@ -1,12 +1,13 @@
 #include "pch.h"
 #include "voxelMachina.h"
-#include "coreGraphics.h"
+#include "graphics/coreGraphics.h"
 #include "input.h"
 #include "colors.h"
 #include "camera.h"
 #include "math.h"
 #include "BoxPS.h"
 #include "BoxVS.h"
+#include "graphics/graphicsUtils.h"
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
@@ -127,32 +128,14 @@ void BuildIndexAndVertexBuffer(_Out_ ID3D11Buffer** vertexBuffer, _Out_ ID3D11Bu
 	hr = graphics::g_d3dDevice->CreateBuffer(&ibd, &iinitData, indexBuffer);
 }
 
-template<class T>
-void BuildConstantBuffer(_Out_ ID3D11Buffer** constantBuffer)
-{
-	// constant colour buffer. TODO(Replace this with all camera and light buffers.)
-	D3D11_BUFFER_DESC bd = { 0 };
-	bd.ByteWidth = sizeof(T);
-	bd.Usage = D3D11_USAGE_DEFAULT;
-	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-
-	auto hr = graphics::g_d3dDevice->CreateBuffer(&bd, nullptr, constantBuffer);
-}
-
 void VoxelMachinaApp::Startup(void)
 {
 	BuildShadersAndInputLayout(m_vertexShader.GetAddressOf(), m_pixelShader.GetAddressOf(), m_inputLayout.GetAddressOf());
 	BuildIndexAndVertexBuffer(m_vertexBuffer.GetAddressOf(), m_indexBuffer.GetAddressOf());
 
 	//Build model const buffer.
-	BuildConstantBuffer<ObjectConstBuffer>(m_ObjectConstBuffer.GetAddressOf());
-	BuildConstantBuffer<SceneConstBuffer>(m_sceneConstBuffer.GetAddressOf());
-
-	//Build scene const buffer.
-
-	//Initialize all matrix.
-	XMMATRIX I = XMMatrixIdentity();
-	XMStoreFloat4x4(&m_WorldMatrix, I);
+	graphics::BuildConstantBuffer<ObjectConstBuffer>(m_ObjectConstBuffer.GetAddressOf());
+	graphics::BuildConstantBuffer<SceneConstBuffer>(m_sceneConstBuffer.GetAddressOf());
 
 	math::Vector3 cameraPosition{ 0.0f, 0.0f, -6.0f };
 	math::Vector3 target{ 0, 0, 0 };

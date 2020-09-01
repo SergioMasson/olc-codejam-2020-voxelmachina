@@ -2,6 +2,7 @@
 #include "input.h"
 #include "Winuser.h"
 #include <map>
+#include "graphics/coreGraphics.h"
 
 //use XInput to handle input.
 #include <XInput.h>
@@ -58,7 +59,49 @@ void KbmBuildKeyMapping()
 		{0x57,Input::KeyCode::Key_w },
 		{0x58,Input::KeyCode::Key_x },
 		{0x59,Input::KeyCode::Key_x },
-		{0x60,Input::KeyCode::Key_z }
+		{0x60,Input::KeyCode::Key_z },
+
+		//Non alpha numeric keys
+		{VK_SPACE, Input::KeyCode::Key_space},
+		{VK_UP, Input::KeyCode::Key_up},
+		{VK_DOWN, Input::KeyCode::Key_down},
+		{VK_LEFT, Input::KeyCode::Key_left},
+		{VK_RIGHT, Input::KeyCode::Key_right},
+		{VK_SPACE, Input::KeyCode::Key_space},
+		{VK_RETURN, Input::KeyCode::Key_return},
+		{VK_ADD, Input::KeyCode::Key_add},
+		{VK_SUBTRACT, Input::KeyCode::Key_minus},
+
+		//Mouse buttons
+		{VK_RBUTTON, Input::KeyCode::MouseRigth},
+		{VK_LBUTTON, Input::KeyCode::MouseLeft},
+		{VK_MBUTTON, Input::KeyCode::MouseMiddle},
+
+		//Numpad
+		{VK_NUMPAD0, Input::KeyCode::Key_numpad0},
+		{VK_NUMPAD1, Input::KeyCode::Key_numpad1},
+		{VK_NUMPAD2, Input::KeyCode::Key_numpad2},
+		{VK_NUMPAD3, Input::KeyCode::Key_numpad3},
+		{VK_NUMPAD4, Input::KeyCode::Key_numpad4},
+		{VK_NUMPAD5, Input::KeyCode::Key_numpad5},
+		{VK_NUMPAD6, Input::KeyCode::Key_numpad6},
+		{VK_NUMPAD7, Input::KeyCode::Key_numpad7},
+		{VK_NUMPAD8, Input::KeyCode::Key_numpad8},
+		{VK_NUMPAD9, Input::KeyCode::Key_numpad9},
+
+		//F keys
+		{VK_F1, Input::KeyCode::Key_f1},
+		{VK_F2, Input::KeyCode::Key_f2},
+		{VK_F3, Input::KeyCode::Key_f3},
+		{VK_F4, Input::KeyCode::Key_f4},
+		{VK_F5, Input::KeyCode::Key_f5},
+		{VK_F6, Input::KeyCode::Key_f6},
+		{VK_F7, Input::KeyCode::Key_f7},
+		{VK_F8, Input::KeyCode::Key_f8},
+		{VK_F9, Input::KeyCode::Key_f9},
+		{VK_F10, Input::KeyCode::Key_f10},
+		{VK_F11, Input::KeyCode::Key_f11},
+		{VK_F12, Input::KeyCode::Key_f12}
 	};
 }
 
@@ -200,4 +243,13 @@ void Input::SetKey(WPARAM key, bool isDown)
 		auto targetKey = windowToKeyMap[key];
 		s_Buttons[0][static_cast<uint32_t>(targetKey)] = true;
 	}
+}
+
+void Input::UpdateMousePosition(float x, float y)
+{
+	float normalizedX = (x / graphics::g_windowWidth) - 0.5;
+	float normalizedY = (y / graphics::g_windowHeight) - 0.5;
+
+	s_Analogs[static_cast<uint32_t>(AnalogInput::kAnalogMouseX)] = -normalizedX;
+	s_Analogs[static_cast<uint32_t>(AnalogInput::kAnalogMouseY)] = normalizedY;
 }

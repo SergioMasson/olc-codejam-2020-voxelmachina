@@ -8,7 +8,12 @@ namespace math
 	__declspec(align(16)) class Matrix3
 	{
 	public:
-		Matrix3() {}
+		Matrix3()
+		{
+			m_mat[0] = math::Vector3(1, 0, 0);
+			m_mat[1] = math::Vector3(0, 1, 0);
+			m_mat[2] = math::Vector3(0, 0, 1);
+		}
 		Matrix3(Vector3 x, Vector3 y, Vector3 z) { m_mat[0] = x; m_mat[1] = y; m_mat[2] = z; }
 		Matrix3(const Matrix3& m) { m_mat[0] = m.m_mat[0]; m_mat[1] = m.m_mat[1]; m_mat[2] = m.m_mat[2]; }
 		Matrix3(Quaternion q) { *this = Matrix3(DirectX::XMMatrixRotationQuaternion(q)); }

@@ -11,7 +11,6 @@ namespace Input
 	enum class KeyCode
 	{
 		// keyboard
-		// kKey must start at zero, see s_DXKeyMapping
 		Key_escape = 0,
 		Key_1,
 		Key_2,
@@ -136,9 +135,9 @@ namespace Input
 		YButton,
 
 		// mouse
-		Mouse0,
-		Mouse1,
-		Mouse2,
+		MouseRigth,
+		MouseLeft,
+		MouseMiddle,
 		Mouse3,
 		Mouse4,
 		Mouse5,
@@ -179,4 +178,6 @@ namespace Input
 	float GetTimeCorrectedAnalogInput(AnalogInput ai);
 
 	void SetKey(WPARAM key, bool isDown);
+	void SetKey(WPARAM key, bool isDown);
+	void UpdateMousePosition(float x, float y);
 }

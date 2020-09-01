@@ -20,9 +20,6 @@
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="coreGraphics.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="voxelMachina.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -35,11 +32,31 @@
     <ClCompile Include="camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="graphics\coreGraphics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\renderPipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\meshRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\material.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\lights.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LightVoxelMachina.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cameraController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="coreGraphics.h" />
     <ClInclude Include="voxelMachina.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="systemTime.h" />
@@ -54,9 +71,23 @@
     <ClInclude Include="math\matrix4.h" />
     <ClInclude Include="math\transform.h" />
     <ClInclude Include="math\common.h" />
+    <ClInclude Include="graphics\coreGraphics.h" />
+    <ClInclude Include="graphics\renderPipeline.h" />
+    <ClInclude Include="graphics\meshRenderer.h" />
+    <ClInclude Include="graphics\material.h" />
+    <ClInclude Include="graphics\lights.h" />
+    <ClInclude Include="graphics\graphicsUtils.h" />
+    <ClInclude Include="LightVoxelMachina.h" />
+    <ClInclude Include="cameraController.h" />
+    <ClInclude Include="math\functions.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\BoxVS.hlsl" />
     <FxCompile Include="shaders\BoxPS.hlsl" />
+    <FxCompile Include="shaders\SimpleLightVS.hlsl" />
+    <FxCompile Include="shaders\SimpleLightPS.hlsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\Lights.hlsli" />
   </ItemGroup>
 </Project>

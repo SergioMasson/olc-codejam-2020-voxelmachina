@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "coreGraphics.h"
-#include "application.h"
-#include "dxassert.h"
-#include "colors.h"
+#include "../application.h"
+#include "../dxassert.h"
+#include "../colors.h"
 
 using namespace Microsoft::WRL;
 using namespace graphics;

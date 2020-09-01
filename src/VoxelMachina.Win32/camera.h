@@ -5,7 +5,7 @@
 class Camera
 {
 public:
-	Camera() : m_viewMatrix{}, m_projectionMatrix{}, m_viewProjectionMatrix{}{}
+	Camera() : m_viewMatrix{}, m_projectionMatrix{}, m_viewProjectionMatrix{}, m_Basis{ }{}
 
 	// Public functions for controlling where the camera is and its orientation
 	void SetEyeAtUp(math::Vector3 eye, math::Vector3 at, math::Vector3 up)
@@ -45,6 +45,7 @@ public:
 	void SetRotation(math::Quaternion basisRotation)
 	{
 		m_CameraToWorld.SetRotation(math::Quaternion(DirectX::XMQuaternionNormalize(basisRotation)));
+		m_Basis = math::Matrix3(m_CameraToWorld.GetRotation());
 	}
 
 	const math::Quaternion GetRotation() const { return m_CameraToWorld.GetRotation(); }
@@ -54,7 +55,16 @@ public:
 		m_CameraToWorld.SetTranslation(worldPos);
 	}
 
+	void SetTransform(const math::Transform& xform)
+	{
+		m_CameraToWorld = xform;
+	}
+
 	const math::Vector3 GetPosition() const { return m_CameraToWorld.GetTranslation(); }
+
+	const math::Vector3 GetRightVec() const { return m_Basis.GetX(); }
+	const math::Vector3 GetUpVec() const { return m_Basis.GetY(); }
+	const math::Vector3 GetForwardVec() const { return -m_Basis.GetZ(); }
 
 	void SetFOV(float value)
 	{
@@ -80,6 +90,10 @@ public:
 		UpdateProjectionMatrix();
 	}
 
+	math::Matrix4 GetViewMatrix() const { return m_viewMatrix.Transpose(); }
+	math::Matrix4 GetProjectionMatrix() const { return m_projectionMatrix.Transpose(); }
+	math::Matrix4 GetViewProjectionMatrix() const { return m_viewProjectionMatrix.Transpose(); }
+
 private:
 	void UpdateProjectionMatrix();
 	void UpdateViewMatrix();
@@ -91,6 +105,9 @@ private:
 	math::Matrix4 m_viewProjectionMatrix;
 
 	math::Transform m_CameraToWorld;
+
+	// Redundant data cached for faster lookups.
+	math::Matrix3 m_Basis;
 
 	float m_VerticalFOV = 0;            // Field of view angle in radians
 	float m_AspectRatio = 0;
