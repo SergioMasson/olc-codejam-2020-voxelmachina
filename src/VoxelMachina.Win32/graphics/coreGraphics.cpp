@@ -13,7 +13,7 @@ LONG							graphics::g_windowHeight;
 
 D3D11_VIEWPORT					graphics::g_ScreenViewport;
 D3D_DRIVER_TYPE					graphics::g_d3dDriverType = D3D_DRIVER_TYPE_HARDWARE;
-bool							graphics::g_Enable4xMsaa;
+bool							graphics::g_Enable4xMsaa = true;
 
 ComPtr<ID3D11RenderTargetView>	graphics::g_RenderTargetView = nullptr;
 ComPtr<ID3D11DepthStencilView>	graphics::g_DepthStencilView = nullptr;
@@ -78,7 +78,7 @@ void InitializeGraphicsInfra(uint32_t width, uint32_t heigth)
 	}
 
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	sd.BufferCount = 1;
+	sd.BufferCount = 3;
 	sd.OutputWindow = g_coreWindow;
 	sd.Windowed = true;
 	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
@@ -89,8 +89,8 @@ void InitializeGraphicsInfra(uint32_t width, uint32_t heigth)
 	// (by calling CreateDXGIFactory), we get an error: "IDXGIFactory::CreateSwapChain:
 	// This function is being called with a device from a different IDXGIFactory."
 
-	ComPtr<IDXGIDevice> dxgiDevice;
-	ASSERT_SUCCEEDED(g_d3dDevice->QueryInterface(__uuidof(IDXGIDevice), (void**)dxgiDevice.GetAddressOf()));
+	ComPtr<IDXGIDevice1> dxgiDevice;
+	ASSERT_SUCCEEDED(g_d3dDevice->QueryInterface(__uuidof(IDXGIDevice1), (void**)dxgiDevice.GetAddressOf()));
 
 	ComPtr<IDXGIAdapter> dxgiAdapter;
 	ASSERT_SUCCEEDED(dxgiDevice->GetParent(__uuidof(IDXGIAdapter), (void**)dxgiAdapter.GetAddressOf()));
@@ -99,6 +99,10 @@ void InitializeGraphicsInfra(uint32_t width, uint32_t heigth)
 	ASSERT_SUCCEEDED(dxgiAdapter->GetParent(__uuidof(IDXGIFactory), (void**)dxgiFactory.GetAddressOf()));
 
 	ASSERT_SUCCEEDED(dxgiFactory->CreateSwapChain(g_d3dDevice.Get(), &sd, &g_SwapChain));
+
+	// ensure that dxgi does not queue more than one frame at a time. this both reduces latency and
+	// ensures that the application will only render after each vsync, minimizing power consumption.
+	hr = dxgiDevice->SetMaximumFrameLatency(1);
 }
 
 void graphics::Initialize(uint32_t width, uint32_t heigth)
