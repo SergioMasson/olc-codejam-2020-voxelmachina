@@ -7,6 +7,9 @@
 #include "graphics/lights.h"
 #include "graphics/meshRenderer.h"
 #include "graphics/renderPipeline.h"
+#include "graphics/UI/guiText.h"
+#include "graphics/UI/guiPanel.h"
+#include "graphics/UI/guiSprite.h"
 
 namespace graphics
 {
@@ -47,7 +50,12 @@ private:
 	std::vector<graphics::MeshData> m_sceneMeshes;
 	std::vector<graphics::MeshRenderer> m_sceneMeshRenderer;
 
+	graphics::UI::GuiText* m_guiText;
+	graphics::UI::GuiPanel* m_guiPanel;
+	graphics::UI::GuiSprite* m_sprite;
+
 	math::Vector3 mouse_position;
+	std::wstring m_typedStuff{ L"Commands: " };
 
 	bool m_isDone = false;
 };

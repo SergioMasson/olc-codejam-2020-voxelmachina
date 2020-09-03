@@ -81,6 +81,18 @@ void LightVoxelMachinaApp::Startup(void)
 	m_sceneSpotLight.Range = 10000.0f;
 	m_sceneSpotLight.Position = DirectX::XMFLOAT3(2.0f, 3.0f, 0.0f);
 	m_sceneSpotLight.Intensity = 0;
+
+	m_guiPanel = new graphics::UI::GuiPanel(nullptr, 0, 0, 500, 500);
+	m_guiPanel->SetColor(D2D1::ColorF{ D2D1::ColorF::White, 0.5f });
+
+	//Create GUI Text
+	m_guiText = new graphics::UI::GuiText(m_guiPanel, 0, 0, 300, 200, 50);
+	m_guiText->SetColor(D2D1::ColorF::Black);
+	m_guiText->SetText(L"Hello world");
+
+	m_sprite = new graphics::UI::GuiSprite(nullptr, 0, -200, 200, 200);
+	m_sprite->LoadBitmapFromFile(L"icon.png", false);
+	m_sprite->SetAnchorType(graphics::UI::ParentAnchorType::BottomLeft);
 }
 
 bool LightVoxelMachinaApp::IsDone()
@@ -92,16 +104,18 @@ void LightVoxelMachinaApp::Update(float deltaT)
 {
 	m_isDone = Input::IsPressed(Input::KeyCode::Key_escape);
 
-	if (Input::IsPressed(Input::KeyCode::Key_add))
-	{
-		m_sceneDirLight.Intensity += 10 * deltaT;
-	}
-	else if (Input::IsPressed(Input::KeyCode::Key_minus))
-	{
-		m_sceneDirLight.Intensity -= 10 * deltaT;
-	}
-
 	m_cameraController->Update(deltaT);
+
+	char key = 0;
+
+	if (Input::IsPressed(Input::KeyCode::Key_return))
+		m_typedStuff = L"Command: ";
+	else if (Input::IsPressed(Input::KeyCode::Key_back) && m_typedStuff.size() > 1)
+		m_typedStuff.erase(m_typedStuff.size() - 1, m_typedStuff.size());
+	else if (Input::TryGetLastKeyboardType(key))
+		m_typedStuff += key;
+
+	m_guiText->SetText(m_typedStuff);
 }
 
 void LightVoxelMachinaApp::RenderScene(void)
@@ -115,6 +129,13 @@ void LightVoxelMachinaApp::RenderScene(void)
 //TODO(Sergio): Implement those things later.
 void LightVoxelMachinaApp::RenderUI(void)
 {
+	graphics::g_d2dDeviceContext->BeginDraw();
+
+	m_guiPanel->Draw();
+	m_guiText->Draw();
+	m_sprite->Draw();
+
+	ASSERT_SUCCEEDED(graphics::g_d2dDeviceContext->EndDraw());
 }
 
 void LightVoxelMachinaApp::Resize(uint32_t width, uint32_t height)

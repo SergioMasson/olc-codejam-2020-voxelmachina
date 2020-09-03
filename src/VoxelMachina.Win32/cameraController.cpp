@@ -12,8 +12,8 @@ CameraController::CameraController(Camera& camera, math::Vector3 worldUp) : m_Ta
 	m_VerticalLookSensitivity = 2.0f;
 	m_MoveSpeed = 100.0f;
 	m_StrafeSpeed = 100.0f;
-	m_MouseSensitivityX = 0.02f;
-	m_MouseSensitivityY = 0.02f;
+	m_MouseSensitivityX = 0.01f;
+	m_MouseSensitivityY = 0.01f;
 
 	m_CurrentPitch = Sin(Dot(camera.GetForwardVec(), m_WorldUp));
 

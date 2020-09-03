@@ -53,6 +53,18 @@
     <ClCompile Include="cameraController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="graphics\UI\drawableElement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\UI\guiText.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\UI\guiPanel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\UI\guiSprite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
@@ -80,6 +92,10 @@
     <ClInclude Include="LightVoxelMachina.h" />
     <ClInclude Include="cameraController.h" />
     <ClInclude Include="math\functions.h" />
+    <ClInclude Include="graphics\UI\drawableElement.h" />
+    <ClInclude Include="graphics\UI\guiText.h" />
+    <ClInclude Include="graphics\UI\guiPanel.h" />
+    <ClInclude Include="graphics\UI\guiSprite.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\BoxVS.hlsl" />
@@ -89,5 +105,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\Lights.hlsli" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

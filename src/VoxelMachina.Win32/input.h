@@ -167,6 +167,8 @@ namespace Input
 
 	bool IsAnyPressed(void);
 
+	bool TryGetLastKeyboardType(char& key);
+
 	bool IsPressed(KeyCode di);
 	bool IsFirstPressed(KeyCode di);
 	bool IsReleased(KeyCode di);
@@ -179,5 +181,6 @@ namespace Input
 
 	void SetKey(WPARAM key, bool isDown);
 	void SetKey(WPARAM key, bool isDown);
+	void SetTypedChar(WPARAM key);
 	void UpdateMousePosition(float x, float y);
 }

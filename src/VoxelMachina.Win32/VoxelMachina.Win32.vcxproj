@@ -170,6 +170,10 @@
     <ClCompile Include="graphics\material.cpp" />
     <ClCompile Include="graphics\meshRenderer.cpp" />
     <ClCompile Include="graphics\renderPipeline.cpp" />
+    <ClCompile Include="graphics\UI\drawableElement.cpp" />
+    <ClCompile Include="graphics\UI\guiPanel.cpp" />
+    <ClCompile Include="graphics\UI\guiSprite.cpp" />
+    <ClCompile Include="graphics\UI\guiText.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pch.cpp">
@@ -194,6 +198,10 @@
     <ClInclude Include="graphics\material.h" />
     <ClInclude Include="graphics\meshRenderer.h" />
     <ClInclude Include="graphics\renderPipeline.h" />
+    <ClInclude Include="graphics\UI\drawableElement.h" />
+    <ClInclude Include="graphics\UI\guiPanel.h" />
+    <ClInclude Include="graphics\UI\guiSprite.h" />
+    <ClInclude Include="graphics\UI\guiText.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="math\common.h" />
     <ClInclude Include="math\functions.h" />
@@ -306,6 +314,14 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\Lights.hlsli" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon.png">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </Image>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

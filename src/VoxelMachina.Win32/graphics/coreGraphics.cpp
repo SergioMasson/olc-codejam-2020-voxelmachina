@@ -13,19 +13,85 @@ LONG							graphics::g_windowHeight;
 
 D3D11_VIEWPORT					graphics::g_ScreenViewport;
 D3D_DRIVER_TYPE					graphics::g_d3dDriverType = D3D_DRIVER_TYPE_HARDWARE;
-bool							graphics::g_Enable4xMsaa = true;
+bool							graphics::g_Enable4xMsaa = false;
 
-ComPtr<ID3D11RenderTargetView>	graphics::g_RenderTargetView = nullptr;
+ComPtr<ID3D11RenderTargetView>  graphics::g_RenderTargetView;
 ComPtr<ID3D11DepthStencilView>	graphics::g_DepthStencilView = nullptr;
 ComPtr<ID3D11Device>			graphics::g_d3dDevice = nullptr;
 ComPtr<ID3D11DeviceContext>		graphics::g_d3dImmediateContext = nullptr;
-ComPtr<IDXGISwapChain>			graphics::g_SwapChain = nullptr;
+ComPtr<IDXGISwapChain1>			graphics::g_SwapChain = nullptr;
 ComPtr<ID3D11Texture2D>			graphics::g_DepthStencilBuffer = nullptr;
+
+ComPtr<ID2D1Device>				graphics::g_d2dDevice = nullptr;
+ComPtr<ID2D1DeviceContext>		graphics::g_d2dDeviceContext = nullptr;
+
+ComPtr<ID2D1Bitmap1> d2dRenderTarget = nullptr;
+
+static int g_CurrBackBuffer;
+
+void createD2DRenderTarget(IDXGISurface1* ptr)
+{
+	// specify the desired bitmap properties
+	D2D1_BITMAP_PROPERTIES1 bp;
+	bp.pixelFormat.format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	bp.pixelFormat.alphaMode = D2D1_ALPHA_MODE_PREMULTIPLIED;
+	bp.dpiX = 96.0f;
+	bp.dpiY = 96.0f;
+	bp.bitmapOptions = D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW;
+	bp.colorContext = nullptr;
+
+	//ERROR(Sergio): This method breaks when called on resize.
+	ASSERT_SUCCEEDED(g_d2dDeviceContext->CreateBitmapFromDxgiSurface(ptr, &bp, d2dRenderTarget.GetAddressOf()));
+
+	// set the newly created bitmap as render target
+	g_d2dDeviceContext->SetTarget(d2dRenderTarget.Get());
+}
+
+void createD3DRenderTarget(ComPtr<IDXGISurface1> ptr)
+{
+	ComPtr<ID3D11Resource> d3dbackBuffer;
+
+	ptr.As(&d3dbackBuffer);
+
+	ASSERT_SUCCEEDED(g_d3dDevice->CreateRenderTargetView(d3dbackBuffer.Get(), nullptr, g_RenderTargetView.GetAddressOf()));
+
+	// Create the depth/stencil buffer and view.
+	D3D11_TEXTURE2D_DESC depthStencilDesc;
+
+	depthStencilDesc.Width = g_windowWidth;
+	depthStencilDesc.Height = g_windowHeight;
+	depthStencilDesc.MipLevels = 1;
+	depthStencilDesc.ArraySize = 1;
+	depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthStencilDesc.SampleDesc.Count = 1;
+	depthStencilDesc.SampleDesc.Quality = 0;
+	depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
+	depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	depthStencilDesc.CPUAccessFlags = 0;
+	depthStencilDesc.MiscFlags = 0;
+
+	//Create a texture for depth and stencil
+	ASSERT_SUCCEEDED(g_d3dDevice->CreateTexture2D(&depthStencilDesc, nullptr, g_DepthStencilBuffer.GetAddressOf()));
+
+	//Create a view to the depth and stencil buffer.
+	ASSERT_SUCCEEDED(g_d3dDevice->CreateDepthStencilView(g_DepthStencilBuffer.Get(), nullptr, g_DepthStencilView.GetAddressOf()));
+
+	// Set the viewport transform.
+	g_ScreenViewport.TopLeftX = 0;
+	g_ScreenViewport.TopLeftY = 0;
+	g_ScreenViewport.Width = static_cast<float>(g_windowWidth);
+	g_ScreenViewport.Height = static_cast<float>(g_windowHeight);
+	g_ScreenViewport.MinDepth = 0.0f;
+	g_ScreenViewport.MaxDepth = 1.0f;
+
+	//Set the view port to the entire buffer.
+	g_d3dImmediateContext->RSSetViewports(1, &g_ScreenViewport);
+}
 
 void InitializeGraphicsInfra(uint32_t width, uint32_t heigth)
 {
 	// Create the device and device context.
-	UINT createDeviceFlags = 0;
+	UINT createDeviceFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 
 #if defined(DEBUG) || defined(_DEBUG)
 	createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
@@ -51,58 +117,60 @@ void InitializeGraphicsInfra(uint32_t width, uint32_t heigth)
 
 	ASSERT(g_4xMsaaQuality > 0, "4xMSAA not suported.");
 
+	ComPtr<IDXGIDevice1> dxgiDevice;
+	// Obtain the underlying DXGI device of the Direct3D11 device.
+	ASSERT_SUCCEEDED(g_d3dDevice.As(&dxgiDevice));
+
+	ComPtr<ID2D1Factory1> m_d2dFactory;
+
+	// Create a Direct2D factory.
+	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, m_d2dFactory.GetAddressOf());
+
+	// Obtain the Direct2D device for 2-D rendering.
+	ASSERT_SUCCEEDED(m_d2dFactory->CreateDevice(dxgiDevice.Get(), g_d2dDevice.GetAddressOf()));
+
+	// Get Direct2D device's corresponding device context object.
+	ASSERT_SUCCEEDED(g_d2dDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, g_d2dDeviceContext.GetAddressOf()));
+
 	g_windowWidth = width;
 	g_windowHeight = heigth;
 
-	// Fill out a DXGI_SWAP_CHAIN_DESC to describe our swap chain.
-	DXGI_SWAP_CHAIN_DESC sd;
-	sd.BufferDesc.Width = g_windowWidth;
-	sd.BufferDesc.Height = g_windowHeight;
-	sd.BufferDesc.RefreshRate.Numerator = 60;
-	sd.BufferDesc.RefreshRate.Denominator = 1;
-	sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-	sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+	// Allocate a descriptor.
+	DXGI_SWAP_CHAIN_DESC1 swapChainDesc = { 0 };
+	swapChainDesc.Width = width;                           // use automatic sizing
+	swapChainDesc.Height = heigth;
+	swapChainDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM; // this is the most common swapchain format
+	swapChainDesc.Stereo = false;
 
-	// Use 4X MSAA?
-	if (g_Enable4xMsaa)
-	{
-		sd.SampleDesc.Count = 4;
-		sd.SampleDesc.Quality = g_4xMsaaQuality - 1;
-	}
-	// No MSAA
-	else
-	{
-		sd.SampleDesc.Count = 1;
-		sd.SampleDesc.Quality = 0;
-	}
+	// Use 4X MSAA? --must match swap chain MSAA values.
+	swapChainDesc.SampleDesc.Count = 1;
+	swapChainDesc.SampleDesc.Quality = 0;
 
-	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	sd.BufferCount = 3;
-	sd.OutputWindow = g_coreWindow;
-	sd.Windowed = true;
-	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-	sd.Flags = 0;
+	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	swapChainDesc.BufferCount = SwapChainBufferCount; // use double buffering to enable flip
+	swapChainDesc.Scaling = DXGI_SCALING_NONE;
+	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL; // all apps must use this SwapEffect
+	swapChainDesc.Flags = 0;
 
-	// To correctly create the swap chain, we must use the IDXGIFactory that was
-	// used to create the device.  If we tried to use a different IDXGIFactory instance
-	// (by calling CreateDXGIFactory), we get an error: "IDXGIFactory::CreateSwapChain:
-	// This function is being called with a device from a different IDXGIFactory."
-
-	ComPtr<IDXGIDevice1> dxgiDevice;
-	ASSERT_SUCCEEDED(g_d3dDevice->QueryInterface(__uuidof(IDXGIDevice1), (void**)dxgiDevice.GetAddressOf()));
-
+	// Identify the physical adapter (GPU or card) this device is runs on.
 	ComPtr<IDXGIAdapter> dxgiAdapter;
-	ASSERT_SUCCEEDED(dxgiDevice->GetParent(__uuidof(IDXGIAdapter), (void**)dxgiAdapter.GetAddressOf()));
+	ASSERT_SUCCEEDED(dxgiDevice->GetAdapter(dxgiAdapter.GetAddressOf()));
 
-	ComPtr<IDXGIFactory> dxgiFactory = 0;
-	ASSERT_SUCCEEDED(dxgiAdapter->GetParent(__uuidof(IDXGIFactory), (void**)dxgiFactory.GetAddressOf()));
+	// Get the factory object that created the DXGI device.
+	ComPtr<IDXGIFactory2> dxgiFactory;
+	ASSERT_SUCCEEDED(dxgiAdapter->GetParent(IID_PPV_ARGS(&dxgiFactory)));
 
-	ASSERT_SUCCEEDED(dxgiFactory->CreateSwapChain(g_d3dDevice.Get(), &sd, &g_SwapChain));
+	// Get the final swap chain for this window from the DXGI factory.
+	ASSERT_SUCCEEDED(dxgiFactory->CreateSwapChainForHwnd(g_d3dDevice.Get(), g_coreWindow, &swapChainDesc, nullptr, nullptr, g_SwapChain.GetAddressOf()));
 
-	// ensure that dxgi does not queue more than one frame at a time. this both reduces latency and
-	// ensures that the application will only render after each vsync, minimizing power consumption.
-	hr = dxgiDevice->SetMaximumFrameLatency(1);
+	// Ensure that DXGI doesn't queue more than one frame at a time.
+	ASSERT_SUCCEEDED(dxgiDevice->SetMaximumFrameLatency(1));
+
+	Microsoft::WRL::ComPtr<IDXGISurface1> dxgiBuffer;
+	ASSERT_SUCCEEDED(g_SwapChain->GetBuffer(0, __uuidof(IDXGISurface1), &dxgiBuffer));
+
+	createD3DRenderTarget(dxgiBuffer);
+	createD2DRenderTarget(dxgiBuffer.Get());
 }
 
 void graphics::Initialize(uint32_t width, uint32_t heigth)
@@ -116,8 +184,13 @@ void graphics::Resize(uint32_t width, uint32_t heigth)
 	if (width == 0 || heigth == 0)
 		return;
 
+	if (g_windowWidth == width && g_windowHeight == heigth)
+		return;
+
 	g_windowWidth = width;
 	g_windowHeight = heigth;
+
+	g_CurrBackBuffer = 0;
 
 	ASSERT(g_d3dImmediateContext);
 	ASSERT(g_d3dDevice);
@@ -129,71 +202,30 @@ void graphics::Resize(uint32_t width, uint32_t heigth)
 	g_RenderTargetView.Reset();
 	g_DepthStencilView.Reset();
 	g_DepthStencilBuffer.Reset();
+	g_d2dDeviceContext->SetTarget(nullptr);
 
 	// Resize the swap chain and recreate the render target view.
 
-	ASSERT_SUCCEEDED(g_SwapChain->ResizeBuffers(1, g_windowWidth, g_windowHeight, DXGI_FORMAT_R8G8B8A8_UNORM, 0));
+	ASSERT_SUCCEEDED(g_SwapChain->ResizeBuffers(SwapChainBufferCount, g_windowWidth, g_windowHeight, DXGI_FORMAT_R8G8B8A8_UNORM, 0));
 
-	ID3D11Texture2D* backBuffer;
+	ComPtr<IDXGISurface1> backBuffer;
+	ASSERT_SUCCEEDED(g_SwapChain->GetBuffer(0, __uuidof(IDXGISurface1), reinterpret_cast<void**>(backBuffer.GetAddressOf())));
 
-	ASSERT_SUCCEEDED(g_SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backBuffer)));
-	ASSERT_SUCCEEDED(g_d3dDevice->CreateRenderTargetView(backBuffer, nullptr, g_RenderTargetView.GetAddressOf()));
-
-	backBuffer->Release();
-
-	// Create the depth/stencil buffer and view.
-	D3D11_TEXTURE2D_DESC depthStencilDesc;
-
-	depthStencilDesc.Width = g_windowWidth;
-	depthStencilDesc.Height = g_windowHeight;
-	depthStencilDesc.MipLevels = 1;
-	depthStencilDesc.ArraySize = 1;
-	depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-
-	// Use 4X MSAA? --must match swap chain MSAA values.
-	if (g_Enable4xMsaa)
-	{
-		depthStencilDesc.SampleDesc.Count = 4;
-		depthStencilDesc.SampleDesc.Quality = g_4xMsaaQuality - 1;
-	}
-	// No MSAA
-	else
-	{
-		depthStencilDesc.SampleDesc.Count = 1;
-		depthStencilDesc.SampleDesc.Quality = 0;
-	}
-
-	depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
-	depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-	depthStencilDesc.CPUAccessFlags = 0;
-	depthStencilDesc.MiscFlags = 0;
-
-	ASSERT_SUCCEEDED(g_d3dDevice->CreateTexture2D(&depthStencilDesc, nullptr, g_DepthStencilBuffer.GetAddressOf()));
-	ASSERT_SUCCEEDED(g_d3dDevice->CreateDepthStencilView(g_DepthStencilBuffer.Get(), nullptr, g_DepthStencilView.GetAddressOf()));
-
-	// Bind the render target view and depth/stencil view to the pipeline.
-	g_d3dImmediateContext->OMSetRenderTargets(1, g_RenderTargetView.GetAddressOf(), g_DepthStencilView.Get());
-
-	// Set the viewport transform.
-	g_ScreenViewport.TopLeftX = 0;
-	g_ScreenViewport.TopLeftY = 0;
-	g_ScreenViewport.Width = static_cast<float>(g_windowWidth);
-	g_ScreenViewport.Height = static_cast<float>(g_windowHeight);
-	g_ScreenViewport.MinDepth = 0.0f;
-	g_ScreenViewport.MaxDepth = 1.0f;
-
-	g_d3dImmediateContext->RSSetViewports(1, &g_ScreenViewport);
+	createD3DRenderTarget(backBuffer);
+	createD2DRenderTarget(backBuffer.Get());
 }
 
 void graphics::BeginDraw()
 {
+	g_d3dImmediateContext->OMSetRenderTargets(1, g_RenderTargetView.GetAddressOf(), g_DepthStencilView.Get());
 	g_d3dImmediateContext->ClearRenderTargetView(g_RenderTargetView.Get(), reinterpret_cast<const float*>(&colors::black));
 	g_d3dImmediateContext->ClearDepthStencilView(g_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
 
 void graphics::Present()
 {
-	ASSERT_SUCCEEDED(g_SwapChain->Present(0, 0));
+	ASSERT_SUCCEEDED(g_SwapChain->Present(1, 0));
+	g_CurrBackBuffer = (g_CurrBackBuffer + 1) % SwapChainBufferCount;
 }
 
 void graphics::ShutDown()
