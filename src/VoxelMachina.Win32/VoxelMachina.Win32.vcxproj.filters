@@ -110,9 +110,12 @@
     <FxCompile Include="shaders\BoxPS.hlsl" />
     <FxCompile Include="shaders\SimpleLightVS.hlsl" />
     <FxCompile Include="shaders\SimpleLightPS.hlsl" />
+    <FxCompile Include="shaders\SkyboxVS.hlsl" />
+    <FxCompile Include="shaders\SkyboxPS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\Lights.hlsli" />
+    <None Include="models\character.model" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="textures\bricks.dds" />
@@ -162,5 +165,11 @@
     <Image Include="icons\icon.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="textures\neutralNormal.dds" />
+    <Image Include="textures\checkboard_mips.dds" />
+    <Image Include="textures\nightSky.dds" />
+    <Image Include="textures\character.dds" />
+    <Image Include="textures\grass_mips.dds" />
+    <Image Include="textures\player.dds" />
   </ItemGroup>
 </Project>

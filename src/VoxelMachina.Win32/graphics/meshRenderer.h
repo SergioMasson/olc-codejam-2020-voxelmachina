@@ -52,12 +52,15 @@ namespace graphics
 		/// at the origin with the specified width and depth.
 		///</summary>
 		static void CreateGrid(float width, float depth, UINT m, UINT n, MeshData& meshData);
+
+		static void LoadFromOBJFile(const wchar_t* filename, MeshData& meshData);
 	};
 
 	class MeshRenderer
 	{
 	public:
 		MeshRenderer(MeshData data, Material material, math::Vector3 position, math::Quaternion rotation);
+		MeshRenderer() = default;
 		~MeshRenderer() = default;
 
 		void SetRotation(math::Quaternion basisRotation)

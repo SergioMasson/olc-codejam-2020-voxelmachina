@@ -1,5 +1,13 @@
 #include "pch.h"
 #include "meshRenderer.h"
+#include <fstream>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
+
+using namespace std;
 
 using namespace DirectX;
 using namespace graphics;
@@ -494,6 +502,100 @@ void graphics::MeshData::CreateGrid(float width, float depth, UINT m, UINT n, Me
 			k += 6; // next quad
 		}
 	}
+}
+
+void graphics::MeshData::LoadFromOBJFile(const wchar_t* filename, MeshData& meshData)
+{
+	std::vector<uint32_t> vertexIndices, uvIndices, normalIndices;
+	std::vector< DirectX::XMFLOAT3> temp_vertices;
+	std::vector< DirectX::XMFLOAT2 > temp_uvs;
+	std::vector< DirectX::XMFLOAT3> temp_normals;
+
+	std::vector<uint32_t> indexes;
+	std::vector<Vertex> vertex;
+
+	std::string line;
+	std::ifstream in(filename);
+
+	while (std::getline(in, line))                           // read whole line
+	{
+		if (line.find_first_of("vVfF") == std::string::npos) continue;     // skip pointless lines
+
+		auto header = line.substr(0, 2);
+		auto body = line.substr(2, line.size());
+
+		std::istringstream ss(body);                         // put line into a stream for input
+
+		if (header == "V " || header == "v ")
+		{
+			float x, y, z;
+			ss >> x >> y >> z;
+			temp_vertices.push_back({ x, y, z });
+
+			Vertex vert{};
+			vert.Position = { x, y, z };
+			vertex.push_back(vert);
+		}
+		else if (header == "VN" || header == "vn")
+		{
+			float x, y, z;
+			ss >> x >> y >> z;
+			temp_normals.push_back({ x, y, z });
+		}
+		else if (header == "VT" || header == "vt")
+		{
+			float x, y;
+			ss >> x >> y;
+			temp_uvs.push_back({ x, y });
+		}
+		else if (header == "F " || header == "f ")
+		{
+			auto space0 = body.find(' ', 1);
+			auto space1 = body.find(' ', space0 + 1);
+
+			auto vertex0 = body.substr(0, space0);
+			auto vertex1 = body.substr(space0, space1 - space0);
+			auto vertex2 = body.substr(space1, body.size());
+
+			auto tab0 = vertex0.find('/', 0);
+			auto tab1 = vertex0.find('/', tab0 + 1);
+
+			auto vertexIndex0 = std::stoi(vertex0.substr(0, tab0)) - 1;
+			auto textureInde0 = std::stoi(vertex0.substr(tab0 + 1, tab1 - tab0)) - 1;
+			auto normalIndex0 = std::stoi(vertex0.substr(tab1 + 1, body.size())) - 1;
+
+			vertex[vertexIndex0].Normal = temp_normals[normalIndex0];
+			vertex[vertexIndex0].TexC = temp_uvs[textureInde0];
+			indexes.push_back(vertexIndex0);
+
+			tab0 = vertex1.find('/', 0);
+			tab1 = vertex1.find('/', tab0 + 1);
+
+			auto vertexIndex1 = std::stoi(vertex1.substr(0, tab0)) - 1;
+			auto textureInde1 = std::stoi(vertex1.substr(tab0 + 1, tab1 - tab0)) - 1;
+			auto normalIndex1 = std::stoi(vertex1.substr(tab1 + 1, body.size())) - 1;
+
+			vertex[vertexIndex1].Normal = temp_normals[normalIndex1];
+			vertex[vertexIndex1].TexC = temp_uvs[textureInde1];
+			indexes.push_back(vertexIndex1);
+
+			tab0 = vertex2.find('/', 0);
+			tab1 = vertex2.find('/', tab0 + 1);
+
+			auto vertexIndex2 = std::stoi(vertex2.substr(0, tab0)) - 1;
+			auto textureInde2 = std::stoi(vertex2.substr(tab0 + 1, tab1 - tab0)) - 1;
+			auto normalIndex2 = std::stoi(vertex2.substr(tab1 + 1, body.size())) - 1;
+
+			vertex[vertexIndex2].Normal = temp_normals[normalIndex2];
+			vertex[vertexIndex2].TexC = temp_uvs[textureInde2];
+			indexes.push_back(vertexIndex2);
+		}
+	}
+
+	meshData.Indices = indexes;
+	meshData.Vertices = vertex;
+
+	in.close();
 }
 
 graphics::MeshRenderer::MeshRenderer(MeshData data, Material material, math::Vector3 position, math::Quaternion rotation) : m_meshData{ data }, m_material{ material }

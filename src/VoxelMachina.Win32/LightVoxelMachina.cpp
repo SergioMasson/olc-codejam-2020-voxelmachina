@@ -17,6 +17,10 @@ void LightVoxelMachinaApp::Startup(void)
 	m_renderPipeline = std::make_unique<graphics::RenderPipeline>();
 	m_renderPipeline->LoadShader(g_pSimpleLightVS, sizeof(g_pSimpleLightVS), g_pSimpleLightPS, sizeof(g_pSimpleLightPS));
 	CreateCamera();
+
+	m_skybox = new graphics::Texture2D(L"textures/DarkSkyCartoon.dds");
+	m_renderPipeline->SetSkyboxTexture(m_skybox);
+
 	CreateLights();
 	CreateObjects();
 	CreateGUI();
@@ -75,7 +79,7 @@ void LightVoxelMachinaApp::Resize(uint32_t width, uint32_t height)
 void LightVoxelMachinaApp::CreateCamera()
 {
 	m_sceneCamera = Camera();
-	math::Vector3 cameraPosition{ 0.0f, 0.0f, 6.0f };
+	math::Vector3 cameraPosition{ 0.0f, 0.0f, 10.0f };
 	math::Vector3 target{ 0, 0, 0 };
 	math::Vector3 up{ 0.0f, 1.0f, 0.0f };
 	m_sceneCamera.SetEyeAtUp(cameraPosition, target, up);
@@ -98,14 +102,14 @@ void LightVoxelMachinaApp::CreateLights()
 	m_sceneDirLight.Intensity = 1;
 
 	m_scenePointLight = PointLight{};
-	//// Point light--position is changed every frame to animate in UpdateScene function.
-	m_scenePointLight.Ambient = DirectX::XMFLOAT4(0, 0, 0, 1.0f);
-	m_scenePointLight.Diffuse = DirectX::XMFLOAT4(0.7f, 0.7f, 0.7f, 1.0f);
-	m_scenePointLight.Specular = DirectX::XMFLOAT4(0.7f, 0.7f, 0.7f, 1.0f);
-	m_scenePointLight.Att = DirectX::XMFLOAT3(0.0f, 0.1f, 0.0f);
-	m_scenePointLight.Range = 25.0f;
-	m_scenePointLight.Position = DirectX::XMFLOAT3(6.0f, 3.0f, 0.0f);
-	m_scenePointLight.Intensity = 1;
+	// Point light--position is changed every frame to animate in UpdateScene function.
+	m_scenePointLight.Ambient = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	m_scenePointLight.Diffuse = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	m_scenePointLight.Specular = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	m_scenePointLight.Att = DirectX::XMFLOAT3(0.0f, 0.4f, 0.0f);
+	m_scenePointLight.Range = 25;
+	m_scenePointLight.Position = DirectX::XMFLOAT3(6.0f, 3.0f, 3.0f);
+	m_scenePointLight.Intensity = 2;
 
 	m_sceneSpotLight = SpotLight{};
 	// Spot light--position and direction changed every frame to animate in UpdateScene function.
@@ -125,10 +129,13 @@ void LightVoxelMachinaApp::CreateObjects()
 	graphics::MeshData::CreateSphere(1, 50, 20, sphere);
 
 	graphics::MeshData quad;
-	graphics::MeshData::CreateGrid(30, 30, 20, 20, quad);
+	graphics::MeshData::CreateGrid(100, 100, 20, 20, quad);
 
 	graphics::MeshData cylinder;
 	graphics::MeshData::CreateCylinder(1, 1, 5, 50, 20, cylinder);
+
+	graphics::MeshData playerCharacter;
+	graphics::MeshData::LoadFromOBJFile(L"models/character.model", playerCharacter);
 
 	//TODO(Sergio): Load this on a separate thread. Asset loading will take a time...
 	auto normalMap = new graphics::Texture2D(L"textures/neutralNormal.dds");
@@ -137,11 +144,17 @@ void LightVoxelMachinaApp::CreateObjects()
 	auto water = new graphics::Texture2D(L"textures/water1.dds");
 	auto grass = new graphics::Texture2D(L"textures/grass.dds");
 	auto bricks = new graphics::Texture2D(L"textures/bricks2.dds");
+	auto characterTexture = new graphics::Texture2D(L"textures/character.dds");
 
 	graphics::Material material1{};
 	material1.Ambient = colors::white;
 	material1.Diffuse = colors::white;
-	material1.Specular = DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 18.0f);
+	material1.Specular = DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 2.0f);
+
+	auto player = graphics::MeshRenderer(playerCharacter, material1, math::Vector3(0, 2, 5), math::Quaternion());
+	player.SetAlbedoTexture(characterTexture);
+	player.SetNormalMap(normalMap);
+	m_sceneMeshRenderer.push_back(player);
 
 	auto sphereFire = graphics::MeshRenderer(sphere, material1, math::Vector3(0, 2, 0), math::Quaternion());
 	sphereFire.SetAlbedoTexture(fire);
@@ -161,10 +174,10 @@ void LightVoxelMachinaApp::CreateObjects()
 	auto brick = graphics::MeshRenderer(cylinder, material1, math::Vector3(5, 0, 5), math::Quaternion());
 	brick.SetAlbedoTexture(bricks);
 	brick.SetNormalMap(bricksnormalMap);
-	brick.SetTextureScale(4, 4);
+	brick.SetTextureScale(3, 3);
 	m_sceneMeshRenderer.push_back(brick);
 
-	auto texture2 = new graphics::Texture2D(L"textures/checkboard.dds");
+	auto texture2 = new graphics::Texture2D(L"textures/checkboard_mips.dds");
 
 	graphics::Material material2{};
 	material2.Ambient = colors::silver;
@@ -174,7 +187,7 @@ void LightVoxelMachinaApp::CreateObjects()
 	auto meshRenderer2 = graphics::MeshRenderer(quad, material2, math::Vector3(0, -3, 4), math::Quaternion());
 	meshRenderer2.SetAlbedoTexture(texture2);
 	meshRenderer2.SetNormalMap(normalMap);
-	meshRenderer2.SetTextureScale(10, 10);
+	meshRenderer2.SetTextureScale(100, 100);
 
 	m_sceneMeshRenderer.push_back(meshRenderer2);
 }

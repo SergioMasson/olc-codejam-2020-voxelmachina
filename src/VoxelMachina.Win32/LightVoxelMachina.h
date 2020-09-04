@@ -54,6 +54,8 @@ private:
 	graphics::UI::GuiPanel* m_guiPanel;
 	graphics::UI::GuiSprite* m_sprite;
 
+	graphics::Texture2D* m_skybox;
+
 	math::Vector3 mouse_position;
 	std::wstring m_typedStuff{ L"Commands: " };
 
