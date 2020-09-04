@@ -1,5 +1,7 @@
 #pragma once
 
+#include "texture2D.h"
+
 namespace graphics
 {
 	class RenderPipeline;

@@ -116,15 +116,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		g_currentApp->Resize((UINT)(UINT64)lParam & 0xFFFF, (UINT)(UINT64)lParam >> 16);
 		break;
 
-	case WM_KEYDOWN:	//This will be called on key first press.
+		//This will be called on key first press.
+	case WM_KEYDOWN:
 		Input::SetKey(wParam, true);
-		Input::SetTypedChar(wParam);
 		break;
 
-	case WM_CHAR:		//This will be called every frame when the key is pressed.
+	case WM_KEYUP:
 		Input::SetKey(wParam, false);
 		break;
 
+		//This will be called every frame when the key is pressed.
+	case WM_CHAR:
+		Input::SetTypedChar(wParam);
+		break;
+
+	case WM_CLOSE:
+	case WM_QUIT:
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;

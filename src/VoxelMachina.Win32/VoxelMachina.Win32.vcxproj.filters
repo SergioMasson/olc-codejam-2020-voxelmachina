@@ -65,6 +65,12 @@
     <ClCompile Include="graphics\UI\guiSprite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="graphics\dds.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\texture2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
@@ -96,6 +102,8 @@
     <ClInclude Include="graphics\UI\guiText.h" />
     <ClInclude Include="graphics\UI\guiPanel.h" />
     <ClInclude Include="graphics\UI\guiSprite.h" />
+    <ClInclude Include="graphics\dds.h" />
+    <ClInclude Include="graphics\texture2D.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\BoxVS.hlsl" />
@@ -107,7 +115,51 @@
     <None Include="shaders\Lights.hlsli" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="icon.png">
+    <Image Include="textures\bricks.dds" />
+    <Image Include="textures\bricks_nmap.dds" />
+    <Image Include="textures\bricks2.dds" />
+    <Image Include="textures\bricks2_nmap.dds" />
+    <Image Include="textures\bricks3.dds" />
+    <Image Include="textures\checkboard.dds" />
+    <Image Include="textures\default_nmap.dds" />
+    <Image Include="textures\desertcube1024.dds" />
+    <Image Include="textures\fire.dds" />
+    <Image Include="textures\grass.dds" />
+    <Image Include="textures\grasscube1024.dds" />
+    <Image Include="textures\head_diff.dds" />
+    <Image Include="textures\head_norm.dds" />
+    <Image Include="textures\ice.dds" />
+    <Image Include="textures\jacket_diff.dds" />
+    <Image Include="textures\jacket_norm.dds" />
+    <Image Include="textures\pants_diff.dds" />
+    <Image Include="textures\pants_norm.dds" />
+    <Image Include="textures\snowcube1024.dds" />
+    <Image Include="textures\stone.dds" />
+    <Image Include="textures\sunsetcube1024.dds" />
+    <Image Include="textures\tile.dds" />
+    <Image Include="textures\tile_nmap.dds" />
+    <Image Include="textures\tree0.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="textures\tree01S.dds" />
+    <Image Include="textures\tree1.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="textures\tree02S.dds" />
+    <Image Include="textures\tree2.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="textures\tree35S.dds" />
+    <Image Include="textures\treearray.dds" />
+    <Image Include="textures\treeArray2.dds" />
+    <Image Include="textures\upBody_diff.dds" />
+    <Image Include="textures\upbody_norm.dds" />
+    <Image Include="textures\water1.dds" />
+    <Image Include="textures\white1x1.dds" />
+    <Image Include="textures\WireFence.dds" />
+    <Image Include="textures\WoodCrate01.dds" />
+    <Image Include="textures\WoodCrate02.dds" />
+    <Image Include="icons\icon.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

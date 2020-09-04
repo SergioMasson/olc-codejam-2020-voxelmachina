@@ -11,8 +11,8 @@ void graphics::UI::DrawableElement::GetScreenPoition(float& x, float& y)
 
 	if (m_parent == nullptr)
 	{
-		parentWidth = graphics::g_windowWidth;
-		parentHeight = graphics::g_windowHeight;
+		parentWidth = static_cast<float>(graphics::g_windowWidth);
+		parentHeight = static_cast<float>(graphics::g_windowHeight);
 	}
 	else
 	{
