@@ -22,7 +22,9 @@ struct ObjectConstBuffer
 	DirectX::XMFLOAT4X4 ObjectModelMatrix;
 	DirectX::XMFLOAT4X4 WorldInvTranspose;
 	DirectX::XMFLOAT4X4 ViewProjectionMatrix;
-	graphics::Material ObjectMaterial;
+	graphics::Material	ObjectMaterial;
+	DirectX::XMFLOAT2	TextureScale;
+	DirectX::XMFLOAT2	TextureDisplacement;
 };
 
 graphics::RenderPipeline::RenderPipeline()
@@ -54,8 +56,8 @@ void graphics::RenderPipeline::LoadShader(const BYTE* vertexShader, SIZE_T verte
 	{
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"TANGENT",  0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0}
+		{"TANGENT",  0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, 36, D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
 
 	auto hr = graphics::g_d3dDevice->CreateVertexShader(vertexShader, vertexShaderSize, 0, m_vertexShader.GetAddressOf());
@@ -113,12 +115,17 @@ void graphics::RenderPipeline::RenderMesh(MeshRenderer const& mesh)
 	DirectX::XMStoreFloat4x4(&objectBuffer.WorldInvTranspose, worldInvTranspose);
 
 	objectBuffer.ObjectMaterial = mesh.m_material;
+	objectBuffer.TextureScale = mesh.m_textureScale;
+	objectBuffer.TextureDisplacement = mesh.m_textureDisplacement;
 
 	graphics::g_d3dImmediateContext->UpdateSubresource(m_objectConstBuffer.Get(), 0, 0, &objectBuffer, 0, 0);
 
 	//Bind view projection matrix to slot b0
 	graphics::g_d3dImmediateContext->VSSetConstantBuffers(0, 1, m_objectConstBuffer.GetAddressOf());
 	graphics::g_d3dImmediateContext->PSSetConstantBuffers(0, 1, m_objectConstBuffer.GetAddressOf());
+
+	graphics::g_d3dImmediateContext->PSSetShaderResources(0, 1, mesh.m_albedoTexture->m_resourceView.GetAddressOf());
+	graphics::g_d3dImmediateContext->PSSetSamplers(0, 1, mesh.m_albedoTexture->m_samplerState.GetAddressOf());
 
 	//Binds vertex buffer and index buffer.
 	graphics::g_d3dImmediateContext->IASetVertexBuffers(0, 1, mesh.m_vertexBuffer.GetAddressOf(), &stride, &offset);

@@ -166,10 +166,12 @@
     <ClCompile Include="application.cpp" />
     <ClCompile Include="cameraController.cpp" />
     <ClCompile Include="graphics\coreGraphics.cpp" />
+    <ClCompile Include="graphics\dds.cpp" />
     <ClCompile Include="graphics\lights.cpp" />
     <ClCompile Include="graphics\material.cpp" />
     <ClCompile Include="graphics\meshRenderer.cpp" />
     <ClCompile Include="graphics\renderPipeline.cpp" />
+    <ClCompile Include="graphics\texture2D.cpp" />
     <ClCompile Include="graphics\UI\drawableElement.cpp" />
     <ClCompile Include="graphics\UI\guiPanel.cpp" />
     <ClCompile Include="graphics\UI\guiSprite.cpp" />
@@ -193,11 +195,13 @@
     <ClInclude Include="colors.h" />
     <ClInclude Include="graphics\coreGraphics.h" />
     <ClInclude Include="dxassert.h" />
+    <ClInclude Include="graphics\dds.h" />
     <ClInclude Include="graphics\graphicsUtils.h" />
     <ClInclude Include="graphics\lights.h" />
     <ClInclude Include="graphics\material.h" />
     <ClInclude Include="graphics\meshRenderer.h" />
     <ClInclude Include="graphics\renderPipeline.h" />
+    <ClInclude Include="graphics\texture2D.h" />
     <ClInclude Include="graphics\UI\drawableElement.h" />
     <ClInclude Include="graphics\UI\guiPanel.h" />
     <ClInclude Include="graphics\UI\guiSprite.h" />
@@ -316,11 +320,125 @@
     <None Include="shaders\Lights.hlsli" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="icon.png">
+    <Image Include="icons\icon.png">
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </Image>
+    <Image Include="textures\bricks.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\bricks2.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\bricks2_nmap.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\bricks3.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\bricks_nmap.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\checkboard.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\default_nmap.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\desertcube1024.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\fire.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\grass.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\grasscube1024.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\head_diff.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\head_norm.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\ice.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\jacket_diff.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\jacket_norm.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\pants_diff.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\pants_norm.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\snowcube1024.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\stone.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\sunsetcube1024.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\tile.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\tile_nmap.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\tree0.bmp">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\tree01S.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\tree02S.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\tree1.bmp">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\tree2.bmp">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\tree35S.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\treearray.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\treeArray2.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\upBody_diff.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\upbody_norm.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\water1.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\white1x1.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\WireFence.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\WoodCrate01.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\WoodCrate02.dds">
+      <DeploymentContent>true</DeploymentContent>
     </Image>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

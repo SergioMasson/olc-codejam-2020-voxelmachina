@@ -202,6 +202,7 @@ void graphics::Resize(uint32_t width, uint32_t heigth)
 	g_RenderTargetView.Reset();
 	g_DepthStencilView.Reset();
 	g_DepthStencilBuffer.Reset();
+	d2dRenderTarget.Reset();
 	g_d2dDeviceContext->SetTarget(nullptr);
 
 	// Resize the swap chain and recreate the render target view.
@@ -210,6 +211,10 @@ void graphics::Resize(uint32_t width, uint32_t heigth)
 
 	ComPtr<IDXGISurface1> backBuffer;
 	ASSERT_SUCCEEDED(g_SwapChain->GetBuffer(0, __uuidof(IDXGISurface1), reinterpret_cast<void**>(backBuffer.GetAddressOf())));
+
+	ComPtr<IDXGIDevice1> dxgiDevice;
+	// Obtain the underlying DXGI device of the Direct3D11 device.
+	ASSERT_SUCCEEDED(g_d3dDevice.As(&dxgiDevice));
 
 	createD3DRenderTarget(backBuffer);
 	createD2DRenderTarget(backBuffer.Get());

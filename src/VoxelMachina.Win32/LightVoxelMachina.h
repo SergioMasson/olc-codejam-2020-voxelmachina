@@ -58,4 +58,10 @@ private:
 	std::wstring m_typedStuff{ L"Commands: " };
 
 	bool m_isDone = false;
+
+private:
+	void CreateCamera();
+	void CreateLights();
+	void CreateObjects();
+	void CreateGUI();
 };

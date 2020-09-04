@@ -76,6 +76,21 @@ namespace graphics
 
 		const math::Vector3 GetPosition() const { return m_transform.GetTranslation(); }
 
+		void SetAlbedoTexture(Texture2D* texture)
+		{
+			m_albedoTexture = texture;
+		}
+
+		void SetTextureDisplacement(float x, float y)
+		{
+			m_textureDisplacement = { x, y };
+		}
+
+		void SetTextureScale(float x, float y)
+		{
+			m_textureScale = { x, y };
+		}
+
 	private:
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_vertexBuffer = nullptr;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_indexBuffer = nullptr;
@@ -85,6 +100,10 @@ namespace graphics
 
 		math::Transform m_transform;
 		math::Matrix4 m_worldMatrix;
+
+		Texture2D* m_albedoTexture;
+		DirectX::XMFLOAT2 m_textureScale{ 1, 1 };
+		DirectX::XMFLOAT2 m_textureDisplacement{ 0, 0 };
 
 		friend RenderPipeline;
 	};

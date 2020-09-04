@@ -206,8 +206,11 @@ void Input::PostUpdate()
 {
 	memcpy(s_Buttons[1], s_Buttons[0], sizeof(s_Buttons[0]));
 
-	//Cleans up buffers.
-	memset(s_Buttons[0], 0, sizeof(s_Buttons[0]));
+	bool* dataPtr = &s_Buttons[0][static_cast<uint32_t>(Input::KeyCode::NumKeys)];
+	auto size = static_cast<uint32_t>(Input::KeyCode::NumDigitalInputs) - static_cast<uint32_t>(Input::KeyCode::NumKeys);
+
+	//Cleans up buffers. Do not clean the keyboard keys.
+	memset(dataPtr, 0, size * sizeof(bool));
 	memset(s_Analogs, 0, sizeof(s_Analogs));
 
 	lastHitChar = NULL;
@@ -270,13 +273,13 @@ void Input::SetKey(WPARAM key, bool isDown)
 	if (keyFind != windowToKeyMap.end())
 	{
 		auto targetKey = windowToKeyMap[key];
-		s_Buttons[0][static_cast<uint32_t>(targetKey)] = true;
+		s_Buttons[0][static_cast<uint32_t>(targetKey)] = isDown;
 	}
 }
 
 void Input::SetTypedChar(WPARAM key)
 {
-	lastHitChar = key;
+	lastHitChar = static_cast<char>(key);
 }
 
 void Input::UpdateMousePosition(float x, float y)

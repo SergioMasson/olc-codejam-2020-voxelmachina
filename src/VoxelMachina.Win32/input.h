@@ -133,9 +133,10 @@ namespace Input
 		BButton,
 		XButton,
 		YButton,
+		NumControllerKeys,
 
 		// mouse
-		MouseRigth,
+		MouseRigth = NumControllerKeys,
 		MouseLeft,
 		MouseMiddle,
 		Mouse3,
