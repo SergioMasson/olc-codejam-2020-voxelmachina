@@ -39,6 +39,7 @@ bool UpdateApplication(IGameApp& app)
 	//Render scene.
 	graphics::BeginDraw();
 	app.RenderScene();
+	app.RenderUI();
 	graphics::Present();
 
 	double fps = 1.0 / deltaTime;
@@ -61,7 +62,7 @@ void RunApplication(IGameApp& app, HINSTANCE instance, const wchar_t* className)
 	// Register class
 	WNDCLASSEX wcex;
 	wcex.cbSize = sizeof(WNDCLASSEX);
-	wcex.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+	wcex.style = (CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS);
 	wcex.lpfnWndProc = WndProc;
 	wcex.cbClsExtra = 0;
 	wcex.cbWndExtra = 0;
@@ -117,6 +118,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_KEYDOWN:	//This will be called on key first press.
 		Input::SetKey(wParam, true);
+		Input::SetTypedChar(wParam);
 		break;
 
 	case WM_CHAR:		//This will be called every frame when the key is pressed.
@@ -126,33 +128,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
-
-	case WM_LBUTTONDOWN:
-	case WM_MBUTTONDOWN:
-	case WM_RBUTTONDOWN:
-		Input::SetKey(wParam, true);
-		Input::UpdateMousePosition(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-		return 0;
-	case WM_LBUTTONUP:
-	case WM_MBUTTONUP:
-	case WM_RBUTTONUP:
-		Input::SetKey(wParam, false);
-		Input::UpdateMousePosition(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-		return 0;
-	case WM_MOUSEMOVE:
-		Input::SetKey(wParam, false);
-		Input::UpdateMousePosition(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-		return 0;
-
-		//Double click.
-	case WM_LBUTTONDBLCLK:
-		return 0;
-
-	case WM_RBUTTONDBLCLK:
-		return 0;
-
-	case WM_MBUTTONDBLCLK:
-		return 0;
 
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);

@@ -2,8 +2,8 @@
 
 //Utilitie functions to help debuging HRESULT.
 
-inline void Print(const char* msg) { printf("%s", msg); }
-inline void Print(const wchar_t* msg) { wprintf(L"%ws", msg); }
+inline void Print(const char* msg) { OutputDebugStringA(msg); }
+inline void Print(const wchar_t* msg) { OutputDebugStringW(msg); }
 
 inline void Printf(const char* format, ...)
 {
@@ -44,6 +44,7 @@ inline void PrintSubMessage(const wchar_t* format, ...)
 	Print(buffer);
 	Print("\n");
 }
+
 inline void PrintSubMessage(void)
 {
 }
@@ -65,6 +66,6 @@ inline void PrintSubMessage(void)
             Print("\nHRESULT failed in " STRINGIFY_BUILTIN(__FILE__) " @ " STRINGIFY_BUILTIN(__LINE__) "\n"); \
             PrintSubMessage("hr = 0x%08X", hr); \
             PrintSubMessage(__VA_ARGS__); \
-            Print("\n"); \
-            __debugbreak(); \
-        }
+			Print("\n"); \
+			__debugbreak(); \
+		}

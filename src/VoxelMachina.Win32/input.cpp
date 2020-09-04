@@ -3,6 +3,7 @@
 #include "Winuser.h"
 #include <map>
 #include "graphics/coreGraphics.h"
+#include "application.h"
 
 //use XInput to handle input.
 #include <XInput.h>
@@ -17,6 +18,7 @@ static float s_Analogs[static_cast<uint32_t>(Input::AnalogInput::kNumAnalogInput
 static float s_AnalogsTC[static_cast<uint32_t>(Input::AnalogInput::kNumAnalogInputs)];
 
 static std::map<WPARAM, Input::KeyCode> windowToKeyMap;
+static char lastHitChar = NULL;
 
 void KbmBuildKeyMapping()
 {
@@ -63,11 +65,11 @@ void KbmBuildKeyMapping()
 
 		//Non alpha numeric keys
 		{VK_SPACE, Input::KeyCode::Key_space},
+		{VK_BACK, Input::KeyCode::Key_back},
 		{VK_UP, Input::KeyCode::Key_up},
 		{VK_DOWN, Input::KeyCode::Key_down},
 		{VK_LEFT, Input::KeyCode::Key_left},
 		{VK_RIGHT, Input::KeyCode::Key_right},
-		{VK_SPACE, Input::KeyCode::Key_space},
 		{VK_RETURN, Input::KeyCode::Key_return},
 		{VK_ADD, Input::KeyCode::Key_add},
 		{VK_SUBTRACT, Input::KeyCode::Key_minus},
@@ -182,6 +184,21 @@ void Input::Update(float frameDelta)
 	{
 		s_AnalogsTC[i] = s_Analogs[i] * frameDelta;
 	}
+
+	POINT p;
+
+	if (GetCursorPos(&p))
+		if (ScreenToClient(g_coreWindow, &p))
+			UpdateMousePosition(static_cast<float>(p.x), static_cast<float>(p.y));
+
+	if ((GetKeyState(VK_RBUTTON) & 0x100) != 0)
+		Input::SetKey(VK_RBUTTON, true);
+
+	if ((GetKeyState(VK_LBUTTON) & 0x100) != 0)
+		Input::SetKey(VK_LBUTTON, true);
+
+	if ((GetKeyState(VK_MBUTTON) & 0x100) != 0)
+		Input::SetKey(VK_MBUTTON, true);
 }
 
 //Cleans up everthing for the next frame.
@@ -192,11 +209,23 @@ void Input::PostUpdate()
 	//Cleans up buffers.
 	memset(s_Buttons[0], 0, sizeof(s_Buttons[0]));
 	memset(s_Analogs, 0, sizeof(s_Analogs));
+
+	lastHitChar = NULL;
 }
 
 bool Input::IsAnyPressed(void)
 {
 	return s_Buttons[0] != 0;
+}
+
+bool Input::TryGetLastKeyboardType(char& key)
+{
+	key = lastHitChar;
+
+	if (lastHitChar == NULL)
+		return false;
+
+	return true;
 }
 
 bool Input::IsPressed(KeyCode di)
@@ -245,10 +274,15 @@ void Input::SetKey(WPARAM key, bool isDown)
 	}
 }
 
+void Input::SetTypedChar(WPARAM key)
+{
+	lastHitChar = key;
+}
+
 void Input::UpdateMousePosition(float x, float y)
 {
-	float normalizedX = (x / graphics::g_windowWidth) - 0.5;
-	float normalizedY = (y / graphics::g_windowHeight) - 0.5;
+	float normalizedX = (x / graphics::g_windowWidth) - 0.5f;
+	float normalizedY = (y / graphics::g_windowHeight) - 0.5f;
 
 	s_Analogs[static_cast<uint32_t>(AnalogInput::kAnalogMouseX)] = -normalizedX;
 	s_Analogs[static_cast<uint32_t>(AnalogInput::kAnalogMouseY)] = normalizedY;
