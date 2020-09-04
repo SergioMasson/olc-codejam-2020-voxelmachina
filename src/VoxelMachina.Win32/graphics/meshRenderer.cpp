@@ -8,7 +8,6 @@
 #include <vector>
 
 using namespace std;
-
 using namespace DirectX;
 using namespace graphics;
 
@@ -534,6 +533,7 @@ void graphics::MeshData::LoadFromOBJFile(const wchar_t* filename, MeshData& mesh
 
 			Vertex vert{};
 			vert.Position = { x, y, z };
+			vert.Normal = { 999, 0, 0 };
 			vertex.push_back(vert);
 		}
 		else if (header == "VN" || header == "vn")
@@ -564,20 +564,12 @@ void graphics::MeshData::LoadFromOBJFile(const wchar_t* filename, MeshData& mesh
 			auto textureInde0 = std::stoi(vertex0.substr(tab0 + 1, tab1 - tab0)) - 1;
 			auto normalIndex0 = std::stoi(vertex0.substr(tab1 + 1, body.size())) - 1;
 
-			vertex[vertexIndex0].Normal = temp_normals[normalIndex0];
-			vertex[vertexIndex0].TexC = temp_uvs[textureInde0];
-			indexes.push_back(vertexIndex0);
-
 			tab0 = vertex1.find('/', 0);
 			tab1 = vertex1.find('/', tab0 + 1);
 
 			auto vertexIndex1 = std::stoi(vertex1.substr(0, tab0)) - 1;
 			auto textureInde1 = std::stoi(vertex1.substr(tab0 + 1, tab1 - tab0)) - 1;
 			auto normalIndex1 = std::stoi(vertex1.substr(tab1 + 1, body.size())) - 1;
-
-			vertex[vertexIndex1].Normal = temp_normals[normalIndex1];
-			vertex[vertexIndex1].TexC = temp_uvs[textureInde1];
-			indexes.push_back(vertexIndex1);
 
 			tab0 = vertex2.find('/', 0);
 			tab1 = vertex2.find('/', tab0 + 1);
@@ -586,9 +578,104 @@ void graphics::MeshData::LoadFromOBJFile(const wchar_t* filename, MeshData& mesh
 			auto textureInde2 = std::stoi(vertex2.substr(tab0 + 1, tab1 - tab0)) - 1;
 			auto normalIndex2 = std::stoi(vertex2.substr(tab1 + 1, body.size())) - 1;
 
-			vertex[vertexIndex2].Normal = temp_normals[normalIndex2];
-			vertex[vertexIndex2].TexC = temp_uvs[textureInde2];
-			indexes.push_back(vertexIndex2);
+			//this vertex has already been assigned.
+			if (vertex[vertexIndex0].Normal.x != 999)
+			{
+				Vertex newVertex{};
+				newVertex.Position = vertex[vertexIndex0].Position;
+				newVertex.Normal = temp_normals[normalIndex0];
+				newVertex.TexC = temp_uvs[textureInde0];
+
+				math::Vector3 pos1 = vertex[vertexIndex0].Position;
+				math::Vector3 pos2 = vertex[vertexIndex1].Position;
+				math::Vector3 normal = vertex[vertexIndex0].Normal;
+
+				math::Vector3 tanget = math::Normalize(math::Cross(normal, (pos1 - pos2)));
+				DirectX::XMStoreFloat3(&newVertex.TangentU, tanget);
+
+				vertex.push_back(newVertex);
+				indexes.push_back(vertex.size() - 1);
+			}
+			else
+			{
+				vertex[vertexIndex0].Normal = temp_normals[normalIndex0];
+				vertex[vertexIndex0].TexC = temp_uvs[textureInde0];
+
+				math::Vector3 pos1 = vertex[vertexIndex0].Position;
+				math::Vector3 pos2 = vertex[vertexIndex1].Position;
+				math::Vector3 normal = vertex[vertexIndex0].Normal;
+
+				math::Vector3 tanget = math::Normalize(math::Cross(normal, (pos1 - pos2)));
+				DirectX::XMStoreFloat3(&vertex[vertexIndex0].TangentU, tanget);
+
+				indexes.push_back(vertexIndex0);
+			}
+
+			//this vertex has already been assigned.
+			if (vertex[vertexIndex1].Normal.x != 999)
+			{
+				Vertex newVertex{};
+				newVertex.Position = vertex[vertexIndex1].Position;
+				newVertex.Normal = temp_normals[normalIndex1];
+				newVertex.TexC = temp_uvs[textureInde1];
+
+				math::Vector3 pos1 = vertex[vertexIndex1].Position;
+				math::Vector3 pos2 = vertex[vertexIndex2].Position;
+				math::Vector3 normal = vertex[vertexIndex1].Normal;
+
+				math::Vector3 tanget = math::Normalize(math::Cross(normal, (pos1 - pos2)));
+				DirectX::XMStoreFloat3(&newVertex.TangentU, tanget);
+
+				vertex.push_back(newVertex);
+				indexes.push_back(vertex.size() - 1);
+			}
+			else
+			{
+				vertex[vertexIndex1].Normal = temp_normals[normalIndex1];
+				vertex[vertexIndex1].TexC = temp_uvs[textureInde1];
+
+				math::Vector3 pos1 = vertex[vertexIndex1].Position;
+				math::Vector3 pos2 = vertex[vertexIndex2].Position;
+				math::Vector3 normal = vertex[vertexIndex1].Normal;
+
+				math::Vector3 tanget = math::Normalize(math::Cross(normal, (pos1 - pos2)));
+				DirectX::XMStoreFloat3(&vertex[vertexIndex1].TangentU, tanget);
+
+				indexes.push_back(vertexIndex1);
+			}
+
+			//this vertex has already been assigned.
+			if (vertex[vertexIndex2].Normal.x != 999)
+			{
+				Vertex newVertex{};
+				newVertex.Position = vertex[vertexIndex2].Position;
+				newVertex.Normal = temp_normals[normalIndex2];
+				newVertex.TexC = temp_uvs[textureInde2];
+
+				math::Vector3 pos1 = vertex[vertexIndex2].Position;
+				math::Vector3 pos2 = vertex[vertexIndex0].Position;
+				math::Vector3 normal = vertex[vertexIndex2].Normal;
+
+				math::Vector3 tanget = math::Normalize(math::Cross(normal, (pos1 - pos2)));
+				DirectX::XMStoreFloat3(&newVertex.TangentU, tanget);
+
+				vertex.push_back(newVertex);
+				indexes.push_back(vertex.size() - 1);
+			}
+			else
+			{
+				vertex[vertexIndex2].Normal = temp_normals[normalIndex2];
+				vertex[vertexIndex2].TexC = temp_uvs[textureInde2];
+
+				math::Vector3 pos1 = vertex[vertexIndex2].Position;
+				math::Vector3 pos2 = vertex[vertexIndex0].Position;
+				math::Vector3 normal = vertex[vertexIndex2].Normal;
+
+				math::Vector3 tanget = math::Normalize(math::Cross(normal, (pos1 - pos2)));
+				DirectX::XMStoreFloat3(&vertex[vertexIndex2].TangentU, tanget);
+
+				indexes.push_back(vertexIndex2);
+			}
 		}
 	}
 

@@ -96,8 +96,8 @@ void LightVoxelMachinaApp::CreateLights()
 	m_sceneDirLight = DirectionalLight{};
 	//Directional light.
 	m_sceneDirLight.Ambient = DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	m_sceneDirLight.Diffuse = DirectX::XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
-	m_sceneDirLight.Specular = DirectX::XMFLOAT4(0.5f, 0.5f, 0.5f, 3.0f);
+	m_sceneDirLight.Diffuse = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	m_sceneDirLight.Specular = DirectX::XMFLOAT4(10.0f, 10.0f, 10.0f, 1.0f);
 	m_sceneDirLight.Direction = DirectX::XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
 	m_sceneDirLight.Intensity = 1;
 
@@ -107,9 +107,9 @@ void LightVoxelMachinaApp::CreateLights()
 	m_scenePointLight.Diffuse = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	m_scenePointLight.Specular = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	m_scenePointLight.Att = DirectX::XMFLOAT3(0.0f, 0.4f, 0.0f);
-	m_scenePointLight.Range = 25;
+	m_scenePointLight.Range = 100;
 	m_scenePointLight.Position = DirectX::XMFLOAT3(6.0f, 3.0f, 3.0f);
-	m_scenePointLight.Intensity = 2;
+	m_scenePointLight.Intensity = 0;
 
 	m_sceneSpotLight = SpotLight{};
 	// Spot light--position and direction changed every frame to animate in UpdateScene function.
@@ -135,7 +135,7 @@ void LightVoxelMachinaApp::CreateObjects()
 	graphics::MeshData::CreateCylinder(1, 1, 5, 50, 20, cylinder);
 
 	graphics::MeshData playerCharacter;
-	graphics::MeshData::LoadFromOBJFile(L"models/character.model", playerCharacter);
+	graphics::MeshData::LoadFromOBJFile(L"models/stage.model", playerCharacter);
 
 	//TODO(Sergio): Load this on a separate thread. Asset loading will take a time...
 	auto normalMap = new graphics::Texture2D(L"textures/neutralNormal.dds");
@@ -144,7 +144,7 @@ void LightVoxelMachinaApp::CreateObjects()
 	auto water = new graphics::Texture2D(L"textures/water1.dds");
 	auto grass = new graphics::Texture2D(L"textures/grass.dds");
 	auto bricks = new graphics::Texture2D(L"textures/bricks2.dds");
-	auto characterTexture = new graphics::Texture2D(L"textures/character.dds");
+	auto characterTexture = new graphics::Texture2D(L"textures/stage.dds");
 
 	graphics::Material material1{};
 	material1.Ambient = colors::white;
