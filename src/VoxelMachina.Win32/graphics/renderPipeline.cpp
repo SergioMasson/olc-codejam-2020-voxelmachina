@@ -125,6 +125,8 @@ void graphics::RenderPipeline::RenderMesh(MeshRenderer const& mesh)
 	graphics::g_d3dImmediateContext->PSSetConstantBuffers(0, 1, m_objectConstBuffer.GetAddressOf());
 
 	graphics::g_d3dImmediateContext->PSSetShaderResources(0, 1, mesh.m_albedoTexture->m_resourceView.GetAddressOf());
+	graphics::g_d3dImmediateContext->PSSetShaderResources(1, 1, mesh.m_normalMap->m_resourceView.GetAddressOf());
+
 	graphics::g_d3dImmediateContext->PSSetSamplers(0, 1, mesh.m_albedoTexture->m_samplerState.GetAddressOf());
 
 	//Binds vertex buffer and index buffer.

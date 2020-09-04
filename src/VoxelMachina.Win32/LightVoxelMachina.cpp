@@ -130,11 +130,13 @@ void LightVoxelMachinaApp::CreateObjects()
 	graphics::MeshData cylinder;
 	graphics::MeshData::CreateCylinder(1, 1, 5, 50, 20, cylinder);
 
-	m_sceneMeshes.push_back(sphere);
+	//TODO(Sergio): Load this on a separate thread. Asset loading will take a time...
+	auto normalMap = new graphics::Texture2D(L"textures/neutralNormal.dds");
+	auto bricksnormalMap = new graphics::Texture2D(L"textures/bricks_nmap.dds");
 	auto fire = new graphics::Texture2D(L"textures/fire.dds");
 	auto water = new graphics::Texture2D(L"textures/water1.dds");
 	auto grass = new graphics::Texture2D(L"textures/grass.dds");
-	auto bricks = new graphics::Texture2D(L"textures/bricks.dds");
+	auto bricks = new graphics::Texture2D(L"textures/bricks2.dds");
 
 	graphics::Material material1{};
 	material1.Ambient = colors::white;
@@ -143,18 +145,23 @@ void LightVoxelMachinaApp::CreateObjects()
 
 	auto sphereFire = graphics::MeshRenderer(sphere, material1, math::Vector3(0, 2, 0), math::Quaternion());
 	sphereFire.SetAlbedoTexture(fire);
+	sphereFire.SetNormalMap(normalMap);
 	m_sceneMeshRenderer.push_back(sphereFire);
 
 	auto sphereWater = graphics::MeshRenderer(sphere, material1, math::Vector3(4, 2, 0), math::Quaternion());
 	sphereWater.SetAlbedoTexture(water);
+	sphereWater.SetNormalMap(normalMap);
 	m_sceneMeshRenderer.push_back(sphereWater);
 
 	auto sphereGrass = graphics::MeshRenderer(sphere, material1, math::Vector3(8, 2, 0), math::Quaternion());
 	sphereGrass.SetAlbedoTexture(grass);
+	sphereGrass.SetNormalMap(normalMap);
 	m_sceneMeshRenderer.push_back(sphereGrass);
 
 	auto brick = graphics::MeshRenderer(cylinder, material1, math::Vector3(5, 0, 5), math::Quaternion());
 	brick.SetAlbedoTexture(bricks);
+	brick.SetNormalMap(bricksnormalMap);
+	brick.SetTextureScale(4, 4);
 	m_sceneMeshRenderer.push_back(brick);
 
 	auto texture2 = new graphics::Texture2D(L"textures/checkboard.dds");
@@ -166,6 +173,7 @@ void LightVoxelMachinaApp::CreateObjects()
 
 	auto meshRenderer2 = graphics::MeshRenderer(quad, material2, math::Vector3(0, -3, 4), math::Quaternion());
 	meshRenderer2.SetAlbedoTexture(texture2);
+	meshRenderer2.SetNormalMap(normalMap);
 	meshRenderer2.SetTextureScale(10, 10);
 
 	m_sceneMeshRenderer.push_back(meshRenderer2);

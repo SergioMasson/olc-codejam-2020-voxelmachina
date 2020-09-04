@@ -2,8 +2,24 @@
 
 
 Texture2D gDiffuseMap : register(t0);
+Texture2D gNormalMap : register(t1);
 
 SamplerState gsamLinear : register(s0);
+
+float3 NormalSampleToWorldSpace(float3 normalMapSample, float3 unitNormalW, float3 tangetW)
+{
+    //Uncompress each component from [0, 1] to [-1, 1]
+    float3 normtalT = 2.0f * normalMapSample - 1.0f;
+    
+    float3 N = unitNormalW;
+    float3 T = normalize(tangetW - dot(tangetW, N) * N);
+    float3 B = cross(N, T);
+    
+    float3x3 TBN = float3x3(T, B, N);
+    
+    float3 bumpedNormalW = mul(normtalT, TBN);
+    return bumpedNormalW;
+}
 
 cbuffer cbPerFrame : register(b1)
 {
@@ -38,6 +54,10 @@ float4 main(VertexOut pin) : SV_TARGET
 	// Interpolating normal can unnormalize it, so normalize it.
     pin.NormalW = normalize(pin.NormalW);
 
+    float3 normalMapSample = gNormalMap.Sample(gsamLinear, (gTextureScale * pin.TexC) + gTextureDisplacement).rgb;
+    
+    float3 bumpedNormal = NormalSampleToWorldSpace(normalMapSample, pin.NormalW, pin.TangentL);
+    
     float3 toEyeW = normalize(gEyePosW - pin.PosW);
 
 	// Start with a sum of zero. 
@@ -48,17 +68,17 @@ float4 main(VertexOut pin) : SV_TARGET
 	// Sum the light contribution from each light source.
     float4 A, D, S;
 
-    ComputeDirectionalLight(gMaterial, gDirLight, pin.NormalW, toEyeW, A, D, S);
+    ComputeDirectionalLight(gMaterial, gDirLight, bumpedNormal, toEyeW, A, D, S);
     ambient += A;
     diffuse += D;
     spec += S;
 
-    ComputePointLight(gMaterial, gPointLight, pin.PosW, pin.NormalW, toEyeW, A, D, S);
+    ComputePointLight(gMaterial, gPointLight, pin.PosW, bumpedNormal, toEyeW, A, D, S);
     ambient += A;
     diffuse += D;
     spec += S;
 
-    ComputeSpotLight(gMaterial, gSpotLight, pin.PosW, pin.NormalW, toEyeW, A, D, S);
+    ComputeSpotLight(gMaterial, gSpotLight, pin.PosW, bumpedNormal, toEyeW, A, D, S);
     ambient += max(A, 0);
     diffuse += max(D, 0);
     spec += max(S, 0);

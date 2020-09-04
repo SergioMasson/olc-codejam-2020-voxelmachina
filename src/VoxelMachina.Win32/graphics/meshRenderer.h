@@ -81,6 +81,11 @@ namespace graphics
 			m_albedoTexture = texture;
 		}
 
+		void SetNormalMap(Texture2D* normalMap)
+		{
+			m_normalMap = normalMap;
+		}
+
 		void SetTextureDisplacement(float x, float y)
 		{
 			m_textureDisplacement = { x, y };
@@ -102,6 +107,8 @@ namespace graphics
 		math::Matrix4 m_worldMatrix;
 
 		Texture2D* m_albedoTexture;
+		Texture2D* m_normalMap;
+
 		DirectX::XMFLOAT2 m_textureScale{ 1, 1 };
 		DirectX::XMFLOAT2 m_textureDisplacement{ 0, 0 };
 
