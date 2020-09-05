@@ -685,10 +685,11 @@ void graphics::MeshData::LoadFromOBJFile(const wchar_t* filename, MeshData& mesh
 	in.close();
 }
 
-graphics::MeshRenderer::MeshRenderer(MeshData data, Material material, math::Vector3 position, math::Quaternion rotation) : m_meshData{ data }, m_material{ material }
+graphics::MeshRenderer::MeshRenderer(MeshData data, Material material, math::Vector3 position, math::Quaternion rotation, math::Vector3 scale) : m_meshData{ data }, m_material{ material }
 {
 	m_transform.SetTranslation(position);
 	m_transform.SetRotation(rotation);
+	m_transform.SetScale(scale);
 	m_worldMatrix = m_transform;
 
 	D3D11_BUFFER_DESC vbd;

@@ -116,6 +116,7 @@
   <ItemGroup>
     <None Include="shaders\Lights.hlsli" />
     <None Include="models\character.model" />
+    <None Include="shaders\Common.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="textures\bricks.dds" />

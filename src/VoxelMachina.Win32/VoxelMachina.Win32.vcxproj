@@ -364,6 +364,7 @@
     <None Include="models\character.model">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="shaders\Common.hlsli" />
     <None Include="shaders\Lights.hlsli" />
   </ItemGroup>
   <ItemGroup>

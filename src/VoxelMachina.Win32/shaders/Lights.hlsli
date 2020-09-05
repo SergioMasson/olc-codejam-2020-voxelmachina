@@ -50,6 +50,12 @@ struct Material
     float4 Reflect;
 };
 
+float CalcAttenuation(float d, float falloffStart, float falloffEnd)
+{
+    // Linear falloff.
+    return saturate((falloffEnd - d) / (falloffEnd - falloffStart));
+}
+
 //---------------------------------------------------------------------------------------
 // Computes the ambient, diffuse, and specular terms in the lighting equation
 // from a directional light.  We need to output the terms separately because
@@ -134,7 +140,8 @@ void ComputePointLight(Material mat, PointLight L, float3 pos, float3 normal, fl
     }
 
 	// Attenuate
-    float att = 1.0f / dot(L.Att, float3(1.0f, d, d * d));
+    float att = CalcAttenuation(d, 0, L.Range);
+    //float att = 1.0f / dot(L.Att, float3(1.0f, d, d * d));
 
     diffuse *= att;
     spec *= att;
@@ -188,8 +195,10 @@ void ComputeSpotLight(Material mat, SpotLight L, float3 pos, float3 normal, floa
 	// Scale by spotlight factor and attenuate.
     float spot = pow(max(dot(-lightVec, L.Direction), 0.0f), L.Spot);
 
+    float att = CalcAttenuation(d, 0, L.Range);
+    
 	// Scale by spotlight factor and attenuate.
-    float att = spot / dot(L.Att, float3(1.0f, d, d * d));
+    //float att = spot / dot(L.Att, float3(1.0f, d, d * d));
 
     ambient *= spot;
     diffuse *= att;

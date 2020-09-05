@@ -84,10 +84,10 @@ float4 main(VertexOut pin) : SV_TARGET
     diffuse += D;
     spec += S;
 
-    //ComputeSpotLight(gMaterial, gSpotLight, pin.PosW, bumpedNormal, toEyeW, A, D, S);
-    //ambient += max(A, 0);
-    //diffuse += max(D, 0);
-    //spec += max(S, 0);
+    ComputeSpotLight(gMaterial, gSpotLight, pin.PosW, bumpedNormal, toEyeW, A, D, S);
+    ambient += max(A, 0);
+    diffuse += max(D, 0);
+    spec += max(S, 0);
 	   
     float4 litColor = ambient + diffuse + spec;
 

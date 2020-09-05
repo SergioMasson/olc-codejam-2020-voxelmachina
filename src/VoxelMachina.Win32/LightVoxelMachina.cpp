@@ -47,6 +47,8 @@ void LightVoxelMachinaApp::Update(float deltaT)
 		m_typedStuff += key;
 
 	m_guiText->SetText(m_typedStuff);
+
+	DirectX::XMStoreFloat3(&m_scenePointLight.Position, m_sceneCamera.GetPosition());
 }
 
 void LightVoxelMachinaApp::RenderScene(void)
@@ -103,24 +105,25 @@ void LightVoxelMachinaApp::CreateLights()
 
 	m_scenePointLight = PointLight{};
 	// Point light--position is changed every frame to animate in UpdateScene function.
-	m_scenePointLight.Ambient = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	m_scenePointLight.Ambient = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
 	m_scenePointLight.Diffuse = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	m_scenePointLight.Specular = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	m_scenePointLight.Att = DirectX::XMFLOAT3(0.0f, 0.25f, 0.0f);
-	m_scenePointLight.Range = 2;
+	m_scenePointLight.Att = DirectX::XMFLOAT3(0.25f, 0.25f, 0.25f);
+	m_scenePointLight.Range = 25;
 	m_scenePointLight.Position = DirectX::XMFLOAT3(6.0f, 3.0f, 3.0f);
 	m_scenePointLight.Intensity = 1;
 
 	m_sceneSpotLight = SpotLight{};
 	// Spot light--position and direction changed every frame to animate in UpdateScene function.
-	m_sceneSpotLight.Ambient = DirectX::XMFLOAT4(1, 1, 1, 1);
-	m_sceneSpotLight.Diffuse = DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
+	m_sceneSpotLight.Ambient = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1);
+	m_sceneSpotLight.Diffuse = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	m_sceneSpotLight.Specular = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	m_sceneSpotLight.Att = DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f);
+	m_sceneSpotLight.Att = DirectX::XMFLOAT3(0.25f, 0.25f, 0.25f);
 	m_sceneSpotLight.Spot = 96.0f;
-	m_sceneSpotLight.Range = 10000.0f;
+	m_sceneSpotLight.Range = 25.0;
 	m_sceneSpotLight.Position = DirectX::XMFLOAT3(2.0f, 3.0f, 0.0f);
-	m_sceneSpotLight.Intensity = 0;
+	m_sceneSpotLight.Direction = DirectX::XMFLOAT3(0.0f, -1.0f, 0.0f);
+	m_sceneSpotLight.Intensity = 1;
 }
 
 void LightVoxelMachinaApp::CreateObjects()
@@ -151,7 +154,7 @@ void LightVoxelMachinaApp::CreateObjects()
 	material1.Diffuse = colors::white;
 	material1.Specular = DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 2.0f);
 
-	auto player = graphics::MeshRenderer(playerCharacter, material1, math::Vector3(0, 2, 5), math::Quaternion());
+	auto player = graphics::MeshRenderer(playerCharacter, material1, math::Vector3(0, 2, 5), math::Quaternion(), math::Vector3(3, 3, 3));
 	player.SetAlbedoTexture(characterTexture);
 	player.SetNormalMap(normalMap);
 	m_sceneMeshRenderer.push_back(player);

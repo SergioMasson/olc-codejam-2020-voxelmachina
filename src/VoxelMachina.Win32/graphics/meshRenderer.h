@@ -59,7 +59,7 @@ namespace graphics
 	class MeshRenderer
 	{
 	public:
-		MeshRenderer(MeshData data, Material material, math::Vector3 position, math::Quaternion rotation);
+		MeshRenderer(MeshData data, Material material, math::Vector3 position, math::Quaternion rotation, math::Vector3 scale = { 1, 1, 1 });
 		MeshRenderer() = default;
 		~MeshRenderer() = default;
 
