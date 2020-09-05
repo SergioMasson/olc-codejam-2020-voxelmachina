@@ -74,8 +74,7 @@ void ComputeDirectionalLight(Material mat, DirectionalLight L,
 
 	// Add diffuse and specular term, provided the surface is in 
 	// the line of site of the light.
-	
-    float diffuseFactor = dot(lightVec, normal);
+    float diffuseFactor = max(dot(normal, lightVec), 0.0);
 
 	// Flatten to avoid dynamic branching.
 	[flatten]

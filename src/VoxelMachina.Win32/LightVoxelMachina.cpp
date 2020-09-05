@@ -97,19 +97,19 @@ void LightVoxelMachinaApp::CreateLights()
 	//Directional light.
 	m_sceneDirLight.Ambient = DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
 	m_sceneDirLight.Diffuse = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	m_sceneDirLight.Specular = DirectX::XMFLOAT4(10.0f, 10.0f, 10.0f, 1.0f);
+	m_sceneDirLight.Specular = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	m_sceneDirLight.Direction = DirectX::XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
 	m_sceneDirLight.Intensity = 1;
 
 	m_scenePointLight = PointLight{};
 	// Point light--position is changed every frame to animate in UpdateScene function.
-	m_scenePointLight.Ambient = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	m_scenePointLight.Ambient = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	m_scenePointLight.Diffuse = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	m_scenePointLight.Specular = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	m_scenePointLight.Att = DirectX::XMFLOAT3(0.0f, 0.4f, 0.0f);
-	m_scenePointLight.Range = 100;
+	m_scenePointLight.Att = DirectX::XMFLOAT3(0.0f, 0.25f, 0.0f);
+	m_scenePointLight.Range = 2;
 	m_scenePointLight.Position = DirectX::XMFLOAT3(6.0f, 3.0f, 3.0f);
-	m_scenePointLight.Intensity = 0;
+	m_scenePointLight.Intensity = 1;
 
 	m_sceneSpotLight = SpotLight{};
 	// Spot light--position and direction changed every frame to animate in UpdateScene function.

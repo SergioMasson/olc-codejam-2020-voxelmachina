@@ -171,5 +171,7 @@
     <Image Include="textures\character.dds" />
     <Image Include="textures\grass_mips.dds" />
     <Image Include="textures\player.dds" />
+    <Image Include="textures\DarkSkyCartoon.dds" />
+    <Image Include="textures\canyon1.dds" />
   </ItemGroup>
 </Project>

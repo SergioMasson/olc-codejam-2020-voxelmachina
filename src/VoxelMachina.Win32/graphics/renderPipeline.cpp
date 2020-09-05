@@ -128,8 +128,9 @@ void graphics::RenderPipeline::RenderMesh(MeshRenderer const& mesh)
 
 	math::Matrix4 mvpMatrix = (mesh.m_worldMatrix.Transpose() * m_camera->GetViewProjectionMatrix());
 	math::Matrix4 worldInvTranspose = mesh.m_worldMatrix.Transpose().InverseTranspose();
+	math::Matrix4 world = mesh.m_worldMatrix.Transpose();
 
-	DirectX::XMStoreFloat4x4(&objectBuffer.ObjectModelMatrix, mesh.m_worldMatrix);
+	DirectX::XMStoreFloat4x4(&objectBuffer.ObjectModelMatrix, world);
 	DirectX::XMStoreFloat4x4(&objectBuffer.ViewProjectionMatrix, mvpMatrix);
 	DirectX::XMStoreFloat4x4(&objectBuffer.WorldInvTranspose, worldInvTranspose);
 

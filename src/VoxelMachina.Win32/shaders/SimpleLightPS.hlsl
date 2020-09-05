@@ -6,19 +6,25 @@ Texture2D gNormalMap : register(t1);
 
 SamplerState gsamLinear : register(s0);
 
-float3 NormalSampleToWorldSpace(float3 normalMapSample, float3 unitNormalW, float3 tangetW)
+//---------------------------------------------------------------------------------------
+// Transforms a normal map sample to world space.
+//---------------------------------------------------------------------------------------
+float3 NormalSampleToWorldSpace(float3 normalMapSample, float3 unitNormalW, float3 tangentW)
 {
-    //Uncompress each component from [0, 1] to [-1, 1]
-    float3 normtalT = 2.0f * normalMapSample - 1.0f;
-    
+	// Uncompress each component from [0,1] to [-1,1].
+    float3 normalT = 2.0f * normalMapSample - 1.0f;
+
+	// Build orthonormal basis.
     float3 N = unitNormalW;
-    float3 T = normalize(tangetW - dot(tangetW, N) * N);
+    float3 T = normalize(tangentW - dot(tangentW, N) * N);
     float3 B = cross(N, T);
-    
+
     float3x3 TBN = float3x3(T, B, N);
-    
-    float3 bumpedNormalW = mul(normtalT, TBN);
-    return bumpedNormalW;
+
+	// Transform from tangent space to world space.
+    float3 bumpedNormalW = mul(normalT, TBN);
+
+    return normalize(bumpedNormalW);
 }
 
 cbuffer cbPerFrame : register(b1)
@@ -45,7 +51,7 @@ struct VertexOut
     float4 PosH : SV_POSITION;
     float3 PosW : POSITION;
     float3 NormalW : NORMAL;
-    float3 TangentL : TANGENT;
+    float3 TangentW : TANGENT;
     float2 TexC : TEXCOORD;
 };
 
@@ -56,7 +62,7 @@ float4 main(VertexOut pin) : SV_TARGET
 
     float3 normalMapSample = gNormalMap.Sample(gsamLinear, (gTextureScale * pin.TexC) + gTextureDisplacement).rgb;
     
-    float3 bumpedNormal = NormalSampleToWorldSpace(normalMapSample, pin.NormalW, pin.TangentL);
+    float3 bumpedNormal = NormalSampleToWorldSpace(normalMapSample, pin.NormalW, pin.TangentW);
     
     float3 toEyeW = normalize(gEyePosW - pin.PosW);
 
@@ -78,10 +84,10 @@ float4 main(VertexOut pin) : SV_TARGET
     diffuse += D;
     spec += S;
 
-    ComputeSpotLight(gMaterial, gSpotLight, pin.PosW, bumpedNormal, toEyeW, A, D, S);
-    ambient += max(A, 0);
-    diffuse += max(D, 0);
-    spec += max(S, 0);
+    //ComputeSpotLight(gMaterial, gSpotLight, pin.PosW, bumpedNormal, toEyeW, A, D, S);
+    //ambient += max(A, 0);
+    //diffuse += max(D, 0);
+    //spec += max(S, 0);
 	   
     float4 litColor = ambient + diffuse + spec;
 

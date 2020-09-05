@@ -388,11 +388,13 @@
     <Image Include="textures\bricks_nmap.dds">
       <DeploymentContent>true</DeploymentContent>
     </Image>
+    <Image Include="textures\canyon1.dds" />
     <Image Include="textures\character.dds" />
     <Image Include="textures\checkboard.dds">
       <DeploymentContent>true</DeploymentContent>
     </Image>
     <Image Include="textures\checkboard_mips.dds" />
+    <Image Include="textures\DarkSkyCartoon.dds" />
     <Image Include="textures\default_nmap.dds">
       <DeploymentContent>true</DeploymentContent>
     </Image>
