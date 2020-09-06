@@ -161,7 +161,8 @@ void LightVoxelMachinaApp::CreateObjects()
 	auto playerTexture = new graphics::Texture2D(L"textures/littleRobot.dds");
 	auto floorTexture = new graphics::Texture2D(L"textures/checkboard_mips.dds");
 	auto floorNormalMap = new graphics::Texture2D(L"textures/tile_nmap.dds");
-	auto enemyTexture = new graphics::Texture2D(L"textures/enemy_inv.dds");
+	auto enemyTexture = new graphics::Texture2D(L"textures/enemy.dds");
+	auto enemyDetectedTexture = new graphics::Texture2D(L"textures/enemy_inv.dds");
 	auto pilarTexture = new graphics::Texture2D(L"textures/checkboard_mips.dds");
 	auto pilarNormal = new graphics::Texture2D(L"textures/tile_nmap.dds");
 
@@ -175,7 +176,7 @@ void LightVoxelMachinaApp::CreateObjects()
 	m_player->SetNormalMap(normalMap);
 	m_sceneMeshRenderer.push_back(m_player);
 
-	CreateEnemy(enemyMesh, enemyTexture, normalMap);
+	CreateEnemy(enemyMesh, enemyTexture, normalMap, enemyDetectedTexture);
 	CreatePilars(pilarMesh, pilarTexture, pilarNormal);
 
 	graphics::Material material2{};
@@ -191,7 +192,7 @@ void LightVoxelMachinaApp::CreateObjects()
 	m_sceneMeshRenderer.push_back(floor);
 }
 
-void LightVoxelMachinaApp::CreateEnemy(graphics::MeshData& enemyData, graphics::Texture2D* enemyTexture, graphics::Texture2D* enemyNormal)
+void LightVoxelMachinaApp::CreateEnemy(graphics::MeshData& enemyData, graphics::Texture2D* enemyTexture, graphics::Texture2D* enemyNormal, graphics::Texture2D* detectedTexture)
 {
 	graphics::Material material1{};
 	material1.Ambient = colors::white;
@@ -210,7 +211,7 @@ void LightVoxelMachinaApp::CreateEnemy(graphics::MeshData& enemyData, graphics::
 		enemy->SetAlbedoTexture(enemyTexture);
 		enemy->SetNormalMap(enemyNormal);
 		m_sceneMeshRenderer.push_back(enemy);
-		m_enemiesLeft.push_back(enemyPosition);
+		m_enemiesLeft.push_back(new Enemy(enemy, detectedTexture));
 	}
 }
 
@@ -242,7 +243,7 @@ void LightVoxelMachinaApp::CreatePilars(graphics::MeshData& pilarData, graphics:
 
 			for (auto enemy : m_enemiesLeft)
 			{
-				distance = enemy - math::Vector3(pilarX, 0, pilarY);
+				distance = enemy->GetPosition() - math::Vector3(pilarX, 0, pilarY);
 
 				if (math::Length(distance) <= 1.0f)
 					overlapingEnemy = true;
@@ -291,12 +292,16 @@ void LightVoxelMachinaApp::CheckForEnemyCollision()
 
 	while (it != m_enemiesLeft.end())
 	{
-		auto distance = *it - m_player->GetPosition();
+		Enemy* enemy = *it;
+
+		math::Vector3 distance = enemy->GetPosition() - m_player->GetPosition();
 
 		if (math::Length(distance) <= 1.0f)
 		{
 			it = m_enemiesLeft.erase(it);
 			enemiesLeft--;
+
+			enemy->SetDetected();
 
 			if (enemiesLeft == 0)
 			{

@@ -4,6 +4,7 @@
 #include "mathHelpers.h"
 #include "camera.h"
 #include "cameraController.h"
+#include "enemy.h"
 #include "playerController.h"
 #include "graphics/lights.h"
 #include "graphics/meshRenderer.h"
@@ -47,7 +48,7 @@ private:
 	std::unique_ptr<graphics::RenderPipeline> m_renderPipeline;
 	std::vector<graphics::MeshRenderer*> m_sceneMeshRenderer;
 	std::vector<graphics::UI::DrawableElement*> m_sceneGuiElements;
-	std::vector<math::Vector3> m_enemiesLeft;
+	std::vector<Enemy*> m_enemiesLeft;
 
 	graphics::UI::GuiText* m_informationText;
 	graphics::UI::GuiText* m_counterText;
@@ -69,7 +70,7 @@ private:
 	void CreateCamera();
 	void CreateLights();
 	void CreateObjects();
-	void CreateEnemy(graphics::MeshData& enemyData, graphics::Texture2D* enemyTexture, graphics::Texture2D* enemyNormal);
+	void CreateEnemy(graphics::MeshData& enemyData, graphics::Texture2D* enemyTexture, graphics::Texture2D* enemyNormal, graphics::Texture2D* detectedTexture);
 	void CreatePilars(graphics::MeshData& pilarData, graphics::Texture2D* pilarTexture, graphics::Texture2D* pilarNormal);
 	void CreateGUI();
 

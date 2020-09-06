@@ -165,6 +165,7 @@
   <ItemGroup>
     <ClCompile Include="application.cpp" />
     <ClCompile Include="cameraController.cpp" />
+    <ClCompile Include="enemy.cpp" />
     <ClCompile Include="graphics\coreGraphics.cpp" />
     <ClCompile Include="graphics\dds.cpp" />
     <ClCompile Include="graphics\lights.cpp" />
@@ -194,6 +195,7 @@
     <ClInclude Include="application.h" />
     <ClInclude Include="cameraController.h" />
     <ClInclude Include="colors.h" />
+    <ClInclude Include="enemy.h" />
     <ClInclude Include="graphics\coreGraphics.h" />
     <ClInclude Include="dxassert.h" />
     <ClInclude Include="graphics\dds.h" />
