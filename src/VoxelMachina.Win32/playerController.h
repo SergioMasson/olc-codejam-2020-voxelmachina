@@ -22,18 +22,19 @@ private:
 
 	float m_MoveSpeed;
 	float m_RotationSpeed;
-	float m_cameraRotationSpeed;
+	float m_mouseCameraRotationSpeed;
+	float m_xboxCamRotationSpeed;
 
 	float m_CurrentHeading;
 
 	float m_MouseSensitivityX;
 	float m_MouseSensitivityY;
 
-	float m_LastYaw = 0;
-	float m_LastPitch = 0;
-	float m_LastForward = 0;
-	float m_LastStrafe = 0;
-	float m_LastAscent = 0;
+	float m_lastCameraRotationX;
+	float m_lastCameraRotationY;
+
+	float m_lastPlayerRotation;
+	float m_lastPlayerFoward;
 
 private:
 	void ApplyMomentum(float& oldValue, float& newValue, float deltaTime);

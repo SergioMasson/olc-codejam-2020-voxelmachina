@@ -11,8 +11,9 @@ PlayerController::PlayerController(math::Vector3 worldUp,
 	m_WorldEast = Cross(m_WorldNorth, m_WorldUp);
 
 	m_MoveSpeed = 10.0f;
-	m_RotationSpeed = 1.0f;
-	m_cameraRotationSpeed = 1.0f;
+	m_RotationSpeed = 2.0f;
+	m_mouseCameraRotationSpeed = 10.0f;
+	m_xboxCamRotationSpeed = 1.0f;
 
 	m_MouseSensitivityX = 0.1f;
 	m_MouseSensitivityY = 0.05f;
@@ -22,19 +23,19 @@ PlayerController::PlayerController(math::Vector3 worldUp,
 	math::Vector3 forward = Normalize(Cross(m_WorldUp, foward));
 	m_CurrentHeading = ATan2(-Dot(forward, m_WorldEast), Dot(forward, m_WorldNorth));
 
-	m_LastYaw = 0.0f;
-	m_LastPitch = 0.0f;
-	m_LastForward = 0.0f;
-	m_LastStrafe = 0.0f;
-	m_LastAscent = 0.0f;
-
 	m_cameraOffset = m_sceneCamera->GetPosition() - m_playerMeshRenderer->GetPosition();
+
+	m_lastCameraRotationX = 0.0f;
+	m_lastCameraRotationY = 0.0f;
+
+	m_lastPlayerRotation = 0.0f;
+	m_lastPlayerFoward = 0.0f;
 }
 
 void PlayerController::Update(float deltaT)
 {
 	float forward = m_MoveSpeed * (
-		Input::GetTimeCorrectedAnalogInput(Input::AnalogInput::kAnalogLeftStickY) +
+		-Input::GetTimeCorrectedAnalogInput(Input::AnalogInput::kAnalogLeftStickY) +
 		(Input::IsPressed(Input::KeyCode::Key_s) ? deltaT : 0.0f) +
 		(Input::IsPressed(Input::KeyCode::Key_w) ? -deltaT : 0.0f)
 		);
@@ -42,30 +43,42 @@ void PlayerController::Update(float deltaT)
 	float mouseX = 0;
 	float mouseY = 0;
 
+	ApplyMomentum(m_lastPlayerFoward, forward, deltaT);
+
 	if (Input::IsPressed(Input::KeyCode::MouseRigth))
 	{
-		mouseX = deltaT * Input::GetAnalogInput(Input::AnalogInput::kAnalogMouseX);
-		mouseY = deltaT * Input::GetAnalogInput(Input::AnalogInput::kAnalogMouseY);
+		mouseX = deltaT * (Input::GetAnalogInput(Input::AnalogInput::kAnalogMouseX));
+		mouseY = deltaT * (Input::GetAnalogInput(Input::AnalogInput::kAnalogMouseY)) * 0.2;
 	}
+
+	float cameraRotationX = (mouseX * m_mouseCameraRotationSpeed) + (m_xboxCamRotationSpeed * deltaT * Input::GetAnalogInput(Input::AnalogInput::kAnalogRightStickX));
+	float cameraRotationY = (mouseY * m_mouseCameraRotationSpeed) + (m_xboxCamRotationSpeed * 0.2 * deltaT * Input::GetAnalogInput(Input::AnalogInput::kAnalogRightStickY));
+
+	ApplyMomentum(m_lastCameraRotationX, cameraRotationX, deltaT);
+	ApplyMomentum(m_lastCameraRotationY, cameraRotationY, deltaT);
 
 	//// don't apply momentum to mouse inputs
 	float rotation = m_RotationSpeed * (
-		Input::GetTimeCorrectedAnalogInput(Input::AnalogInput::kAnalogLeftStickX) +
+		-Input::GetTimeCorrectedAnalogInput(Input::AnalogInput::kAnalogLeftStickX) +
 		(Input::IsPressed(Input::KeyCode::Key_d) ? deltaT : 0.0f) +
 		(Input::IsPressed(Input::KeyCode::Key_a) ? -deltaT : 0.0f)
 		);
 
+	ApplyMomentum(m_lastPlayerRotation, rotation, deltaT);
+
 	math::Vector3 position = (m_playerMeshRenderer->GetRotation() * math::Vector3(0, 0, -forward)) + math::Vector3{ m_playerMeshRenderer->GetPosition().GetX(),m_playerMeshRenderer->GetPosition().GetY(), m_playerMeshRenderer->GetPosition().GetZ() };
 	m_playerMeshRenderer->SetPosition(position);
 
-	m_cameraOffset = math::Quaternion(math::Vector3(0, 1, 0), mouseX * m_cameraRotationSpeed) * m_cameraOffset;
+	auto YcameraRotation = math::Quaternion(m_playerMeshRenderer->GetRotation() * math::Vector3(0, 1, 0), cameraRotationX);
+	auto ZcameraRotation = math::Quaternion(m_sceneCamera->GetRotation() * math::Vector3(1, 0, 0), cameraRotationY);
+
+	auto totalRotation = YcameraRotation * ZcameraRotation;
+
+	m_cameraOffset = (totalRotation * m_cameraOffset);
 
 	math::Vector3 cameraPosition = m_playerMeshRenderer->GetPosition() + m_cameraOffset;
 
 	m_sceneCamera->SetEyeAtUp(cameraPosition, position, math::Vector3(0, 1, 0));
-
-	m_LastForward = forward;
-
 	m_sceneCamera->Update();
 
 	m_CurrentHeading -= rotation;
@@ -76,6 +89,11 @@ void PlayerController::Update(float deltaT)
 
 	math::Matrix3 orientation = math::Matrix3(m_WorldEast, m_WorldUp, -m_WorldNorth) * math::Matrix3::MakeYRotation(m_CurrentHeading);
 	m_playerMeshRenderer->SetRotation(math::Quaternion{ orientation });
+
+	m_lastCameraRotationX = cameraRotationX;
+	m_lastCameraRotationY = cameraRotationY;
+	m_lastPlayerFoward = forward;
+	m_lastPlayerRotation = rotation;
 }
 
 void PlayerController::ApplyMomentum(float& oldValue, float& newValue, float deltaTime)

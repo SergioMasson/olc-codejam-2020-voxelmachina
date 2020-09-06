@@ -47,11 +47,14 @@ private:
 	std::unique_ptr<graphics::RenderPipeline> m_renderPipeline;
 	std::vector<graphics::MeshRenderer*> m_sceneMeshRenderer;
 	std::vector<graphics::UI::DrawableElement*> m_sceneGuiElements;
+	std::vector<math::Vector3> m_enemiesLeft;
 
 	graphics::UI::GuiText* m_informationText;
 	graphics::UI::GuiText* m_counterText;
+	graphics::UI::GuiText* m_enemiesLeftText;
 
-	float m_time{ 30 };
+	float m_time{ 0 };
+	uint32_t enemiesLeft;
 
 	graphics::MeshRenderer* m_player;
 	PlayerController* m_playerController;
@@ -66,5 +69,9 @@ private:
 	void CreateCamera();
 	void CreateLights();
 	void CreateObjects();
+	void CreateEnemy(graphics::MeshData& enemyData, graphics::Texture2D* enemyTexture, graphics::Texture2D* enemyNormal);
+	void CreatePilars(graphics::MeshData& pilarData, graphics::Texture2D* pilarTexture, graphics::Texture2D* pilarNormal);
 	void CreateGUI();
+
+	void CheckForEnemyCollision();
 };
