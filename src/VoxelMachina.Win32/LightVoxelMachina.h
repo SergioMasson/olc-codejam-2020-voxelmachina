@@ -4,6 +4,7 @@
 #include "mathHelpers.h"
 #include "camera.h"
 #include "cameraController.h"
+#include "playerController.h"
 #include "graphics/lights.h"
 #include "graphics/meshRenderer.h"
 #include "graphics/renderPipeline.h"
@@ -45,13 +46,21 @@ private:
 
 	std::unique_ptr<graphics::RenderPipeline> m_renderPipeline;
 	std::vector<graphics::MeshRenderer*> m_sceneMeshRenderer;
+	std::vector<graphics::UI::DrawableElement*> m_sceneGuiElements;
+
+	graphics::UI::GuiText* m_informationText;
+	graphics::UI::GuiText* m_counterText;
+
+	float m_time{ 30 };
 
 	graphics::MeshRenderer* m_player;
+	PlayerController* m_playerController;
 	CameraController* m_cameraController;
 
 	graphics::Texture2D* m_skybox;
 	math::Vector3 mouse_position;
 	bool m_isDone = false;
+	bool m_firstFrame = true;
 
 private:
 	void CreateCamera();

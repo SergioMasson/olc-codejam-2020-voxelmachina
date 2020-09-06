@@ -122,6 +122,8 @@
     <None Include="shaders\Common.hlsli" />
     <None Include="models\player.model" />
     <None Include="models\stage.model" />
+    <None Include="models\littleRobot.model" />
+    <None Include="models\enemy.model" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="textures\bricks.dds" />
@@ -180,5 +182,7 @@
     <Image Include="textures\DarkSkyCartoon.dds" />
     <Image Include="textures\canyon1.dds" />
     <Image Include="textures\stage.dds" />
+    <Image Include="textures\littleRobot.dds" />
+    <Image Include="textures\enemy.dds" />
   </ItemGroup>
 </Project>

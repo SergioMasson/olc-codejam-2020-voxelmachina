@@ -101,9 +101,10 @@ void CameraController::Update(float deltaTime)
 		m_CurrentHeading += DirectX::XM_2PI;
 
 	math::Matrix3 orientation = math::Matrix3(m_WorldEast, m_WorldUp, -m_WorldNorth) * math::Matrix3::MakeYRotation(m_CurrentHeading) * math::Matrix3::MakeXRotation(m_CurrentPitch);
-	math::Vector3 position = orientation * math::Vector3(strafe, ascent, -forward) + m_TargetCamera.GetPosition();
+	//math::Vector3 position = orientation * math::Vector3(strafe, ascent, -forward) + m_TargetCamera.GetPosition();
 
-	m_TargetCamera.SetTransform(math::Transform(orientation, position));
+	//m_TargetCamera.SetTransform(math::Transform(orientation, position));
+	m_TargetCamera.SetRotation(math::Quaternion(orientation));
 	m_TargetCamera.Update();
 }
 

@@ -27,12 +27,19 @@ namespace math
 		}
 
 		void SetRotation(Quaternion q) { m_rotation = q; }
-		void SetTranslation(Vector3 v) { m_translation = v; }
+		void SetTranslation(Vector3 v)
+		{
+			m_translation = v;
+		}
 		void SetScale(Vector3 scale) { m_scale = scale; }
 
 		Quaternion GetRotation() const { return m_rotation; }
 		Vector3 GetTranslation() const { return m_translation; }
 		Vector3 GetScale() const { return m_scale; }
+
+		const math::Vector3 GetRightVec() const { return Matrix3{ m_rotation }.GetX(); }
+		const math::Vector3 GetUpVec() const { return Matrix3{ m_rotation }.GetY(); }
+		Vector3 GetForwardVec() const { return -Matrix3{ m_rotation }.GetZ(); };
 
 		static Transform MakeXRotation(float angle) { return Transform(Quaternion(Vector3(1, 0, 0), angle)); }
 		static Transform MakeYRotation(float angle) { return Transform(Quaternion(Vector3(0, 1, 0), angle)); }

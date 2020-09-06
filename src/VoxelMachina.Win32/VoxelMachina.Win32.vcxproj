@@ -363,6 +363,12 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="models\enemy.model">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="models\littleRobot.model">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="models\player.model">
       <DeploymentContent>true</DeploymentContent>
     </None>
@@ -407,6 +413,9 @@
     <Image Include="textures\desertcube1024.dds">
       <DeploymentContent>true</DeploymentContent>
     </Image>
+    <Image Include="textures\enemy.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
     <Image Include="textures\fire.dds">
       <DeploymentContent>true</DeploymentContent>
     </Image>
@@ -430,6 +439,9 @@
       <DeploymentContent>true</DeploymentContent>
     </Image>
     <Image Include="textures\jacket_norm.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\littleRobot.dds">
       <DeploymentContent>true</DeploymentContent>
     </Image>
     <Image Include="textures\neutralNormal.dds">

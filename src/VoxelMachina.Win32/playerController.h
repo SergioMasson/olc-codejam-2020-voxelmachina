@@ -6,7 +6,7 @@
 class PlayerController
 {
 public:
-	PlayerController(math::Vector3 worldUp, graphics::MeshRenderer& playerMesh, Camera& sceneCamera);
+	PlayerController(math::Vector3 worldUp, graphics::MeshRenderer* playerMesh, Camera* sceneCamera);
 	void Update(float deltaT);
 
 private:
@@ -15,11 +15,16 @@ private:
 	math::Vector3 m_WorldNorth;
 	math::Vector3 m_WorldEast;
 
-	graphics::MeshRenderer& m_playerMeshRenderer;
-	Camera& m_sceneCamera;
+	graphics::MeshRenderer* m_playerMeshRenderer;
+	Camera* m_sceneCamera;
 
 	float m_MoveSpeed;
-	float m_StrafeSpeed;
+	float m_RotationSpeed;
+
+	float m_CurrentHeading;
+
+	float m_MouseSensitivityX;
+	float m_MouseSensitivityY;
 
 	float m_LastYaw = 0;
 	float m_LastPitch = 0;
