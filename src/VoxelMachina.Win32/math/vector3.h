@@ -100,4 +100,13 @@ namespace math
 		Scalar W = v.GetW();
 		m_vec = DirectX::XMVectorSelect(DirectX::XMVectorDivide(v, W), v, DirectX::XMVectorEqual(W, DirectX::XMVectorZero()));
 	}
+
+	class BoolVector
+	{
+	public:
+		INLINE BoolVector(FXMVECTOR vec) { m_vec = vec; }
+		INLINE operator XMVECTOR() const { return m_vec; }
+	protected:
+		XMVECTOR m_vec;
+	};
 }

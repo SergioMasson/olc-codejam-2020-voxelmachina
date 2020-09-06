@@ -6,14 +6,17 @@ using namespace math;
 
 void Camera::SetLookDirection(math::Vector3 forward, math::Vector3 up)
 {
-	forward = Normalize(forward);
-	up = Normalize(up);
+	// Given, but ensure normalization
+	Scalar forwardLenSq = LengthSquare(forward);
+	forward = Select(forward * RecipSqrt(forwardLenSq), -Vector3(0, 0, 1), forwardLenSq < Scalar(0.000001f));
 
 	// Deduce a valid, orthogonal right vector
-	Vector3 right = Normalize(Cross(forward, up));
+	Vector3 right = Cross(forward, up);
+	Scalar rightLenSq = LengthSquare(right);
+	right = Select(right * RecipSqrt(rightLenSq), Quaternion(Vector3(0, 1, 0), -XM_PIDIV2) * forward, rightLenSq < Scalar(0.000001f));
 
 	// Compute actual up vector
-	up = Normalize(Cross(forward, right));
+	up = Cross(right, forward);
 
 	// Finish constructing basis
 	m_Basis = Matrix3(right, up, -forward);

@@ -12,6 +12,7 @@ PlayerController::PlayerController(math::Vector3 worldUp,
 
 	m_MoveSpeed = 10.0f;
 	m_RotationSpeed = 1.0f;
+	m_cameraRotationSpeed = 1.0f;
 
 	m_MouseSensitivityX = 0.1f;
 	m_MouseSensitivityY = 0.05f;
@@ -26,6 +27,8 @@ PlayerController::PlayerController(math::Vector3 worldUp,
 	m_LastForward = 0.0f;
 	m_LastStrafe = 0.0f;
 	m_LastAscent = 0.0f;
+
+	m_cameraOffset = m_sceneCamera->GetPosition() - m_playerMeshRenderer->GetPosition();
 }
 
 void PlayerController::Update(float deltaT)
@@ -36,21 +39,13 @@ void PlayerController::Update(float deltaT)
 		(Input::IsPressed(Input::KeyCode::Key_w) ? -deltaT : 0.0f)
 		);
 
-	math::Vector3 cameraDelta = m_playerMeshRenderer->GetPosition() - m_sceneCamera->GetPosition();
-	math::Vector3 position = (m_playerMeshRenderer->GetRotation() * math::Vector3(0, 0, -forward)) + math::Vector3{ m_playerMeshRenderer->GetPosition().GetX(),m_playerMeshRenderer->GetPosition().GetY(), m_playerMeshRenderer->GetPosition().GetZ() };
-	m_playerMeshRenderer->SetPosition(position);
-
-	math::Vector3 cameraPosition = m_playerMeshRenderer->GetPosition() - cameraDelta;
-
-	m_sceneCamera->SetPosition(cameraPosition);
-
 	float mouseX = 0;
 	float mouseY = 0;
 
 	if (Input::IsPressed(Input::KeyCode::MouseRigth))
 	{
-		mouseX = Input::GetAnalogInput(Input::AnalogInput::kAnalogMouseX);
-		mouseY = Input::GetAnalogInput(Input::AnalogInput::kAnalogMouseY);
+		mouseX = deltaT * Input::GetAnalogInput(Input::AnalogInput::kAnalogMouseX);
+		mouseY = deltaT * Input::GetAnalogInput(Input::AnalogInput::kAnalogMouseY);
 	}
 
 	//// don't apply momentum to mouse inputs
@@ -59,6 +54,15 @@ void PlayerController::Update(float deltaT)
 		(Input::IsPressed(Input::KeyCode::Key_d) ? deltaT : 0.0f) +
 		(Input::IsPressed(Input::KeyCode::Key_a) ? -deltaT : 0.0f)
 		);
+
+	math::Vector3 position = (m_playerMeshRenderer->GetRotation() * math::Vector3(0, 0, -forward)) + math::Vector3{ m_playerMeshRenderer->GetPosition().GetX(),m_playerMeshRenderer->GetPosition().GetY(), m_playerMeshRenderer->GetPosition().GetZ() };
+	m_playerMeshRenderer->SetPosition(position);
+
+	m_cameraOffset = math::Quaternion(math::Vector3(0, 1, 0), mouseX * m_cameraRotationSpeed) * m_cameraOffset;
+
+	math::Vector3 cameraPosition = m_playerMeshRenderer->GetPosition() + m_cameraOffset;
+
+	m_sceneCamera->SetEyeAtUp(cameraPosition, position, math::Vector3(0, 1, 0));
 
 	m_LastForward = forward;
 

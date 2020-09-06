@@ -45,7 +45,7 @@ void LightVoxelMachinaApp::Update(float deltaT)
 
 	m_isDone = Input::IsPressed(Input::KeyCode::Key_escape);
 	m_playerController->Update(deltaT);
-	m_cameraController->Update(deltaT);
+	//m_cameraController->Update(deltaT);
 
 	math::Vector3 lightPosition = m_player->GetPosition() + (m_player->GetRotation() * math::Vector3{ 0, 1, 1 });
 	math::Vector3 playerFoward = math::Matrix3{ m_player->GetRotation() }.GetZ();

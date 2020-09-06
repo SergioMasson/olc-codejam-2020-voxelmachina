@@ -67,4 +67,25 @@ namespace math
 	INLINE float Max(float a, float b) { return a > b ? a : b; }
 	INLINE float Min(float a, float b) { return a < b ? a : b; }
 	INLINE float Clamp(float v, float a, float b) { return Min(Max(v, a), b); }
+
+	INLINE Vector3 Select(Vector3 lhs, Vector3 rhs, BoolVector mask) { return Vector3(XMVectorSelect(lhs, rhs, mask)); }
+	INLINE Vector4 Select(Vector4 lhs, Vector4 rhs, BoolVector mask) { return Vector4(XMVectorSelect(lhs, rhs, mask)); }
+
+	INLINE BoolVector operator<  (Scalar lhs, Scalar rhs) { return BoolVector(XMVectorLess(lhs, rhs)); }
+	INLINE BoolVector operator<= (Scalar lhs, Scalar rhs) { return BoolVector(XMVectorLessOrEqual(lhs, rhs)); }
+	INLINE BoolVector operator>  (Scalar lhs, Scalar rhs) { return BoolVector(XMVectorGreater(lhs, rhs)); }
+	INLINE BoolVector operator>= (Scalar lhs, Scalar rhs) { return BoolVector(XMVectorGreaterOrEqual(lhs, rhs)); }
+	INLINE BoolVector operator== (Scalar lhs, Scalar rhs) { return BoolVector(XMVectorEqual(lhs, rhs)); }
+
+	INLINE BoolVector operator<  (Vector3 lhs, Vector3 rhs) { return BoolVector(XMVectorLess(lhs, rhs)); }
+	INLINE BoolVector operator<= (Vector3 lhs, Vector3 rhs) { return BoolVector(XMVectorLessOrEqual(lhs, rhs)); }
+	INLINE BoolVector operator>  (Vector3 lhs, Vector3 rhs) { return BoolVector(XMVectorGreater(lhs, rhs)); }
+	INLINE BoolVector operator>= (Vector3 lhs, Vector3 rhs) { return BoolVector(XMVectorGreaterOrEqual(lhs, rhs)); }
+	INLINE BoolVector operator== (Vector3 lhs, Vector3 rhs) { return BoolVector(XMVectorEqual(lhs, rhs)); }
+
+	INLINE BoolVector operator<  (Vector4 lhs, Vector4 rhs) { return BoolVector(XMVectorLess(lhs, rhs)); }
+	INLINE BoolVector operator<= (Vector4 lhs, Vector4 rhs) { return BoolVector(XMVectorLessOrEqual(lhs, rhs)); }
+	INLINE BoolVector operator>  (Vector4 lhs, Vector4 rhs) { return BoolVector(XMVectorGreater(lhs, rhs)); }
+	INLINE BoolVector operator>= (Vector4 lhs, Vector4 rhs) { return BoolVector(XMVectorGreaterOrEqual(lhs, rhs)); }
+	INLINE BoolVector operator== (Vector4 lhs, Vector4 rhs) { return BoolVector(XMVectorEqual(lhs, rhs)); }
 }

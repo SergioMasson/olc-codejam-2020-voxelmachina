@@ -15,11 +15,14 @@ private:
 	math::Vector3 m_WorldNorth;
 	math::Vector3 m_WorldEast;
 
+	math::Vector3 m_cameraOffset;
+
 	graphics::MeshRenderer* m_playerMeshRenderer;
 	Camera* m_sceneCamera;
 
 	float m_MoveSpeed;
 	float m_RotationSpeed;
+	float m_cameraRotationSpeed;
 
 	float m_CurrentHeading;
 
