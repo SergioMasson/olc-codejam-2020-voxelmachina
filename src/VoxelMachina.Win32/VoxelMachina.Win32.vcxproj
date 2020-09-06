@@ -369,12 +369,6 @@
     <None Include="models\littleRobot.model">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="models\player.model">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="models\stage.model">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
     <None Include="shaders\Common.hlsli" />
     <None Include="shaders\Lights.hlsli" />
   </ItemGroup>
@@ -385,9 +379,6 @@
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
     </Image>
-    <Image Include="textures\bricks.dds">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
     <Image Include="textures\bricks2.dds">
       <DeploymentContent>true</DeploymentContent>
     </Image>
@@ -397,48 +388,22 @@
     <Image Include="textures\bricks3.dds">
       <DeploymentContent>true</DeploymentContent>
     </Image>
-    <Image Include="textures\bricks_nmap.dds">
+    <Image Include="textures\character.dds">
       <DeploymentContent>true</DeploymentContent>
     </Image>
-    <Image Include="textures\canyon1.dds" />
-    <Image Include="textures\character.dds" />
     <Image Include="textures\checkboard.dds">
       <DeploymentContent>true</DeploymentContent>
     </Image>
-    <Image Include="textures\checkboard_mips.dds" />
-    <Image Include="textures\DarkSkyCartoon.dds" />
+    <Image Include="textures\checkboard_mips.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\congratulations.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
     <Image Include="textures\default_nmap.dds">
       <DeploymentContent>true</DeploymentContent>
     </Image>
-    <Image Include="textures\desertcube1024.dds">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
     <Image Include="textures\enemy.dds">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="textures\fire.dds">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="textures\grass.dds">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="textures\grasscube1024.dds">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="textures\grass_mips.dds" />
-    <Image Include="textures\head_diff.dds">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="textures\head_norm.dds">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="textures\ice.dds">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="textures\jacket_diff.dds">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="textures\jacket_norm.dds">
       <DeploymentContent>true</DeploymentContent>
     </Image>
     <Image Include="textures\littleRobot.dds">
@@ -447,73 +412,10 @@
     <Image Include="textures\neutralNormal.dds">
       <DeploymentContent>true</DeploymentContent>
     </Image>
-    <Image Include="textures\nightSky.dds" />
-    <Image Include="textures\pants_diff.dds">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="textures\pants_norm.dds">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="textures\player.dds" />
-    <Image Include="textures\snowcube1024.dds">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="textures\stage.dds" />
-    <Image Include="textures\stone.dds">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="textures\sunsetcube1024.dds">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="textures\tile.dds">
+    <Image Include="textures\stage.dds">
       <DeploymentContent>true</DeploymentContent>
     </Image>
     <Image Include="textures\tile_nmap.dds">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="textures\tree0.bmp">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="textures\tree01S.dds">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="textures\tree02S.dds">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="textures\tree1.bmp">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="textures\tree2.bmp">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="textures\tree35S.dds">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="textures\treearray.dds">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="textures\treeArray2.dds">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="textures\upBody_diff.dds">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="textures\upbody_norm.dds">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="textures\water1.dds">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="textures\white1x1.dds">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="textures\WireFence.dds">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="textures\WoodCrate01.dds">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="textures\WoodCrate02.dds">
       <DeploymentContent>true</DeploymentContent>
     </Image>
   </ItemGroup>
