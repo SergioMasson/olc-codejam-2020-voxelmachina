@@ -186,6 +186,7 @@
     </ClCompile>
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="LightVoxelMachina.cpp" />
+    <ClCompile Include="playerController.cpp" />
     <ClCompile Include="systemTime.cpp" />
     <ClCompile Include="voxelMachina.cpp" />
   </ItemGroup>
@@ -219,6 +220,7 @@
     <ClInclude Include="mathHelpers.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="LightVoxelMachina.h" />
+    <ClInclude Include="playerController.h" />
     <ClInclude Include="systemTime.h" />
     <ClInclude Include="voxelMachina.h" />
   </ItemGroup>
@@ -361,7 +363,10 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="models\character.model">
+    <None Include="models\player.model">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="models\stage.model">
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="shaders\Common.hlsli" />
@@ -441,6 +446,7 @@
     <Image Include="textures\snowcube1024.dds">
       <DeploymentContent>true</DeploymentContent>
     </Image>
+    <Image Include="textures\stage.dds" />
     <Image Include="textures\stone.dds">
       <DeploymentContent>true</DeploymentContent>
     </Image>

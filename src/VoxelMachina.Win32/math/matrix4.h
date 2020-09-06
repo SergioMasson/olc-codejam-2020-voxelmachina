@@ -30,17 +30,7 @@ namespace math
 		}
 		Matrix4(const Transform& xform)
 		{
-			auto scale = xform.GetScale();
-
-			Matrix4 scaleMatrix
-			{
-				Vector4(scale.GetX(), 0, 0, 0),
-				Vector4(0, scale.GetY(), 0, 0),
-				Vector4(0, 0, scale.GetX(), 0),
-				Vector4(0, 0, 0, 1)
-			};
-
-			*this = scaleMatrix * Matrix4(Matrix3(xform.GetRotation()), xform.GetTranslation());
+			*this = Matrix4{ DirectX::XMMatrixAffineTransformation(xform.GetScale(), math::Vector3(0, 0, 0), xform.GetRotation(), xform.GetTranslation()) };
 		}
 
 		explicit Matrix4(const DirectX::XMMATRIX& mat) { m_mat = mat; }

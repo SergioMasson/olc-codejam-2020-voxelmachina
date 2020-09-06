@@ -37,28 +37,20 @@ public:
 	virtual void Resize(uint32_t width, uint32_t height) override;
 
 private:
-
 	Camera m_sceneCamera{};
-	CameraController* m_cameraController{ nullptr };
 
 	DirectionalLight m_sceneDirLight{};
 	PointLight m_scenePointLight{};
 	SpotLight m_sceneSpotLight{};
 
 	std::unique_ptr<graphics::RenderPipeline> m_renderPipeline;
+	std::vector<graphics::MeshRenderer*> m_sceneMeshRenderer;
 
-	std::vector<graphics::MeshData> m_sceneMeshes;
-	std::vector<graphics::MeshRenderer> m_sceneMeshRenderer;
-
-	graphics::UI::GuiText* m_guiText;
-	graphics::UI::GuiPanel* m_guiPanel;
-	graphics::UI::GuiSprite* m_sprite;
+	graphics::MeshRenderer* m_player;
+	CameraController* m_cameraController;
 
 	graphics::Texture2D* m_skybox;
-
 	math::Vector3 mouse_position;
-	std::wstring m_typedStuff{ L"Commands: " };
-
 	bool m_isDone = false;
 
 private:

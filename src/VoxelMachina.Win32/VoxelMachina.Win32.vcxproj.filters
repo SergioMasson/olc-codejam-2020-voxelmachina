@@ -71,6 +71,9 @@
     <ClCompile Include="graphics\texture2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="playerController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
@@ -104,6 +107,7 @@
     <ClInclude Include="graphics\UI\guiSprite.h" />
     <ClInclude Include="graphics\dds.h" />
     <ClInclude Include="graphics\texture2D.h" />
+    <ClInclude Include="playerController.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\BoxVS.hlsl" />
@@ -115,8 +119,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\Lights.hlsli" />
-    <None Include="models\character.model" />
     <None Include="shaders\Common.hlsli" />
+    <None Include="models\player.model" />
+    <None Include="models\stage.model" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="textures\bricks.dds" />
@@ -174,5 +179,6 @@
     <Image Include="textures\player.dds" />
     <Image Include="textures\DarkSkyCartoon.dds" />
     <Image Include="textures\canyon1.dds" />
+    <Image Include="textures\stage.dds" />
   </ItemGroup>
 </Project>

@@ -10,11 +10,8 @@ public:
 	// Public functions for controlling where the camera is and its orientation
 	void SetEyeAtUp(math::Vector3 eye, math::Vector3 at, math::Vector3 up)
 	{
-		DirectX::XMMATRIX V = DirectX::XMMatrixLookAtLH(eye, at, up);
-		auto rotation = DirectX::XMQuaternionRotationMatrix(V);
-		m_CameraToWorld.SetRotation(math::Quaternion(rotation));
-		m_CameraToWorld.SetTranslation(eye);
-		UpdateViewMatrix();
+		SetLookDirection(eye - at, up);
+		SetPosition(eye);
 	}
 
 	void SetPerspectiveMatrix(float verticalFovRadians, float aspectHeightOverWidth, float nearZClip, float farZClip)
@@ -95,6 +92,7 @@ public:
 	math::Matrix4 GetViewProjectionMatrix() const { return m_viewProjectionMatrix.Transpose(); }
 
 private:
+	void SetLookDirection(math::Vector3 forward, math::Vector3 up);
 	void UpdateProjectionMatrix();
 	void UpdateViewMatrix();
 	void UpdateViewProjectionMatrix();
@@ -103,7 +101,6 @@ private:
 	math::Matrix4 m_viewMatrix;
 	math::Matrix4 m_projectionMatrix;
 	math::Matrix4 m_viewProjectionMatrix;
-
 	math::Transform m_CameraToWorld;
 
 	// Redundant data cached for faster lookups.

@@ -4,6 +4,22 @@
 using namespace DirectX;
 using namespace math;
 
+void Camera::SetLookDirection(math::Vector3 forward, math::Vector3 up)
+{
+	forward = Normalize(forward);
+	up = Normalize(up);
+
+	// Deduce a valid, orthogonal right vector
+	Vector3 right = Normalize(Cross(forward, up));
+
+	// Compute actual up vector
+	up = Normalize(Cross(forward, right));
+
+	// Finish constructing basis
+	m_Basis = Matrix3(right, up, -forward);
+	m_CameraToWorld.SetRotation(Quaternion(m_Basis));
+}
+
 void Camera::UpdateProjectionMatrix()
 {
 	XMMATRIX V = XMMatrixPerspectiveFovLH(m_VerticalFOV, m_AspectRatio, m_NearClip, m_FarClip);
