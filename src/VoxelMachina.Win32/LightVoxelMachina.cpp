@@ -14,8 +14,8 @@
 
 #define ENEMY_COUNT 5
 #define PILAR_COUNT 100
-#define WORLD_X  100
-#define WORLD_Y  100
+#define WORLD_X  100.0f
+#define WORLD_Y  100.0f
 
 void LightVoxelMachinaApp::Startup(void)
 {
@@ -161,9 +161,9 @@ void LightVoxelMachinaApp::CreateObjects()
 	auto playerTexture = new graphics::Texture2D(L"textures/littleRobot.dds");
 	auto floorTexture = new graphics::Texture2D(L"textures/checkboard_mips.dds");
 	auto floorNormalMap = new graphics::Texture2D(L"textures/tile_nmap.dds");
-	auto enemyTexture = new graphics::Texture2D(L"textures/enemy.dds");
-	auto pilarTexture = new graphics::Texture2D(L"textures/bricks2.dds");
-	auto pilarNormal = new graphics::Texture2D(L"textures/bricks2_nmap.dds");
+	auto enemyTexture = new graphics::Texture2D(L"textures/enemy_inv.dds");
+	auto pilarTexture = new graphics::Texture2D(L"textures/checkboard_mips.dds");
+	auto pilarNormal = new graphics::Texture2D(L"textures/tile_nmap.dds");
 
 	graphics::Material material1{};
 	material1.Ambient = colors::white;
@@ -186,7 +186,7 @@ void LightVoxelMachinaApp::CreateObjects()
 	auto floor = new graphics::MeshRenderer(quad, material2, math::Vector3(0, 0, 0), math::Quaternion());
 	floor->SetAlbedoTexture(floorTexture);
 	floor->SetNormalMap(floorNormalMap);
-	floor->SetTextureScale(10, 10);
+	floor->SetTextureScale(20, 20);
 
 	m_sceneMeshRenderer.push_back(floor);
 }
@@ -200,8 +200,11 @@ void LightVoxelMachinaApp::CreateEnemy(graphics::MeshData& enemyData, graphics::
 
 	for (size_t i = 0; i < ENEMY_COUNT; i++)
 	{
-		float enemyX = static_cast<float>(rand() % WORLD_X) - (static_cast<float>(WORLD_X) / 2.0);
-		float enemyY = static_cast<float>(rand() % WORLD_Y) - (static_cast<float>(WORLD_Y) / 2.0);
+		float randomX = (rand() % 1000) / 1000.0f;
+		float randomY = rand() % 1000 / 1000.0f;
+
+		float enemyX = (randomX * WORLD_X) - ((WORLD_X) / 2.0);
+		float enemyY = (randomY * WORLD_Y) - ((WORLD_Y) / 2.0);
 		auto enemyPosition = math::Vector3(enemyX, 0, enemyY);
 		auto enemy = new graphics::MeshRenderer(enemyData, material1, enemyPosition, math::Quaternion());
 		enemy->SetAlbedoTexture(enemyTexture);
@@ -220,12 +223,40 @@ void LightVoxelMachinaApp::CreatePilars(graphics::MeshData& pilarData, graphics:
 
 	for (size_t i = 0; i < PILAR_COUNT; i++)
 	{
-		float enemyX = static_cast<float>(rand() % WORLD_X) - (static_cast<float>(WORLD_X) / 2.0);
-		float enemyY = static_cast<float>(rand() % WORLD_Y) - (static_cast<float>(WORLD_Y) / 2.0);
-		auto pilar = new graphics::MeshRenderer(pilarData, material1, math::Vector3(enemyX, 5, enemyY), math::Quaternion());
+		float pilarX = 0.0f;
+		float pilarY = 0.0f;
+
+		math::Vector3 distance;
+
+		bool overlapingEnemy = false;
+
+		do
+		{
+			float randomX = (rand() % 1000) / 1000.0f;
+			float randomY = rand() % 1000 / 1000.0f;
+
+			pilarX = (randomX * (WORLD_X - 3.0f)) - ((WORLD_X - 3.0f) / 2.0f);
+			pilarY = (randomY * (WORLD_Y - 3.0f)) - ((WORLD_Y - 3.0f) / 2.0f);
+
+			distance = m_player->GetPosition() - math::Vector3(pilarX, 0, pilarY);
+
+			for (auto enemy : m_enemiesLeft)
+			{
+				distance = enemy - math::Vector3(pilarX, 0, pilarY);
+
+				if (math::Length(distance) <= 1.0f)
+					overlapingEnemy = true;
+			}
+		} while (math::Length(distance) <= 10.0f && overlapingEnemy);
+
+		//Check for player
+
+		//Check for enemy
+
+		auto pilar = new graphics::MeshRenderer(pilarData, material1, math::Vector3(pilarX, 5, pilarY), math::Quaternion());
 		pilar->SetAlbedoTexture(pilarTexture);
 		pilar->SetNormalMap(pilarNormal);
-		pilar->SetTextureScale(3, 3);
+		pilar->SetTextureScale(3, 5);
 		m_sceneMeshRenderer.push_back(pilar);
 	}
 }
