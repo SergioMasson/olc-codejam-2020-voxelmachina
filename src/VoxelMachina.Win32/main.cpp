@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "voxelMachina.h"
 #include "LightVoxelMachina.h"
 
 INT __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nCmdShow)

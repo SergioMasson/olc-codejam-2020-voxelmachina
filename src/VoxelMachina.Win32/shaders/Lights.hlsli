@@ -75,12 +75,12 @@ void ComputeDirectionalLight(Material mat, DirectionalLight L,
 	// The light vector aims opposite the direction the light rays travel.
     float3 lightVec = -L.Direction;
 
-	// Add ambient term.
-    ambient = L.Intensity * mat.Ambient * L.Ambient;
-
 	// Add diffuse and specular term, provided the surface is in 
 	// the line of site of the light.
     float diffuseFactor = max(dot(normal, lightVec), 0.0);
+    
+    // Add ambient term.
+    ambient = L.Intensity * mat.Ambient * L.Ambient;
 
 	// Flatten to avoid dynamic branching.
 	[flatten]
@@ -145,6 +145,7 @@ void ComputePointLight(Material mat, PointLight L, float3 pos, float3 normal, fl
 
     diffuse *= att;
     spec *= att;
+    ambient *= att;
 }
 
 //---------------------------------------------------------------------------------------

@@ -27,6 +27,8 @@ ComPtr<ID2D1DeviceContext>		graphics::g_d2dDeviceContext = nullptr;
 
 ComPtr<ID2D1Bitmap1> d2dRenderTarget = nullptr;
 
+Color m_cleanColor{ Color::Black };
+
 static int g_CurrBackBuffer;
 
 void createD2DRenderTarget(IDXGISurface1* ptr)
@@ -223,7 +225,7 @@ void graphics::Resize(uint32_t width, uint32_t heigth)
 void graphics::BeginDraw()
 {
 	g_d3dImmediateContext->OMSetRenderTargets(1, g_RenderTargetView.GetAddressOf(), g_DepthStencilView.Get());
-	g_d3dImmediateContext->ClearRenderTargetView(g_RenderTargetView.Get(), reinterpret_cast<const float*>(&colors::black));
+	g_d3dImmediateContext->ClearRenderTargetView(g_RenderTargetView.Get(), reinterpret_cast<const float*>(&m_cleanColor));
 	g_d3dImmediateContext->ClearDepthStencilView(g_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
 

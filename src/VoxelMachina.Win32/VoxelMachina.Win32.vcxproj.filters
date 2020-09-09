@@ -20,9 +20,6 @@
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="voxelMachina.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -77,11 +74,13 @@
     <ClCompile Include="enemy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="color.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="voxelMachina.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="systemTime.h" />
     <ClInclude Include="dxassert.h" />
@@ -134,9 +133,6 @@
     <Image Include="textures\checkboard.dds" />
     <Image Include="textures\default_nmap.dds" />
     <Image Include="textures\tile_nmap.dds" />
-    <Image Include="icons\icon.png">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="textures\neutralNormal.dds" />
     <Image Include="textures\checkboard_mips.dds" />
     <Image Include="textures\character.dds" />
@@ -146,5 +142,12 @@
     <Image Include="textures\congratulations.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="icons\enemy_icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="icons\player_icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="textures\enemy_inv.dds" />
   </ItemGroup>
 </Project>

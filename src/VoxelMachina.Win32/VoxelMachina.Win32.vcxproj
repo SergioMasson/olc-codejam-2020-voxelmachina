@@ -120,6 +120,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)bin\Shaders\$(PlatformTarget)\$(Configuration)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -154,6 +155,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)bin\Shaders\$(PlatformTarget)\$(Configuration)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -165,6 +167,7 @@
   <ItemGroup>
     <ClCompile Include="application.cpp" />
     <ClCompile Include="cameraController.cpp" />
+    <ClCompile Include="color.cpp" />
     <ClCompile Include="enemy.cpp" />
     <ClCompile Include="graphics\coreGraphics.cpp" />
     <ClCompile Include="graphics\dds.cpp" />
@@ -189,7 +192,6 @@
     <ClCompile Include="LightVoxelMachina.cpp" />
     <ClCompile Include="playerController.cpp" />
     <ClCompile Include="systemTime.cpp" />
-    <ClCompile Include="voxelMachina.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
@@ -224,7 +226,6 @@
     <ClInclude Include="LightVoxelMachina.h" />
     <ClInclude Include="playerController.h" />
     <ClInclude Include="systemTime.h" />
-    <ClInclude Include="voxelMachina.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\BoxPS.hlsl">
@@ -375,11 +376,11 @@
     <None Include="shaders\Lights.hlsli" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="icons\icon.png">
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    <Image Include="icons\enemy_icon.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="icons\player_icon.png">
+      <DeploymentContent>true</DeploymentContent>
     </Image>
     <Image Include="textures\bricks2.dds">
       <DeploymentContent>true</DeploymentContent>
@@ -406,6 +407,9 @@
       <DeploymentContent>true</DeploymentContent>
     </Image>
     <Image Include="textures\enemy.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="textures\enemy_inv.dds">
       <DeploymentContent>true</DeploymentContent>
     </Image>
     <Image Include="textures\littleRobot.dds">

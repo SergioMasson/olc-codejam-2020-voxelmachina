@@ -36,8 +36,6 @@ void PlayerController::Update(float deltaT)
 {
 	float forward = m_MoveSpeed * (
 		-Input::GetTimeCorrectedAnalogInput(Input::AnalogInput::kAnalogLeftStickY) +
-		Input::IsPressed(Input::KeyCode::DPadUp) ? -deltaT : 0.0f +
-		Input::IsPressed(Input::KeyCode::DPadDown) ? deltaT : 0.0f +
 		(Input::IsPressed(Input::KeyCode::Key_s) ? deltaT : 0.0f) +
 		(Input::IsPressed(Input::KeyCode::Key_w) ? -deltaT : 0.0f)
 		);
@@ -50,7 +48,7 @@ void PlayerController::Update(float deltaT)
 	if (Input::IsPressed(Input::KeyCode::MouseRigth))
 	{
 		mouseX = deltaT * (Input::GetAnalogInput(Input::AnalogInput::kAnalogMouseX));
-		mouseY = deltaT * (Input::GetAnalogInput(Input::AnalogInput::kAnalogMouseY)) * 0.2;
+		mouseY = deltaT * (Input::GetAnalogInput(Input::AnalogInput::kAnalogMouseY)) * 0.2f;
 	}
 
 	float cameraRotationX = (mouseX * m_mouseCameraRotationSpeed) + (m_xboxCamRotationSpeed * deltaT * Input::GetAnalogInput(Input::AnalogInput::kAnalogRightStickX));
@@ -61,9 +59,7 @@ void PlayerController::Update(float deltaT)
 
 	//// don't apply momentum to mouse inputs
 	float rotation = m_RotationSpeed * (
-		-Input::GetTimeCorrectedAnalogInput(Input::AnalogInput::kAnalogLeftStickX) +
-		Input::IsPressed(Input::KeyCode::DPadLeft) ? -deltaT : 0.0f +
-		Input::IsPressed(Input::KeyCode::DPadRight) ? deltaT : 0.0f +
+		Input::GetTimeCorrectedAnalogInput(Input::AnalogInput::kAnalogLeftStickX) +
 		(Input::IsPressed(Input::KeyCode::Key_d) ? deltaT : 0.0f) +
 		(Input::IsPressed(Input::KeyCode::Key_a) ? -deltaT : 0.0f)
 		);
