@@ -287,8 +287,8 @@ void graphics::MeshData::CreateSphere(float radius, UINT sliceCount, UINT stackC
 			XMVECTOR p = XMLoadFloat3(&v.Position);
 			XMStoreFloat3(&v.Normal, XMVector3Normalize(p));
 
-			v.TexC.x = theta / XM_2PI;
-			v.TexC.y = phi / XM_PI;
+			v.TexUV.x = theta / XM_2PI;
+			v.TexUV.y = phi / XM_PI;
 
 			meshData.Vertices.push_back(v);
 		}
@@ -382,8 +382,8 @@ void graphics::MeshData::CreateCylinder(float bottomRadius, float topRadius, flo
 
 			vertex.Position = XMFLOAT3(r * c, y, r * s);
 
-			vertex.TexC.x = (float)j / sliceCount;
-			vertex.TexC.y = 1.0f - (float)i / stackCount;
+			vertex.TexUV.x = (float)j / sliceCount;
+			vertex.TexUV.y = 1.0f - (float)i / stackCount;
 
 			// Cylinder can be parameterized as follows, where we introduce v
 			// parameter that goes in the same direction as the v tex-coord
@@ -473,8 +473,8 @@ void graphics::MeshData::CreateGrid(float width, float depth, UINT m, UINT n, Me
 			meshData.Vertices[i * n + j].TangentU = XMFLOAT3(1.0f, 0.0f, 0.0f);
 
 			// Stretch texture over grid.
-			meshData.Vertices[i * n + j].TexC.x = j * du;
-			meshData.Vertices[i * n + j].TexC.y = i * dv;
+			meshData.Vertices[i * n + j].TexUV.x = j * du;
+			meshData.Vertices[i * n + j].TexUV.y = i * dv;
 		}
 	}
 
@@ -584,7 +584,7 @@ void graphics::MeshData::LoadFromOBJFile(const wchar_t* filename, MeshData& mesh
 				Vertex newVertex{};
 				newVertex.Position = vertex[vertexIndex0].Position;
 				newVertex.Normal = temp_normals[normalIndex0];
-				newVertex.TexC = temp_uvs[textureInde0];
+				newVertex.TexUV = temp_uvs[textureInde0];
 
 				math::Vector3 pos1 = vertex[vertexIndex0].Position;
 				math::Vector3 pos2 = vertex[vertexIndex1].Position;
@@ -599,7 +599,7 @@ void graphics::MeshData::LoadFromOBJFile(const wchar_t* filename, MeshData& mesh
 			else
 			{
 				vertex[vertexIndex0].Normal = temp_normals[normalIndex0];
-				vertex[vertexIndex0].TexC = temp_uvs[textureInde0];
+				vertex[vertexIndex0].TexUV = temp_uvs[textureInde0];
 
 				math::Vector3 pos1 = vertex[vertexIndex0].Position;
 				math::Vector3 pos2 = vertex[vertexIndex1].Position;
@@ -617,7 +617,7 @@ void graphics::MeshData::LoadFromOBJFile(const wchar_t* filename, MeshData& mesh
 				Vertex newVertex{};
 				newVertex.Position = vertex[vertexIndex1].Position;
 				newVertex.Normal = temp_normals[normalIndex1];
-				newVertex.TexC = temp_uvs[textureInde1];
+				newVertex.TexUV = temp_uvs[textureInde1];
 
 				math::Vector3 pos1 = vertex[vertexIndex1].Position;
 				math::Vector3 pos2 = vertex[vertexIndex2].Position;
@@ -632,7 +632,7 @@ void graphics::MeshData::LoadFromOBJFile(const wchar_t* filename, MeshData& mesh
 			else
 			{
 				vertex[vertexIndex1].Normal = temp_normals[normalIndex1];
-				vertex[vertexIndex1].TexC = temp_uvs[textureInde1];
+				vertex[vertexIndex1].TexUV = temp_uvs[textureInde1];
 
 				math::Vector3 pos1 = vertex[vertexIndex1].Position;
 				math::Vector3 pos2 = vertex[vertexIndex2].Position;
@@ -650,7 +650,7 @@ void graphics::MeshData::LoadFromOBJFile(const wchar_t* filename, MeshData& mesh
 				Vertex newVertex{};
 				newVertex.Position = vertex[vertexIndex2].Position;
 				newVertex.Normal = temp_normals[normalIndex2];
-				newVertex.TexC = temp_uvs[textureInde2];
+				newVertex.TexUV = temp_uvs[textureInde2];
 
 				math::Vector3 pos1 = vertex[vertexIndex2].Position;
 				math::Vector3 pos2 = vertex[vertexIndex0].Position;
@@ -665,7 +665,7 @@ void graphics::MeshData::LoadFromOBJFile(const wchar_t* filename, MeshData& mesh
 			else
 			{
 				vertex[vertexIndex2].Normal = temp_normals[normalIndex2];
-				vertex[vertexIndex2].TexC = temp_uvs[textureInde2];
+				vertex[vertexIndex2].TexUV = temp_uvs[textureInde2];
 
 				math::Vector3 pos1 = vertex[vertexIndex2].Position;
 				math::Vector3 pos2 = vertex[vertexIndex0].Position;

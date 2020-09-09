@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "../../colors.h"
 #include "guiText.h"
 #include "../coreGraphics.h"
 
@@ -40,7 +41,7 @@ void graphics::UI::GuiText::Draw(void)
 	graphics::g_d2dDeviceContext->DrawText(m_text.c_str(), static_cast<int>(m_text.size()), m_writer.Get(), drawRect, m_brush.Get());
 }
 
-void graphics::UI::GuiText::SetColor(D2D1::ColorF color)
+void graphics::UI::GuiText::SetColor(Color color)
 {
 	m_brush.Reset();
 	ASSERT_SUCCEEDED(graphics::g_d2dDeviceContext->CreateSolidColorBrush(color, m_brush.GetAddressOf()));

@@ -1,9 +1,10 @@
 #include "pch.h"
-#include "texture2D.h"
 #include "coreGraphics.h"
 #include <fstream>
 #include <iterator>
 #include <vector>
+
+#include "texture2D.h"
 
 #include "dds.h"
 

@@ -15,7 +15,7 @@ void graphics::UI::GuiPanel::Draw(void)
 	graphics::g_d2dDeviceContext->FillRectangle(drawRect, m_brush.Get());
 }
 
-void graphics::UI::GuiPanel::SetColor(D2D1::ColorF color)
+void graphics::UI::GuiPanel::SetColor(Color color)
 {
 	m_brush.Reset();
 	m_color = color;

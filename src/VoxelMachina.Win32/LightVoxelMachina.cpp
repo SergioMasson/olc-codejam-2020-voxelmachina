@@ -19,6 +19,8 @@
 
 void LightVoxelMachinaApp::Startup(void)
 {
+	enemiesLeft = ENEMY_COUNT;
+
 	//Create the render pipeline
 	m_renderPipeline = std::make_unique<graphics::RenderPipeline>();
 	m_renderPipeline->LoadShader(g_pSimpleLightVS, sizeof(g_pSimpleLightVS), g_pSimpleLightPS, sizeof(g_pSimpleLightPS));
@@ -30,8 +32,6 @@ void LightVoxelMachinaApp::Startup(void)
 	CreateObjects();
 	CreateGUI();
 	CreateCamera();
-
-	enemiesLeft = ENEMY_COUNT;
 
 	m_playerController = new PlayerController(math::Vector3(0, 1, 0), m_player, &m_sceneCamera);
 	m_cameraController = new CameraController(m_sceneCamera, math::Vector3(0, 1, 0));
@@ -56,7 +56,7 @@ void LightVoxelMachinaApp::Update(float deltaT)
 
 	CheckForEnemyCollision();
 
-	math::Vector3 lightPosition = m_player->GetPosition() + (m_player->GetRotation() * math::Vector3{ 0, 1, 1 });
+	math::Vector3 lightPosition = m_player->GetPosition() + (m_player->GetRotation() * math::Vector3{ 0, 2, 0.25f });
 	math::Vector3 playerFoward = math::Matrix3{ m_player->GetRotation() }.GetZ();
 
 	DirectX::XMStoreFloat3(&m_scenePointLight.Position, lightPosition);
@@ -66,7 +66,7 @@ void LightVoxelMachinaApp::Update(float deltaT)
 	m_time += deltaT;
 	m_counterText->SetText(L"TOTAL TIME: " + std::to_wstring(m_time));
 
-	m_enemiesLeftText->SetText(L"Evil robots left: " + std::to_wstring(enemiesLeft));
+	m_enemiesLeftText->SetText(L" X " + std::to_wstring(enemiesLeft));
 }
 
 void LightVoxelMachinaApp::RenderScene(void)
@@ -114,14 +114,14 @@ void LightVoxelMachinaApp::CreateLights()
 	m_sceneDirLight = Light{};
 	//Directional light.
 	m_sceneDirLight.Ambient = 0.0f;
-	m_sceneDirLight.Color = colors::white;
+	m_sceneDirLight.Color = Color::White;
 	m_sceneDirLight.Direction = DirectX::XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
-	m_sceneDirLight.Intensity = 0.1;
+	m_sceneDirLight.Intensity = 0.0;
 
 	m_scenePointLight = Light{};
 	// Point light--position is changed every frame to animate in UpdateScene function.
 	m_scenePointLight.Ambient = 0.2f;
-	m_scenePointLight.Color = colors::white;
+	m_scenePointLight.Color = Color::White;
 	m_scenePointLight.Range = 10.0f;
 	m_scenePointLight.Position = DirectX::XMFLOAT3(0.0f, 3.0f, 5.0f);
 	m_scenePointLight.Intensity = 0.5f;
@@ -129,9 +129,9 @@ void LightVoxelMachinaApp::CreateLights()
 	m_sceneSpotLight = Light{};
 	// Spot light--position and direction changed every frame to animate in UpdateScene function.
 	m_scenePointLight.Ambient = 1.0f;
-	m_scenePointLight.Color = colors::white;
+	m_scenePointLight.Color = Color::White;
 	m_sceneSpotLight.Spot = 96.0f;
-	m_sceneSpotLight.Range = 10.0;
+	m_sceneSpotLight.Range = 25.0f;
 	m_sceneSpotLight.Position = DirectX::XMFLOAT3(2.0f, 3.0f, 0.0f);
 	m_sceneSpotLight.Direction = DirectX::XMFLOAT3(0.0f, -1.0f, 0.0f);
 	m_sceneSpotLight.Intensity = 0.0f;
@@ -164,7 +164,7 @@ void LightVoxelMachinaApp::CreateObjects()
 	graphics::Material material1{};
 	material1.Diffuse = 1.0f;
 	material1.Specular = 2.0f;
-	material1.Color = colors::white;
+	material1.Color = Color::White;
 
 	m_player = new graphics::MeshRenderer(playerCharacter, material1, math::Vector3(0, 0, 0), math::Quaternion(), math::Vector3(1, 1, 1));
 	m_player->SetAlbedoTexture(playerTexture);
@@ -175,7 +175,7 @@ void LightVoxelMachinaApp::CreateObjects()
 	CreatePilars(pilarMesh, pilarTexture, pilarNormal);
 
 	graphics::Material material2{};
-	material2.Color = colors::silver;
+	material2.Color = Color::Silver;
 	material2.Specular = 2.0f;
 	material2.Diffuse = 1.0f;
 
@@ -190,7 +190,7 @@ void LightVoxelMachinaApp::CreateObjects()
 void LightVoxelMachinaApp::CreateEnemy(graphics::MeshData& enemyData, graphics::Texture2D* enemyTexture, graphics::Texture2D* enemyNormal, graphics::Texture2D* detectedTexture)
 {
 	graphics::Material material1{};
-	material1.Color = colors::white;
+	material1.Color = Color::White;
 	material1.Diffuse = 1.0f;
 	material1.Specular = 2.0f;
 
@@ -199,8 +199,8 @@ void LightVoxelMachinaApp::CreateEnemy(graphics::MeshData& enemyData, graphics::
 		float randomX = (rand() % 1000) / 1000.0f;
 		float randomY = rand() % 1000 / 1000.0f;
 
-		float enemyX = (randomX * WORLD_X) - ((WORLD_X) / 2.0);
-		float enemyY = (randomY * WORLD_Y) - ((WORLD_Y) / 2.0);
+		float enemyX = (randomX * WORLD_X) - ((WORLD_X) / 2.0f);
+		float enemyY = (randomY * WORLD_Y) - ((WORLD_Y) / 2.0f);
 		auto enemyPosition = math::Vector3(enemyX, 0, enemyY);
 		auto enemy = new graphics::MeshRenderer(enemyData, material1, enemyPosition, math::Quaternion());
 		enemy->SetAlbedoTexture(enemyTexture);
@@ -213,7 +213,7 @@ void LightVoxelMachinaApp::CreateEnemy(graphics::MeshData& enemyData, graphics::
 void LightVoxelMachinaApp::CreatePilars(graphics::MeshData& pilarData, graphics::Texture2D* pilarTexture, graphics::Texture2D* pilarNormal)
 {
 	graphics::Material material1{};
-	material1.Color = colors::white;
+	material1.Color = Color::White;
 	material1.Diffuse = 1.0f;
 	material1.Specular = 2.0f;
 
@@ -259,9 +259,9 @@ void LightVoxelMachinaApp::CreatePilars(graphics::MeshData& pilarData, graphics:
 
 void LightVoxelMachinaApp::CreateGUI()
 {
-	m_informationText = new graphics::UI::GuiText(nullptr, 0, 0, 500, 100, 30);
+	m_informationText = new graphics::UI::GuiText(nullptr, 10, 10, 500, 100, 30);
 
-	m_informationText->SetText(L"10 evil robots are lost in the room, find all of them! How fast can you do it?");
+	m_informationText->SetText(std::to_wstring(enemiesLeft) + L" evil robots are lost in the room, find all of them! How fast can you do it?");
 	m_informationText->SetColor(D2D1::ColorF::White);
 
 	m_sceneGuiElements.push_back(m_informationText);
@@ -273,12 +273,21 @@ void LightVoxelMachinaApp::CreateGUI()
 
 	m_sceneGuiElements.push_back(m_counterText);
 
-	m_enemiesLeftText = new graphics::UI::GuiText(nullptr, -500, 100, 500, 100, 20);
-	m_enemiesLeftText->SetColor(D2D1::ColorF::Green);
-	m_enemiesLeftText->SetAnchorType(graphics::UI::ParentAnchorType::TopRight);
-	m_enemiesLeftText->SetText(L"Evil robots left: 10");
+	auto scorePanel = new graphics::UI::GuiPanel(nullptr, -200, 30, 170, 100);
+	scorePanel->SetColor(Color{ Color::White, 0.5f });
+	scorePanel->SetAnchorType(graphics::UI::ParentAnchorType::TopRight);
+	m_sceneGuiElements.push_back(scorePanel);
+
+	m_enemiesLeftText = new graphics::UI::GuiText(scorePanel, 80, 0, 300, 100, 30);
+	m_enemiesLeftText->SetColor(D2D1::ColorF::Purple);
+	m_enemiesLeftText->SetAnchorType(graphics::UI::ParentAnchorType::TopLeft);
+	m_enemiesLeftText->SetText(L" X " + std::to_wstring(enemiesLeft));
 
 	m_sceneGuiElements.push_back(m_enemiesLeftText);
+
+	auto enemy_icon = new graphics::UI::GuiSprite(m_enemiesLeftText, -60, 20, 60, 60);
+	enemy_icon->LoadBitmapFromFile(L"icons/enemy_icon.png", false);
+	m_sceneGuiElements.push_back(enemy_icon);
 }
 
 void LightVoxelMachinaApp::CheckForEnemyCollision()

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "drawableElement.h"
+#include "../../colors.h"
 
 namespace graphics
 {
@@ -15,14 +16,14 @@ namespace graphics
 			void SetText(std::wstring text) { m_text = text; }
 			std::wstring GetText() const { return m_text; };
 
-			void SetColor(D2D1::ColorF color);
-			D2D1::ColorF GetColor() const { return m_color; };
+			void SetColor(Color color);
+			Color GetColor() const { return m_color; };
 
 		private:
 			Microsoft::WRL::ComPtr<IDWriteTextFormat> m_writer = nullptr;
 			Microsoft::WRL::ComPtr<ID2D1SolidColorBrush> m_brush = nullptr;
 			std::wstring m_text;
-			D2D1::ColorF m_color;
+			Color m_color;
 		};
 	}
 }
