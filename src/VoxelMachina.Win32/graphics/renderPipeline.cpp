@@ -14,9 +14,9 @@ struct SceneConstBuffer
 {
 	SceneConstBuffer() { ZeroMemory(this, sizeof(this)); }
 
-	DirectionalLight DirectionalLights;
-	PointLight PointLight;
-	SpotLight SpotLight;
+	Light PointLight;
+	Light DirectionalLights;
+	Light SpotLight;
 
 	//Position of the camera in world space.
 	DirectX::XMFLOAT3 eyeWorld;
@@ -79,7 +79,7 @@ void graphics::RenderPipeline::LoadShader(const BYTE* vertexShader, SIZE_T verte
 	ASSERT_SUCCEEDED(hr, "Fail to create input layout");
 }
 
-void graphics::RenderPipeline::StartRender(Camera* camera, DirectionalLight lights, SpotLight spotLights, PointLight pointLights)
+void graphics::RenderPipeline::StartRender(Camera* camera, Light lights, Light spotLights, Light pointLights)
 {
 	m_camera = camera;
 

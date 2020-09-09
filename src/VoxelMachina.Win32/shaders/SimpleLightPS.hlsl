@@ -1,4 +1,4 @@
-#include "Lights.hlsli"
+#include "NewLightModel.hlsli"
 
 
 Texture2D gDiffuseMap : register(t0);
@@ -29,9 +29,9 @@ float3 NormalSampleToWorldSpace(float3 normalMapSample, float3 unitNormalW, floa
 
 cbuffer cbPerFrame : register(b1)
 {
-    DirectionalLight gDirLight;
-    PointLight gPointLight;
-    SpotLight gSpotLight;
+    Light gPointLight;
+    Light gDirLight;
+    Light gSpotLight;
     float3 gEyePosW;
     float gPad;
 };
@@ -66,35 +66,14 @@ float4 main(VertexOut pin) : SV_TARGET
     
     float3 toEyeW = normalize(gEyePosW - pin.PosW);
 
-	// Start with a sum of zero. 
-    float4 ambient = float4(0.0f, 0.0f, 0.0f, 0.0f);
-    float4 diffuse = float4(0.0f, 0.0f, 0.0f, 0.0f);
-    float4 spec = float4(0.0f, 0.0f, 0.0f, 0.0f);
-
-	// Sum the light contribution from each light source.
-    float4 A, D, S;
-
-    ComputeDirectionalLight(gMaterial, gDirLight, bumpedNormal, toEyeW, A, D, S);
-    ambient += A;
-    diffuse += D;
-    spec += S;
-
-    ComputePointLight(gMaterial, gPointLight, pin.PosW, bumpedNormal, toEyeW, A, D, S);
-    ambient += A;
-    diffuse += D;
-    spec += S;
-
-    ComputeSpotLight(gMaterial, gSpotLight, pin.PosW, bumpedNormal, toEyeW, A, D, S);
-    ambient += max(A, 0);
-    diffuse += max(D, 0);
-    spec += max(S, 0);
-	   
-    float4 litColor = ambient + diffuse + spec;
-
-	// Common to take alpha from diffuse material.
-    litColor.a = gMaterial.Diffuse.a;
-
-    float4 diffuseAlbedo = litColor * gDiffuseMap.Sample(gsamLinear, (gTextureScale * pin.TexC) + gTextureDisplacement);
+    float4 albedoMapColor = gDiffuseMap.Sample(gsamLinear, (gTextureScale * pin.TexC) + gTextureDisplacement);
+    float4 objectColor = gMaterial.Color * albedoMapColor;
     
-    return diffuseAlbedo;
+    float4 pixelColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    
+    pixelColor += objectColor * ComputeDirectionalLight(gMaterial, gDirLight, bumpedNormal, toEyeW);
+    pixelColor += objectColor * ComputePointLight(gMaterial, gPointLight, pin.PosW, bumpedNormal, toEyeW);
+    pixelColor += objectColor * ComputeSpotLight(gMaterial, gSpotLight, pin.PosW, bumpedNormal, toEyeW);
+
+    return pixelColor;
 }

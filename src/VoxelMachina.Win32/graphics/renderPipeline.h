@@ -17,7 +17,7 @@ namespace graphics
 		RenderPipeline();
 		~RenderPipeline();
 		void LoadShader(const BYTE* vertexShader, SIZE_T vertexShaderSize, const BYTE* pixelShader, SIZE_T pixelShaderSize);
-		void StartRender(Camera* camera, DirectionalLight lights, SpotLight spotLights, PointLight pointLights);
+		void StartRender(Camera* camera, Light lights, Light spotLights, Light pointLights);
 		void RenderMesh(MeshRenderer const& mesh);
 		void SetSkyboxTexture(Texture2D* skybox) { m_skyboxTexture = skybox; };
 

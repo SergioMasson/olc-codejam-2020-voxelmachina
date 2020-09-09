@@ -126,6 +126,7 @@
     <None Include="shaders\Common.hlsli" />
     <None Include="models\littleRobot.model" />
     <None Include="models\enemy.model" />
+    <None Include="shaders\NewLightModel.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="textures\bricks2.dds" />

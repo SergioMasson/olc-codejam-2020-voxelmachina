@@ -11,10 +11,12 @@ namespace graphics
 	public:
 		Material() { ZeroMemory(this, sizeof(this)); }
 
-		DirectX::XMFLOAT4 Ambient;
-		DirectX::XMFLOAT4 Diffuse;
-		DirectX::XMFLOAT4 Specular; // w = SpecPower
-		DirectX::XMFLOAT4 Reflect;
+		DirectX::XMFLOAT4 Color;
+		DirectX::XMFLOAT4 Emission;
+
+		float Diffuse;
+		float Specular; // w = SpecPower
+		DirectX::XMFLOAT2 Pad;
 
 		friend RenderPipeline;
 	};

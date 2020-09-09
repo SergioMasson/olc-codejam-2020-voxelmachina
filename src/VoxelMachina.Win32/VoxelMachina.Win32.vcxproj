@@ -373,6 +373,7 @@
     </None>
     <None Include="shaders\Common.hlsli" />
     <None Include="shaders\Lights.hlsli" />
+    <None Include="shaders\NewLightModel.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="icons\icon.png">

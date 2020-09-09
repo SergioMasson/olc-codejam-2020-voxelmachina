@@ -111,35 +111,30 @@ void LightVoxelMachinaApp::CreateCamera()
 
 void LightVoxelMachinaApp::CreateLights()
 {
-	m_sceneDirLight = DirectionalLight{};
+	m_sceneDirLight = Light{};
 	//Directional light.
-	m_sceneDirLight.Ambient = DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	m_sceneDirLight.Diffuse = DirectX::XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
-	m_sceneDirLight.Specular = DirectX::XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
+	m_sceneDirLight.Ambient = 0.0f;
+	m_sceneDirLight.Color = colors::white;
 	m_sceneDirLight.Direction = DirectX::XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
-	m_sceneDirLight.Intensity = 0.5;
+	m_sceneDirLight.Intensity = 0.1;
 
-	m_scenePointLight = PointLight{};
+	m_scenePointLight = Light{};
 	// Point light--position is changed every frame to animate in UpdateScene function.
-	m_scenePointLight.Ambient = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
-	m_scenePointLight.Diffuse = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	m_scenePointLight.Specular = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	m_scenePointLight.Att = DirectX::XMFLOAT3(0.25f, 0.25f, 0.25f);
-	m_scenePointLight.Range = 5;
+	m_scenePointLight.Ambient = 0.2f;
+	m_scenePointLight.Color = colors::white;
+	m_scenePointLight.Range = 10.0f;
 	m_scenePointLight.Position = DirectX::XMFLOAT3(0.0f, 3.0f, 5.0f);
-	m_scenePointLight.Intensity = 0;
+	m_scenePointLight.Intensity = 0.5f;
 
-	m_sceneSpotLight = SpotLight{};
+	m_sceneSpotLight = Light{};
 	// Spot light--position and direction changed every frame to animate in UpdateScene function.
-	m_sceneSpotLight.Ambient = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1);
-	m_sceneSpotLight.Diffuse = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	m_sceneSpotLight.Specular = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	m_sceneSpotLight.Att = DirectX::XMFLOAT3(0.25f, 0.25f, 0.25f);
+	m_scenePointLight.Ambient = 1.0f;
+	m_scenePointLight.Color = colors::white;
 	m_sceneSpotLight.Spot = 96.0f;
 	m_sceneSpotLight.Range = 10.0;
 	m_sceneSpotLight.Position = DirectX::XMFLOAT3(2.0f, 3.0f, 0.0f);
 	m_sceneSpotLight.Direction = DirectX::XMFLOAT3(0.0f, -1.0f, 0.0f);
-	m_sceneSpotLight.Intensity = 1;
+	m_sceneSpotLight.Intensity = 0.0f;
 }
 
 void LightVoxelMachinaApp::CreateObjects()
@@ -167,9 +162,9 @@ void LightVoxelMachinaApp::CreateObjects()
 	auto pilarNormal = new graphics::Texture2D(L"textures/tile_nmap.dds");
 
 	graphics::Material material1{};
-	material1.Ambient = colors::white;
-	material1.Diffuse = colors::white;
-	material1.Specular = DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 2.0f);
+	material1.Diffuse = 1.0f;
+	material1.Specular = 2.0f;
+	material1.Color = colors::white;
 
 	m_player = new graphics::MeshRenderer(playerCharacter, material1, math::Vector3(0, 0, 0), math::Quaternion(), math::Vector3(1, 1, 1));
 	m_player->SetAlbedoTexture(playerTexture);
@@ -180,9 +175,9 @@ void LightVoxelMachinaApp::CreateObjects()
 	CreatePilars(pilarMesh, pilarTexture, pilarNormal);
 
 	graphics::Material material2{};
-	material2.Ambient = colors::silver;
-	material2.Diffuse = colors::silver;
-	material2.Specular = DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 2);
+	material2.Color = colors::silver;
+	material2.Specular = 2.0f;
+	material2.Diffuse = 1.0f;
 
 	auto floor = new graphics::MeshRenderer(quad, material2, math::Vector3(0, 0, 0), math::Quaternion());
 	floor->SetAlbedoTexture(floorTexture);
@@ -195,9 +190,9 @@ void LightVoxelMachinaApp::CreateObjects()
 void LightVoxelMachinaApp::CreateEnemy(graphics::MeshData& enemyData, graphics::Texture2D* enemyTexture, graphics::Texture2D* enemyNormal, graphics::Texture2D* detectedTexture)
 {
 	graphics::Material material1{};
-	material1.Ambient = colors::white;
-	material1.Diffuse = colors::white;
-	material1.Specular = DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 2.0f);
+	material1.Color = colors::white;
+	material1.Diffuse = 1.0f;
+	material1.Specular = 2.0f;
 
 	for (size_t i = 0; i < ENEMY_COUNT; i++)
 	{
@@ -218,9 +213,9 @@ void LightVoxelMachinaApp::CreateEnemy(graphics::MeshData& enemyData, graphics::
 void LightVoxelMachinaApp::CreatePilars(graphics::MeshData& pilarData, graphics::Texture2D* pilarTexture, graphics::Texture2D* pilarNormal)
 {
 	graphics::Material material1{};
-	material1.Ambient = colors::white;
-	material1.Diffuse = colors::white;
-	material1.Specular = DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 2.0f);
+	material1.Color = colors::white;
+	material1.Diffuse = 1.0f;
+	material1.Specular = 2.0f;
 
 	for (size_t i = 0; i < PILAR_COUNT; i++)
 	{

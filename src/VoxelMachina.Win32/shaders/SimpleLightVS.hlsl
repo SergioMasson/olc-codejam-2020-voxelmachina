@@ -1,12 +1,12 @@
-#include "Lights.hlsli"
+#include "NewLightModel.hlsli"
  
 cbuffer cbPerFrame : register(b1)
 {
-    DirectionalLight gDirLight;
-    PointLight       gPointLight;
-    SpotLight        gSpotLight;
-    float3           gEyePosW;
-    float            gPad;
+    Light           gPointLight;
+    Light           gDirLight;
+    Light           gSpotLight;
+    float3          gEyePosW;
+    float           gPad;
 };
 
 cbuffer cbPerObject : register(b0)
