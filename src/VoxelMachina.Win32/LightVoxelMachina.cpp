@@ -56,7 +56,7 @@ void LightVoxelMachinaApp::Update(float deltaT)
 
 	CheckForEnemyCollision();
 
-	math::Vector3 lightPosition = m_player->GetPosition() + (m_player->GetRotation() * math::Vector3{ 0, 2, 0.25f });
+	math::Vector3 lightPosition = m_player->GetPosition() + (m_player->GetRotation() * math::Vector3{ 0, 2.5f, 0.25f });
 	math::Vector3 playerFoward = math::Matrix3{ m_player->GetRotation() }.GetZ();
 
 	DirectX::XMStoreFloat3(&m_scenePointLight.Position, lightPosition);
@@ -116,25 +116,25 @@ void LightVoxelMachinaApp::CreateLights()
 	m_sceneDirLight.Ambient = 0.0f;
 	m_sceneDirLight.Color = Color::White;
 	m_sceneDirLight.Direction = DirectX::XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
-	m_sceneDirLight.Intensity = 0.0;
+	m_sceneDirLight.Intensity = 0.0f;
 
 	m_scenePointLight = Light{};
 	// Point light--position is changed every frame to animate in UpdateScene function.
 	m_scenePointLight.Ambient = 0.2f;
-	m_scenePointLight.Color = Color::White;
-	m_scenePointLight.Range = 10.0f;
+	m_scenePointLight.Color = Color::OrangeRed;
+	m_scenePointLight.Range = 5;
 	m_scenePointLight.Position = DirectX::XMFLOAT3(0.0f, 3.0f, 5.0f);
-	m_scenePointLight.Intensity = 0.5f;
+	m_scenePointLight.Intensity = 3.0f;
 
 	m_sceneSpotLight = Light{};
 	// Spot light--position and direction changed every frame to animate in UpdateScene function.
-	m_scenePointLight.Ambient = 1.0f;
-	m_scenePointLight.Color = Color::White;
+	m_sceneSpotLight.Ambient = 1.0f;
+	m_sceneSpotLight.Color = Color::White;
 	m_sceneSpotLight.Spot = 96.0f;
-	m_sceneSpotLight.Range = 25.0f;
+	m_sceneSpotLight.Range = 15.0f;
 	m_sceneSpotLight.Position = DirectX::XMFLOAT3(2.0f, 3.0f, 0.0f);
 	m_sceneSpotLight.Direction = DirectX::XMFLOAT3(0.0f, -1.0f, 0.0f);
-	m_sceneSpotLight.Intensity = 0.0f;
+	m_sceneSpotLight.Intensity = 0.3f;
 }
 
 void LightVoxelMachinaApp::CreateObjects()
@@ -165,6 +165,7 @@ void LightVoxelMachinaApp::CreateObjects()
 	material1.Diffuse = 1.0f;
 	material1.Specular = 2.0f;
 	material1.Color = Color::White;
+	material1.Emission = Color::OrangeRed;
 
 	m_player = new graphics::MeshRenderer(playerCharacter, material1, math::Vector3(0, 0, 0), math::Quaternion(), math::Vector3(1, 1, 1));
 	m_player->SetAlbedoTexture(playerTexture);

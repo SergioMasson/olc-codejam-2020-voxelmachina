@@ -9,7 +9,11 @@ namespace graphics
 	class Material
 	{
 	public:
-		Material() { ZeroMemory(this, sizeof(this)); }
+		Material()
+		{
+			ZeroMemory(this, sizeof(this));
+			Emission = { 0.0f, 0.0f, 0.0f, 0.0f };
+		}
 
 		DirectX::XMFLOAT4 Color;
 		DirectX::XMFLOAT4 Emission;
