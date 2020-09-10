@@ -121,7 +121,7 @@ void LightVoxelMachinaApp::CreateLights()
 	m_scenePointLight = Light{};
 	// Point light--position is changed every frame to animate in UpdateScene function.
 	m_scenePointLight.Ambient = 0.2f;
-	m_scenePointLight.Color = Color::OrangeRed;
+	m_scenePointLight.Color = Color::Aquamarine;
 	m_scenePointLight.Range = 5;
 	m_scenePointLight.Position = DirectX::XMFLOAT3(0.0f, 3.0f, 5.0f);
 	m_scenePointLight.Intensity = 3.0f;
@@ -161,19 +161,22 @@ void LightVoxelMachinaApp::CreateObjects()
 	auto pilarTexture = new graphics::Texture2D(L"textures/checkboard_mips.dds");
 	auto pilarNormal = new graphics::Texture2D(L"textures/tile_nmap.dds");
 
+	auto defaultEmissionMap = new graphics::Texture2D(L"textures/defaultEmissionMap.dds");
+	auto playerEmissionMap = new graphics::Texture2D(L"textures/emissionMap.dds");
+
 	graphics::Material material1{};
 	material1.Diffuse = 1.0f;
 	material1.Specular = 2.0f;
 	material1.Color = Color::White;
-	material1.Emission = Color::OrangeRed;
 
 	m_player = new graphics::MeshRenderer(playerCharacter, material1, math::Vector3(0, 0, 0), math::Quaternion(), math::Vector3(1, 1, 1));
 	m_player->SetAlbedoTexture(playerTexture);
 	m_player->SetNormalMap(normalMap);
+	m_player->SetEmissionMap(playerEmissionMap);
 	m_sceneMeshRenderer.push_back(m_player);
 
-	CreateEnemy(enemyMesh, enemyTexture, normalMap, enemyDetectedTexture);
-	CreatePilars(pilarMesh, pilarTexture, pilarNormal);
+	CreateEnemy(enemyMesh, enemyTexture, normalMap, enemyDetectedTexture, defaultEmissionMap);
+	CreatePilars(pilarMesh, pilarTexture, pilarNormal, defaultEmissionMap);
 
 	graphics::Material material2{};
 	material2.Color = Color::Silver;
@@ -183,12 +186,13 @@ void LightVoxelMachinaApp::CreateObjects()
 	auto floor = new graphics::MeshRenderer(quad, material2, math::Vector3(0, 0, 0), math::Quaternion());
 	floor->SetAlbedoTexture(floorTexture);
 	floor->SetNormalMap(floorNormalMap);
+	floor->SetEmissionMap(defaultEmissionMap);
 	floor->SetTextureScale(20, 20);
 
 	m_sceneMeshRenderer.push_back(floor);
 }
 
-void LightVoxelMachinaApp::CreateEnemy(graphics::MeshData& enemyData, graphics::Texture2D* enemyTexture, graphics::Texture2D* enemyNormal, graphics::Texture2D* detectedTexture)
+void LightVoxelMachinaApp::CreateEnemy(graphics::MeshData& enemyData, graphics::Texture2D* enemyTexture, graphics::Texture2D* enemyNormal, graphics::Texture2D* detectedTexture, graphics::Texture2D* emissionMap)
 {
 	graphics::Material material1{};
 	material1.Color = Color::White;
@@ -206,12 +210,13 @@ void LightVoxelMachinaApp::CreateEnemy(graphics::MeshData& enemyData, graphics::
 		auto enemy = new graphics::MeshRenderer(enemyData, material1, enemyPosition, math::Quaternion());
 		enemy->SetAlbedoTexture(enemyTexture);
 		enemy->SetNormalMap(enemyNormal);
+		enemy->SetEmissionMap(emissionMap);
 		m_sceneMeshRenderer.push_back(enemy);
 		m_enemiesLeft.push_back(new Enemy(enemy, detectedTexture));
 	}
 }
 
-void LightVoxelMachinaApp::CreatePilars(graphics::MeshData& pilarData, graphics::Texture2D* pilarTexture, graphics::Texture2D* pilarNormal)
+void LightVoxelMachinaApp::CreatePilars(graphics::MeshData& pilarData, graphics::Texture2D* pilarTexture, graphics::Texture2D* pilarNormal, graphics::Texture2D* emissionMap)
 {
 	graphics::Material material1{};
 	material1.Color = Color::White;
@@ -254,6 +259,7 @@ void LightVoxelMachinaApp::CreatePilars(graphics::MeshData& pilarData, graphics:
 		pilar->SetAlbedoTexture(pilarTexture);
 		pilar->SetNormalMap(pilarNormal);
 		pilar->SetTextureScale(3, 5);
+		pilar->SetEmissionMap(emissionMap);
 		m_sceneMeshRenderer.push_back(pilar);
 	}
 }

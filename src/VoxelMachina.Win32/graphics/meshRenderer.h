@@ -89,6 +89,11 @@ namespace graphics
 			m_normalMap = normalMap;
 		}
 
+		void SetEmissionMap(Texture2D* emissionMap)
+		{
+			m_emissionTexture = emissionMap;
+		}
+
 		void SetTextureDisplacement(float x, float y)
 		{
 			m_textureDisplacement = { x, y };
@@ -97,6 +102,11 @@ namespace graphics
 		void SetTextureScale(float x, float y)
 		{
 			m_textureScale = { x, y };
+		}
+
+		void SetEmission(DirectX::XMFLOAT4 emission)
+		{
+			m_material.Emission = emission;
 		}
 
 	private:
@@ -111,6 +121,7 @@ namespace graphics
 
 		Texture2D* m_albedoTexture;
 		Texture2D* m_normalMap;
+		Texture2D* m_emissionTexture;
 
 		DirectX::XMFLOAT2 m_textureScale{ 1, 1 };
 		DirectX::XMFLOAT2 m_textureDisplacement{ 0, 0 };

@@ -3,6 +3,7 @@
 
 Texture2D gDiffuseMap : register(t0);
 Texture2D gNormalMap : register(t1);
+Texture2D gEmissionMap : register(t2);
 
 SamplerState gsamLinear : register(s0);
 
@@ -70,7 +71,10 @@ float4 main(VertexOut pin) : SV_TARGET
     float4 objectColor = gMaterial.Color * albedoMapColor;
     
     float4 pixelColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    
+    pixelColor += gEmissionMap.Sample(gsamLinear, pin.TexC);
     pixelColor += gMaterial.Emission;
+    
     pixelColor += objectColor * ComputeDirectionalLight(gMaterial, gDirLight, bumpedNormal, toEyeW);
     pixelColor += objectColor * ComputePointLight(gMaterial, gPointLight, pin.PosW, bumpedNormal, toEyeW);
     pixelColor += objectColor * ComputeSpotLight(gMaterial, gSpotLight, pin.PosW, bumpedNormal, toEyeW);
