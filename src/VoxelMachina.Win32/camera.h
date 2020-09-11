@@ -1,6 +1,7 @@
 #pragma once
 
 #include "mathHelpers.h"
+#include "math/frustum.h"
 
 class Camera
 {
@@ -90,6 +91,8 @@ public:
 	math::Matrix4 GetViewMatrix() const { return m_viewMatrix.Transpose(); }
 	math::Matrix4 GetProjectionMatrix() const { return m_projectionMatrix.Transpose(); }
 	math::Matrix4 GetViewProjectionMatrix() const { return m_viewProjectionMatrix.Transpose(); }
+	math::Frustum GetViewFrustum() const { return m_viewFrustum; };
+	inline math::Frustum GetWorldFrustum() const { return m_worldFrustum; };
 
 private:
 	void SetLookDirection(math::Vector3 forward, math::Vector3 up);
@@ -106,8 +109,13 @@ private:
 	// Redundant data cached for faster lookups.
 	math::Matrix3 m_Basis;
 
+	math::Frustum m_viewFrustum;
+	math::Frustum m_worldFrustum;
+
 	float m_VerticalFOV = 0;            // Field of view angle in radians
 	float m_AspectRatio = 0;
 	float m_NearClip = 0;
 	float m_FarClip = 0;
+
+public:
 };

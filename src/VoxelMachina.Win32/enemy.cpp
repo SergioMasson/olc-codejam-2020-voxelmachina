@@ -6,5 +6,5 @@ void Enemy::SetDetected()
 {
 	m_isDetected = true;
 	//m_meshRenderer->SetAlbedoTexture(m_detectedTexture);
-	m_meshRenderer->SetEmission(Color::OrangeRed);
+	m_meshRenderer->SetEmission(Color::MediumVioletRed);
 }

@@ -23,9 +23,9 @@ float3 NormalSampleToWorldSpace(float3 normalMapSample, float3 unitNormalW, floa
     float3x3 TBN = float3x3(T, B, N);
 
 	// Transform from tangent space to world space.
-    float3 bumpedNormalW = mul(normalT, TBN);
+    float3 bumpedNormalW = mul(normalize(normalT), TBN);
 
-    return normalize(bumpedNormalW);
+    return bumpedNormalW;
 }
 
 cbuffer cbPerFrame : register(b1)
@@ -78,7 +78,6 @@ float4 main(VertexOut pin) : SV_TARGET
     pixelColor += objectColor * ComputeDirectionalLight(gMaterial, gDirLight, bumpedNormal, toEyeW);
     pixelColor += objectColor * ComputePointLight(gMaterial, gPointLight, pin.PosW, bumpedNormal, toEyeW);
     pixelColor += objectColor * ComputeSpotLight(gMaterial, gSpotLight, pin.PosW, bumpedNormal, toEyeW);
-
 
     return pixelColor;
 }

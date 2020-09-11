@@ -2,6 +2,7 @@
 #include "material.h"
 #include "coreGraphics.h"
 #include "../mathHelpers.h"
+#include "../math/boundingSphere.h"
 
 namespace graphics
 {
@@ -28,6 +29,8 @@ namespace graphics
 	{
 		std::vector<Vertex> Vertices;
 		std::vector<UINT> Indices;
+
+		math::BoundingSphere BoudingSphere;
 
 		///<summary>
 		/// Creates a box centered at the origin with the given dimensions.
@@ -59,7 +62,7 @@ namespace graphics
 	class MeshRenderer
 	{
 	public:
-		MeshRenderer(MeshData data, Material material, math::Vector3 position, math::Quaternion rotation, math::Vector3 scale = { 1, 1, 1 });
+		MeshRenderer(MeshData* data, Material material, math::Vector3 position, math::Quaternion rotation, math::Vector3 scale = { 1, 1, 1 });
 		MeshRenderer() = default;
 		~MeshRenderer() = default;
 
@@ -75,6 +78,12 @@ namespace graphics
 		{
 			m_transform.SetTranslation(worldPos);
 			m_worldMatrix = m_transform;
+			m_worldBoudingSphere = m_worldMatrix * m_meshData->BoudingSphere;
+		}
+
+		inline math::BoundingSphere GetWorldBoudingSphere() const
+		{
+			return m_worldBoudingSphere;
 		}
 
 		const math::Vector3 GetPosition() const { return m_transform.GetTranslation(); }
@@ -113,8 +122,10 @@ namespace graphics
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_vertexBuffer = nullptr;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_indexBuffer = nullptr;
 
+		math::BoundingSphere m_worldBoudingSphere;
+
 		Material m_material;
-		MeshData m_meshData;
+		MeshData* m_meshData;
 
 		math::Transform m_transform;
 		math::Matrix4 m_worldMatrix;

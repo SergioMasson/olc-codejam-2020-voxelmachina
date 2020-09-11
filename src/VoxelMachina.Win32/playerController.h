@@ -6,7 +6,7 @@
 class PlayerController
 {
 public:
-	PlayerController(math::Vector3 worldUp, graphics::MeshRenderer* playerMesh, Camera* sceneCamera);
+	PlayerController(math::Vector3 worldUp, graphics::MeshRenderer* playerMesh, Camera* sceneCamera, bool lockCamera = false);
 	void Update(float deltaT);
 
 private:
@@ -35,6 +35,8 @@ private:
 
 	float m_lastPlayerRotation;
 	float m_lastPlayerFoward;
+
+	bool m_lockCamera;
 
 private:
 	void ApplyMomentum(float& oldValue, float& newValue, float deltaTime);

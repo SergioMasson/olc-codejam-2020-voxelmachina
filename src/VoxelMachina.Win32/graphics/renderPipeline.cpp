@@ -121,6 +121,10 @@ void graphics::RenderPipeline::StartRender(Camera* camera, Light lights, Light s
 
 void graphics::RenderPipeline::RenderMesh(MeshRenderer const& mesh)
 {
+	//If mesh bouding sphere is not inside camera`s frustum skip this mesh.
+	if (!m_camera->GetWorldFrustum().IntersectSphere(mesh.GetWorldBoudingSphere()))
+		return;
+
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
 
@@ -153,7 +157,7 @@ void graphics::RenderPipeline::RenderMesh(MeshRenderer const& mesh)
 	//Binds vertex buffer and index buffer.
 	graphics::g_d3dImmediateContext->IASetVertexBuffers(0, 1, mesh.m_vertexBuffer.GetAddressOf(), &stride, &offset);
 	graphics::g_d3dImmediateContext->IASetIndexBuffer(mesh.m_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-	graphics::g_d3dImmediateContext->DrawIndexed(static_cast<UINT>(mesh.m_meshData.Indices.size()), 0, 0);
+	graphics::g_d3dImmediateContext->DrawIndexed(static_cast<UINT>(mesh.m_meshData->Indices.size()), 0, 0);
 }
 
 void graphics::RenderPipeline::CreateSkybox()
@@ -183,8 +187,8 @@ void graphics::RenderPipeline::CreateSkybox()
 	hr = graphics::g_d3dDevice->CreateInputLayout(vertexDesc, 4, g_pSkyboxVS, sizeof(g_pSkyboxVS), m_skyboxInputLayout.GetAddressOf());
 	ASSERT_SUCCEEDED(hr, "Fail to create skybox input layout");
 
-	MeshData skyboxMeshFull;
-	MeshData::CreateBox(10000, 10000, 10000, skyboxMeshFull);
+	MeshData* skyboxMeshFull = new MeshData();
+	MeshData::CreateBox(10000, 10000, 10000, *skyboxMeshFull);
 
 	Material material;
 	m_skyboxMeshRenerer = MeshRenderer(skyboxMeshFull, material, math::Vector3(), math::Quaternion());
@@ -263,5 +267,5 @@ void graphics::RenderPipeline::RenderSkybox(Camera* camera)
 	//Binds vertex buffer and index buffer.
 	graphics::g_d3dImmediateContext->IASetVertexBuffers(0, 1, m_skyboxMeshRenerer.m_vertexBuffer.GetAddressOf(), &stride, &offset);
 	graphics::g_d3dImmediateContext->IASetIndexBuffer(m_skyboxMeshRenerer.m_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-	graphics::g_d3dImmediateContext->DrawIndexed(static_cast<UINT>(m_skyboxMeshRenerer.m_meshData.Indices.size()), 0, 0);
+	graphics::g_d3dImmediateContext->DrawIndexed(static_cast<UINT>(m_skyboxMeshRenerer.m_meshData->Indices.size()), 0, 0);
 }

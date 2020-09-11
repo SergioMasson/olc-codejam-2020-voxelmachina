@@ -1,8 +1,10 @@
 #pragma once
 
+#include "../colors.h"
+
 struct Light
 {
-	DirectX::XMFLOAT4 Color;
+	Color Color;
 	DirectX::XMFLOAT3 Position;
 	float Ambient;
 	DirectX::XMFLOAT3 Direction;

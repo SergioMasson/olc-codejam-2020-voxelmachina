@@ -4,7 +4,11 @@
 
 PlayerController::PlayerController(math::Vector3 worldUp,
 	graphics::MeshRenderer* meshRenderer,
-	Camera* sceneCamera) : m_playerMeshRenderer{ meshRenderer }, m_sceneCamera{ sceneCamera }
+	Camera* sceneCamera,
+	bool lockCamera) :
+	m_playerMeshRenderer{ meshRenderer },
+	m_sceneCamera{ sceneCamera },
+	m_lockCamera{ lockCamera }
 {
 	m_WorldUp = Normalize(worldUp);
 	m_WorldNorth = Normalize(Cross(m_WorldUp, math::Vector3(1, 0, 0)));
@@ -60,8 +64,8 @@ void PlayerController::Update(float deltaT)
 	//// don't apply momentum to mouse inputs
 	float rotation = m_RotationSpeed * (
 		Input::GetTimeCorrectedAnalogInput(Input::AnalogInput::kAnalogLeftStickX) +
-		(Input::IsPressed(Input::KeyCode::Key_d) ? deltaT : 0.0f) +
-		(Input::IsPressed(Input::KeyCode::Key_a) ? -deltaT : 0.0f)
+		(Input::IsPressed(Input::KeyCode::Key_d) ? -deltaT : 0.0f) +
+		(Input::IsPressed(Input::KeyCode::Key_a) ? deltaT : 0.0f)
 		);
 
 	ApplyMomentum(m_lastPlayerRotation, rotation, deltaT);
@@ -74,13 +78,6 @@ void PlayerController::Update(float deltaT)
 
 	auto totalRotation = YcameraRotation * ZcameraRotation;
 
-	m_cameraOffset = (totalRotation * m_cameraOffset);
-
-	math::Vector3 cameraPosition = m_playerMeshRenderer->GetPosition() + m_cameraOffset;
-
-	m_sceneCamera->SetEyeAtUp(cameraPosition, position, math::Vector3(0, 1, 0));
-	m_sceneCamera->Update();
-
 	m_CurrentHeading -= rotation;
 	if (m_CurrentHeading > DirectX::XM_PI)
 		m_CurrentHeading -= DirectX::XM_2PI;
@@ -89,6 +86,19 @@ void PlayerController::Update(float deltaT)
 
 	math::Matrix3 orientation = math::Matrix3(m_WorldEast, m_WorldUp, -m_WorldNorth) * math::Matrix3::MakeYRotation(m_CurrentHeading);
 	m_playerMeshRenderer->SetRotation(math::Quaternion{ orientation });
+
+	if (m_lockCamera)
+	{
+		m_cameraOffset = math::Matrix3(m_WorldEast, m_WorldUp, -m_WorldNorth) * math::Matrix3::MakeYRotation(-rotation) * (totalRotation * m_cameraOffset);
+	}
+	else
+	{
+		m_cameraOffset = (totalRotation * m_cameraOffset);
+	}
+
+	math::Vector3 cameraPosition = m_playerMeshRenderer->GetPosition() + m_cameraOffset;
+	m_sceneCamera->SetEyeAtUp(cameraPosition, position, math::Vector3(0, 1, 0));
+	m_sceneCamera->Update();
 
 	m_lastCameraRotationX = cameraRotationX;
 	m_lastCameraRotationY = cameraRotationY;

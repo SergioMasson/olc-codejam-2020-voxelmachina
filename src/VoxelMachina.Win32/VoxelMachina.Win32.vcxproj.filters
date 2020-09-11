@@ -77,6 +77,9 @@
     <ClCompile Include="color.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="math\frustum.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
@@ -111,6 +114,10 @@
     <ClInclude Include="graphics\texture2D.h" />
     <ClInclude Include="playerController.h" />
     <ClInclude Include="enemy.h" />
+    <ClInclude Include="math\boundingSphere.h" />
+    <ClInclude Include="math\boundingPlane.h" />
+    <ClInclude Include="math\frustum.h" />
+    <ClInclude Include="hash.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\BoxVS.hlsl" />

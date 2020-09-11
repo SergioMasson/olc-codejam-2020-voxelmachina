@@ -46,26 +46,19 @@ float4 ComputeDirectionalLight(Material mat, Light L, float3 normal, float3 toEy
     float3 lightVec = -L.Direction;
 
 	// Add ambient term.
-    ambient = L.Intensity * L.Ambient;
+    ambient = L.Ambient;
 
     normal = normalize(normal);
     
 	// Add diffuse and specular term, provided the surface is in 
 	// the line of site of the light.
-    float diffuseFactor = max(dot(normal, lightVec), 0.0);
+    float diffuseFactor = max(dot(normal, lightVec), 0.0f);
 
-	// Flatten to avoid dynamic branching.
-	[flatten]
-    if (diffuseFactor > 0.0f)
-    {
-        float3 v = reflect(-lightVec, normal);
-        float specFactor = pow(max(dot(v, toEye), 0.0f), mat.Specular);
-					
-        diffuse = L.Intensity * diffuseFactor * mat.Diffuse;
-        spec = L.Intensity * specFactor * mat.Specular;
-    }
+    float3 v = reflect(-lightVec, normal);
+    spec = pow(max(dot(v, toEye), 0.0f), mat.Specular);
+    diffuse = diffuseFactor * mat.Diffuse;
     
-    return (ambient + diffuse + spec) * L.Color;
+    return (ambient + diffuse + spec) * L.Intensity * L.Color;
 }
 
 //---------------------------------------------------------------------------------------
@@ -94,7 +87,7 @@ float4 ComputePointLight(Material mat, Light L, float3 pos, float3 normal, float
     lightVec /= d;
 	
 	// Ambient term.
-    ambient = L.Intensity * L.Ambient;
+    ambient = L.Ambient;
 
 	// Add diffuse and specular term, provided the surface is in 
 	// the line of site of the light.
@@ -102,20 +95,15 @@ float4 ComputePointLight(Material mat, Light L, float3 pos, float3 normal, float
     float diffuseFactor = dot(lightVec, normal);
 
 	// Flatten to avoid dynamic branching.
-	[flatten]
-    if (diffuseFactor > 0.0f)
-    {
-        float3 v = reflect(-lightVec, normal);
-        float specFactor = pow(max(dot(v, toEye), 0.0f), mat.Specular);
-					
-        diffuse = L.Intensity * diffuseFactor * mat.Diffuse;
-        spec = L.Intensity * specFactor * mat.Specular;
-    }
+
+    float3 v = reflect(-lightVec, normal);
+    spec = pow(max(dot(v, toEye), 0.0f), mat.Specular);
+    diffuse = diffuseFactor * mat.Diffuse;
 
 	// Attenuate
     float att = CalcAttenuation(d, 0, L.Range);
 
-    return (diffuse + spec + ambient) * att * L.Color;
+    return (diffuse + spec + ambient) * L.Intensity * att * L.Color;
 }
 
 //---------------------------------------------------------------------------------------
@@ -144,28 +132,20 @@ float4 ComputeSpotLight(Material mat, Light L, float3 pos, float3 normal, float3
     lightVec /= d;
 	
 	// Ambient term.
-    ambient = L.Intensity * L.Ambient;
+    ambient =  L.Ambient;
 
 	// Add diffuse and specular term, provided the surface is in 
 	// the line of site of the light.
 
     float diffuseFactor = dot(lightVec, normal);
 
-	// Flatten to avoid dynamic branching.
-	[flatten]
-    if (diffuseFactor > 0.0f)
-    {
-        float3 v = reflect(-lightVec, normal);
-        float specFactor = pow(max(dot(v, toEye), 0.0f), mat.Specular);
-					
-        diffuse = L.Intensity * diffuseFactor * mat.Diffuse;
-        spec = L.Intensity * specFactor * mat.Specular;
-    }
+    float3 v = reflect(-lightVec, normal);
+    spec = pow(max(dot(v, toEye), 0.0f), mat.Specular);
+    diffuse =  diffuseFactor * mat.Diffuse;
 	
 	// Scale by spotlight factor and attenuate.
     float spot = pow(max(dot(-lightVec, L.Direction), 0.0f), L.Spot);
-
     float att = CalcAttenuation(d, 0, L.Range);
     
-    return ((ambient + diffuse + spec) * att) * L.Color;
+    return ((ambient + diffuse + spec) * L.Intensity * att) * L.Color;
 }

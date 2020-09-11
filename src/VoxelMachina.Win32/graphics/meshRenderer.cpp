@@ -6,10 +6,15 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <map>
+#include "../hash.h"
 
 using namespace std;
 using namespace DirectX;
 using namespace graphics;
+
+std::map<size_t, Microsoft::WRL::ComPtr<ID3D11Buffer>> g_vertexBufferTable{};
+std::map<size_t, Microsoft::WRL::ComPtr<ID3D11Buffer>> g_indexBufferTable{};
 
 void Subdivide(MeshData& meshData)
 {
@@ -164,6 +169,9 @@ void BuildCylinderBottomCap(float bottomRadius, float topRadius, float height, U
 
 void graphics::MeshData::CreateBox(float width, float height, float depth, MeshData& meshData)
 {
+	float radius = sqrtf(((width / 2.0f) * (width / 2.0f)) + ((height / 2.0f) * (height / 2.0f)));
+	meshData.BoudingSphere = math::BoundingSphere(math::Vector3(0, 0, 0), radius);
+
 	Vertex v[24];
 
 	float w2 = 0.5f * width;
@@ -241,6 +249,8 @@ void graphics::MeshData::CreateBox(float width, float height, float depth, MeshD
 
 void graphics::MeshData::CreateSphere(float radius, UINT sliceCount, UINT stackCount, MeshData& meshData)
 {
+	meshData.BoudingSphere = math::BoundingSphere(math::Vector3(0, 0, 0), radius);
+
 	meshData.Vertices.clear();
 	meshData.Indices.clear();
 
@@ -351,6 +361,15 @@ void graphics::MeshData::CreateSphere(float radius, UINT sliceCount, UINT stackC
 
 void graphics::MeshData::CreateCylinder(float bottomRadius, float topRadius, float height, UINT sliceCount, UINT stackCount, MeshData& meshData)
 {
+	float radius = 0.0f;
+
+	if (bottomRadius > topRadius)
+		radius = sqrtf((bottomRadius * bottomRadius) + ((height / 2.0f) * (height / 2.0f)));
+	else
+		radius = sqrtf((topRadius * topRadius) + ((height / 2.0f) * (height / 2.0f)));
+
+	meshData.BoudingSphere = math::BoundingSphere(math::Vector3(0, 0, 0), radius);
+
 	meshData.Vertices.clear();
 	meshData.Indices.clear();
 
@@ -444,6 +463,8 @@ void graphics::MeshData::CreateCylinder(float bottomRadius, float topRadius, flo
 
 void graphics::MeshData::CreateGrid(float width, float depth, UINT m, UINT n, MeshData& meshData)
 {
+	meshData.BoudingSphere = math::BoundingSphere(math::Vector3(0, 0, 0), width / 2.0f);
+
 	UINT vertexCount = m * n;
 	UINT faceCount = (m - 1) * (n - 1) * 2;
 
@@ -516,6 +537,8 @@ void graphics::MeshData::LoadFromOBJFile(const wchar_t* filename, MeshData& mesh
 	std::string line;
 	std::ifstream in(filename);
 
+	float maxDistance = 0.0f;
+
 	while (std::getline(in, line))                           // read whole line
 	{
 		if (line.find_first_of("vVfF") == std::string::npos) continue;     // skip pointless lines
@@ -535,6 +558,11 @@ void graphics::MeshData::LoadFromOBJFile(const wchar_t* filename, MeshData& mesh
 			vert.Position = { x, y, z };
 			vert.Normal = { 999, 0, 0 };
 			vertex.push_back(vert);
+
+			float distance = math::Length(math::Vector3{ x, y, z });
+
+			if (distance > maxDistance)
+				maxDistance = distance;
 		}
 		else if (header == "VN" || header == "vn")
 		{
@@ -681,43 +709,67 @@ void graphics::MeshData::LoadFromOBJFile(const wchar_t* filename, MeshData& mesh
 
 	meshData.Indices = indexes;
 	meshData.Vertices = vertex;
+	meshData.BoudingSphere = math::BoundingSphere(math::Vector3{ 0, 0, 0 }, maxDistance);
 
 	in.close();
 }
 
-graphics::MeshRenderer::MeshRenderer(MeshData data, Material material, math::Vector3 position, math::Quaternion rotation, math::Vector3 scale) : m_meshData{ data }, m_material{ material }
+graphics::MeshRenderer::MeshRenderer(MeshData* data, Material material, math::Vector3 position, math::Quaternion rotation, math::Vector3 scale) : m_meshData{ data }, m_material{ material }
 {
 	m_transform.SetTranslation(position);
 	m_transform.SetRotation(rotation);
 	m_transform.SetScale(scale);
 	m_worldMatrix = m_transform;
+	m_worldBoudingSphere = m_worldMatrix * data->BoudingSphere;
 
 	D3D11_BUFFER_DESC vbd;
-
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;
-	vbd.ByteWidth = sizeof(Vertex) * static_cast<UINT>(m_meshData.Vertices.size());
+	vbd.ByteWidth = sizeof(Vertex) * static_cast<UINT>(m_meshData->Vertices.size());
 	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vbd.CPUAccessFlags = 0;
 	vbd.MiscFlags = 0;
 	vbd.StructureByteStride = 0;
 	D3D11_SUBRESOURCE_DATA vinitData;
-	vinitData.pSysMem = m_meshData.Vertices.data();
+	vinitData.pSysMem = m_meshData->Vertices.data();
 
-	auto hr = graphics::g_d3dDevice->CreateBuffer(&vbd, &vinitData, m_vertexBuffer.GetAddressOf());
+	auto resourceHash = HashState(&vinitData);
 
-	ASSERT_SUCCEEDED(hr, "Fail to create vertex buffer.");
+	auto VertIter = g_vertexBufferTable.find(resourceHash);
+
+	//Check if the mesh data is already on the GPU.
+	if (VertIter != g_vertexBufferTable.end())
+	{
+		m_vertexBuffer = g_vertexBufferTable[resourceHash];
+	}
+	else
+	{
+		auto hr = graphics::g_d3dDevice->CreateBuffer(&vbd, &vinitData, m_vertexBuffer.GetAddressOf());
+		ASSERT_SUCCEEDED(hr, "Fail to create vertex buffer.");
+		g_vertexBufferTable.insert({ resourceHash,  m_vertexBuffer });
+	}
 
 	D3D11_BUFFER_DESC ibd;
 	ibd.Usage = D3D11_USAGE_IMMUTABLE;
-	ibd.ByteWidth = sizeof(UINT) * static_cast<UINT>(m_meshData.Indices.size());
+	ibd.ByteWidth = sizeof(UINT) * static_cast<UINT>(m_meshData->Indices.size());
 	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	ibd.CPUAccessFlags = 0;
 	ibd.MiscFlags = 0;
 	ibd.StructureByteStride = 0;
 	D3D11_SUBRESOURCE_DATA iinitData;
-	iinitData.pSysMem = m_meshData.Indices.data();
+	iinitData.pSysMem = m_meshData->Indices.data();
 
-	hr = graphics::g_d3dDevice->CreateBuffer(&ibd, &iinitData, m_indexBuffer.GetAddressOf());
+	resourceHash = HashState(&iinitData);
 
-	ASSERT_SUCCEEDED(hr, "Fail to create index buffer.");
+	auto IndexIter = g_indexBufferTable.find(resourceHash);
+
+	if (IndexIter != g_indexBufferTable.end())
+	{
+		m_indexBuffer = g_indexBufferTable[resourceHash];
+	}
+	else
+	{
+		auto hr = graphics::g_d3dDevice->CreateBuffer(&ibd, &iinitData, m_indexBuffer.GetAddressOf());
+		ASSERT_SUCCEEDED(hr, "Fail to create index buffer.");
+		g_indexBufferTable.insert({ resourceHash,  m_indexBuffer });
+	}
 }

@@ -1,3 +1,15 @@
+//
+// Copyright (c) Microsoft. All rights reserved.
+// This code is licensed under the MIT License (MIT).
+// THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF
+// ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY
+// IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR
+// PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
+//
+// Developed by Minigraph
+//
+// Author:  James Stanard
+//
 #pragma once
 
 #include "scalar.h"
@@ -88,4 +100,7 @@ namespace math
 	INLINE BoolVector operator>  (Vector4 lhs, Vector4 rhs) { return BoolVector(XMVectorGreater(lhs, rhs)); }
 	INLINE BoolVector operator>= (Vector4 lhs, Vector4 rhs) { return BoolVector(XMVectorGreaterOrEqual(lhs, rhs)); }
 	INLINE BoolVector operator== (Vector4 lhs, Vector4 rhs) { return BoolVector(XMVectorEqual(lhs, rhs)); }
+
+	INLINE Matrix4 Transpose(const Matrix4& mat) { return Matrix4(XMMatrixTranspose(mat)); }
+	INLINE Matrix4 Invert(const Matrix4& mat) { return Matrix4(XMMatrixInverse(nullptr, mat)); }
 }

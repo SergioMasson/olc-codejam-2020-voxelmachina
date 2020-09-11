@@ -12,10 +12,15 @@
 #include "SimpleLightVS.h"
 #include <string>
 
-#define ENEMY_COUNT 5
+#define ENEMY_COUNT 10
 #define PILAR_COUNT 100
 #define WORLD_X  100.0f
 #define WORLD_Y  100.0f
+
+graphics::MeshData quad;
+graphics::MeshData playerCharacter;
+graphics::MeshData enemyMesh;
+graphics::MeshData pilarMesh;
 
 void LightVoxelMachinaApp::Startup(void)
 {
@@ -105,7 +110,7 @@ void LightVoxelMachinaApp::CreateCamera()
 	m_sceneCamera.SetEyeAtUp(cameraPosition, target, up);
 
 	auto aspectRation = static_cast<float>(graphics::g_windowWidth) / static_cast<float>(graphics::g_windowHeight);
-	m_sceneCamera.SetPerspectiveMatrix(0.25f * math::Pi, aspectRation, 1.0f, 1000.0f);
+	m_sceneCamera.SetPerspectiveMatrix(0.25f * math::Pi, aspectRation, 1.0f, 50.0f);
 	m_sceneCamera.Update();
 }
 
@@ -113,7 +118,7 @@ void LightVoxelMachinaApp::CreateLights()
 {
 	m_sceneDirLight = Light{};
 	//Directional light.
-	m_sceneDirLight.Ambient = 0.0f;
+	m_sceneDirLight.Ambient = 0.1f;
 	m_sceneDirLight.Color = Color::White;
 	m_sceneDirLight.Direction = DirectX::XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
 	m_sceneDirLight.Intensity = 0.0f;
@@ -139,16 +144,12 @@ void LightVoxelMachinaApp::CreateLights()
 
 void LightVoxelMachinaApp::CreateObjects()
 {
-	graphics::MeshData quad;
 	graphics::MeshData::CreateGrid(100, 100, 20, 20, quad);
 
-	graphics::MeshData playerCharacter;
 	graphics::MeshData::LoadFromOBJFile(L"models/littleRobot.model", playerCharacter);
 
-	graphics::MeshData enemyMesh;
 	graphics::MeshData::LoadFromOBJFile(L"models/enemy.model", enemyMesh);
 
-	graphics::MeshData pilarMesh;
 	graphics::MeshData::CreateCylinder(1, 1, 10, 20, 20, pilarMesh);
 
 	//TODO(Sergio): Load this on a separate thread. Asset loading will take a time...
@@ -169,21 +170,21 @@ void LightVoxelMachinaApp::CreateObjects()
 	material1.Specular = 2.0f;
 	material1.Color = Color::White;
 
-	m_player = new graphics::MeshRenderer(playerCharacter, material1, math::Vector3(0, 0, 0), math::Quaternion(), math::Vector3(1, 1, 1));
+	m_player = new graphics::MeshRenderer(&playerCharacter, material1, math::Vector3(0, 0, 0), math::Quaternion(), math::Vector3(1, 1, 1));
 	m_player->SetAlbedoTexture(playerTexture);
 	m_player->SetNormalMap(normalMap);
 	m_player->SetEmissionMap(playerEmissionMap);
 	m_sceneMeshRenderer.push_back(m_player);
 
-	CreateEnemy(enemyMesh, enemyTexture, normalMap, enemyDetectedTexture, defaultEmissionMap);
-	CreatePilars(pilarMesh, pilarTexture, pilarNormal, defaultEmissionMap);
+	CreateEnemy(&enemyMesh, enemyTexture, normalMap, enemyDetectedTexture, defaultEmissionMap);
+	CreatePilars(&pilarMesh, pilarTexture, pilarNormal, defaultEmissionMap);
 
 	graphics::Material material2{};
 	material2.Color = Color::Silver;
 	material2.Specular = 2.0f;
 	material2.Diffuse = 1.0f;
 
-	auto floor = new graphics::MeshRenderer(quad, material2, math::Vector3(0, 0, 0), math::Quaternion());
+	auto floor = new graphics::MeshRenderer(&quad, material2, math::Vector3(0, 0, 0), math::Quaternion());
 	floor->SetAlbedoTexture(floorTexture);
 	floor->SetNormalMap(floorNormalMap);
 	floor->SetEmissionMap(defaultEmissionMap);
@@ -192,7 +193,7 @@ void LightVoxelMachinaApp::CreateObjects()
 	m_sceneMeshRenderer.push_back(floor);
 }
 
-void LightVoxelMachinaApp::CreateEnemy(graphics::MeshData& enemyData, graphics::Texture2D* enemyTexture, graphics::Texture2D* enemyNormal, graphics::Texture2D* detectedTexture, graphics::Texture2D* emissionMap)
+void LightVoxelMachinaApp::CreateEnemy(graphics::MeshData* enemyData, graphics::Texture2D* enemyTexture, graphics::Texture2D* enemyNormal, graphics::Texture2D* detectedTexture, graphics::Texture2D* emissionMap)
 {
 	graphics::Material material1{};
 	material1.Color = Color::White;
@@ -216,7 +217,7 @@ void LightVoxelMachinaApp::CreateEnemy(graphics::MeshData& enemyData, graphics::
 	}
 }
 
-void LightVoxelMachinaApp::CreatePilars(graphics::MeshData& pilarData, graphics::Texture2D* pilarTexture, graphics::Texture2D* pilarNormal, graphics::Texture2D* emissionMap)
+void LightVoxelMachinaApp::CreatePilars(graphics::MeshData* pilarData, graphics::Texture2D* pilarTexture, graphics::Texture2D* pilarNormal, graphics::Texture2D* emissionMap)
 {
 	graphics::Material material1{};
 	material1.Color = Color::White;

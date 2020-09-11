@@ -27,6 +27,8 @@ void Camera::UpdateProjectionMatrix()
 {
 	XMMATRIX V = XMMatrixPerspectiveFovLH(m_VerticalFOV, m_AspectRatio, m_NearClip, m_FarClip);
 	m_projectionMatrix = math::Matrix4{ V };
+	m_viewFrustum = math::Frustum(m_projectionMatrix);
+	m_worldFrustum = math::Invert(m_viewMatrix) * m_viewFrustum;
 }
 
 void Camera::UpdateViewMatrix()
