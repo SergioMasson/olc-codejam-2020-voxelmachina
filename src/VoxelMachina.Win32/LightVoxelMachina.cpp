@@ -5,6 +5,7 @@
 #include "graphics/renderPipeline.h"
 #include "graphics/coreGraphics.h"
 #include "graphics/texture2D.h"
+#include "audio/audioCore.h"
 #include "input.h"
 #include "colors.h"
 
@@ -40,6 +41,8 @@ void LightVoxelMachinaApp::Startup(void)
 
 	m_playerController = new PlayerController(math::Vector3(0, 1, 0), m_player, &m_sceneCamera);
 	m_cameraController = new CameraController(m_sceneCamera, math::Vector3(0, 1, 0));
+
+	audio::PlayAudioFile(L"audioFiles/test.wav", true);
 }
 
 bool LightVoxelMachinaApp::IsDone()
@@ -119,7 +122,7 @@ void LightVoxelMachinaApp::CreateLights()
 	m_scenePointLight = Light{};
 	// Point light--position is changed every frame to animate in UpdateScene function.
 	m_scenePointLight.Ambient = 0.2f;
-	m_scenePointLight.Color = Color::Aquamarine;
+	m_scenePointLight.Color = Color::GreenYellow;
 	m_scenePointLight.Range = 5;
 	m_scenePointLight.Position = DirectX::XMFLOAT3(0.0f, 3.0f, 5.0f);
 	m_scenePointLight.Intensity = 3.0f;
@@ -162,7 +165,7 @@ void LightVoxelMachinaApp::CreateObjects()
 	auto pilarNormal = new graphics::Texture2D(L"textures/tile_nmap.dds");
 
 	auto defaultEmissionMap = new graphics::Texture2D(L"textures/defaultEmissionMap.dds");
-	auto playerEmissionMap = new graphics::Texture2D(L"textures/emissionMap.dds");
+	auto playerEmissionMap = new graphics::Texture2D(L"textures/newEmissionMap.dds");
 
 	graphics::Material material1{};
 	material1.Diffuse = 1.0f;
@@ -323,6 +326,8 @@ void LightVoxelMachinaApp::CheckForEnemyCollision()
 			*light = CreatePointLight(Color::MediumVioletRed, enemyPosition, 3.0f, 0.0f, 10.0f);
 
 			m_renderPipeline->AddLight(light);
+
+			audio::PlayAudioFile(L"audioFiles/enemy.wav");
 
 			if (enemiesLeft == 0)
 			{

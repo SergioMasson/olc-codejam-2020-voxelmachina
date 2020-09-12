@@ -166,6 +166,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="application.cpp" />
+    <ClCompile Include="audio\audioCore.cpp" />
     <ClCompile Include="cameraController.cpp" />
     <ClCompile Include="color.cpp" />
     <ClCompile Include="enemy.cpp" />
@@ -196,6 +197,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
+    <ClInclude Include="audio\audioCore.h" />
     <ClInclude Include="cameraController.h" />
     <ClInclude Include="colors.h" />
     <ClInclude Include="enemy.h" />
@@ -434,6 +436,14 @@
     <Image Include="textures\tile_nmap.dds">
       <DeploymentContent>true</DeploymentContent>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="audioFiles\enemy.wav">
+      <DeploymentContent>true</DeploymentContent>
+    </Media>
+    <Media Include="audioFiles\test.wav">
+      <DeploymentContent>true</DeploymentContent>
+    </Media>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

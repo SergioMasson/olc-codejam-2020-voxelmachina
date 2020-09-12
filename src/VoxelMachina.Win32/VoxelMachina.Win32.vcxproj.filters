@@ -80,6 +80,9 @@
     <ClCompile Include="math\frustum.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="audio\audioCore.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
@@ -118,6 +121,7 @@
     <ClInclude Include="math\boundingPlane.h" />
     <ClInclude Include="math\frustum.h" />
     <ClInclude Include="hash.h" />
+    <ClInclude Include="audio\audioCore.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\BoxVS.hlsl" />
@@ -157,5 +161,13 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="textures\enemy_inv.dds" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="audioFiles\test.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="audioFiles\enemy.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
   </ItemGroup>
 </Project>

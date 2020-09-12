@@ -10,6 +10,8 @@
 #include "dwrite.h"
 #pragma comment(lib, "dwrite.lib")
 
+#include "xaudio2.h"
+
 #include "d3d11.h"
 #include "dxgi1_2.h"
 #include "DirectXMath.h"

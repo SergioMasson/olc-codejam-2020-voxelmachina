@@ -2,6 +2,7 @@
 #include "assert.h"
 #include "application.h"
 #include "graphics/coreGraphics.h"
+#include "audio/audioCore.h"
 #include "input.h"
 #include "systemTime.h"
 #include <iostream>
@@ -21,6 +22,7 @@ IGameApp* g_currentApp;
 void InitializeApplication(IGameApp& app)
 {
 	graphics::Initialize(defaultWidth, defaultHeight);
+	audio::Initialize();
 	SystemTime::Initialize();
 	Input::Initialize();
 
