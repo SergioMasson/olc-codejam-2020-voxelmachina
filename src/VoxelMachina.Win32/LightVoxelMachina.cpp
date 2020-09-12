@@ -12,7 +12,7 @@
 #include "SimpleLightVS.h"
 #include <string>
 
-#define ENEMY_COUNT 100
+#define ENEMY_COUNT 10
 #define PILAR_COUNT 100
 #define WORLD_X  100.0f
 #define WORLD_Y  100.0f

@@ -463,8 +463,6 @@ void graphics::MeshData::CreateCylinder(float bottomRadius, float topRadius, flo
 
 void graphics::MeshData::CreateGrid(float width, float depth, UINT m, UINT n, MeshData& meshData)
 {
-	meshData.BoudingSphere = math::BoundingSphere(math::Vector3(0, 0, 0), width / 2.0f);
-
 	UINT vertexCount = m * n;
 	UINT faceCount = (m - 1) * (n - 1) * 2;
 
@@ -474,6 +472,10 @@ void graphics::MeshData::CreateGrid(float width, float depth, UINT m, UINT n, Me
 
 	float halfWidth = 0.5f * width;
 	float halfDepth = 0.5f * depth;
+
+	float radius = sqrtf(halfWidth * halfWidth + halfDepth * halfDepth);
+
+	meshData.BoudingSphere = math::BoundingSphere(math::Vector3(0, 0, 0), radius);
 
 	float dx = width / (n - 1);
 	float dz = depth / (m - 1);
