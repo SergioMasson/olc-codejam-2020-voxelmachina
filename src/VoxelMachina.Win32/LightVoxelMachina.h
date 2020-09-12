@@ -41,7 +41,6 @@ public:
 private:
 	Camera m_sceneCamera{};
 
-	Light m_sceneDirLight{};
 	Light m_scenePointLight{};
 	Light m_sceneSpotLight{};
 

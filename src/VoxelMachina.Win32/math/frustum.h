@@ -36,7 +36,7 @@ namespace math
 			{
 				auto distance = m_FrustumPlanes[i].DistanceFromPoint(sphere.GetCenter());
 
-				if (distance - radius >= 0.0f)
+				if (distance - (radius) >= 0.0f)
 					return false;
 			}
 			return true;

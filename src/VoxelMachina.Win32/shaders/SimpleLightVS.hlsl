@@ -1,14 +1,5 @@
 #include "NewLightModel.hlsli"
  
-cbuffer cbPerFrame : register(b1)
-{
-    Light           gPointLight;
-    Light           gDirLight;
-    Light           gSpotLight;
-    float3          gEyePosW;
-    float           gPad;
-};
-
 cbuffer cbPerObject : register(b0)
 {
     float4x4 gWorld;
@@ -26,7 +17,6 @@ struct VertexIn
     float3 TangentL : TANGENT;
     float2 Tex : TEXCOORD;
 };
-
 
 struct VertexOut
 {

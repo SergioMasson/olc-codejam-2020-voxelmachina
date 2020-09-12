@@ -28,15 +28,6 @@ float3 NormalSampleToWorldSpace(float3 normalMapSample, float3 unitNormalW, floa
     return bumpedNormalW;
 }
 
-cbuffer cbPerFrame : register(b1)
-{
-    Light gPointLight;
-    Light gDirLight;
-    Light gSpotLight;
-    float3 gEyePosW;
-    float gPad;
-};
-
 cbuffer cbPerObject : register(b0)
 {
     float4x4 gWorld;
@@ -45,6 +36,13 @@ cbuffer cbPerObject : register(b0)
     Material gMaterial;
     float2 gTextureScale;
     float2 gTextureDisplacement;
+};
+
+cbuffer cbPerFrame : register(b1)
+{
+    float3 gEyePosW;
+    int NumberOfLights;
+    Light Lights[MAX_LIGHTS];
 };
 
 struct VertexOut
@@ -75,9 +73,18 @@ float4 main(VertexOut pin) : SV_TARGET
     pixelColor += gEmissionMap.Sample(gsamLinear, pin.TexC);
     pixelColor += gMaterial.Emission;
     
-    pixelColor += objectColor * ComputeDirectionalLight(gMaterial, gDirLight, bumpedNormal, toEyeW);
-    pixelColor += objectColor * ComputePointLight(gMaterial, gPointLight, pin.PosW, bumpedNormal, toEyeW);
-    pixelColor += objectColor * ComputeSpotLight(gMaterial, gSpotLight, pin.PosW, bumpedNormal, toEyeW);
-
+    [unroll] 
+    for (int i = 0; (i < NumberOfLights) && (i < MAX_LIGHTS); i++)
+    {  
+        if (Lights[i].LightType == DIR_LIGHT)
+            pixelColor += objectColor * ComputeDirectionalLight(gMaterial, Lights[i], bumpedNormal, toEyeW);
+        
+        if (Lights[i].LightType == SPOT_LIGHT)
+            pixelColor += objectColor * ComputePointLight(gMaterial, Lights[i], pin.PosW, bumpedNormal, toEyeW);
+        
+        if (Lights[i].LightType == POINT_LIGHT)
+            pixelColor += objectColor * ComputeSpotLight(gMaterial, Lights[i], pin.PosW, bumpedNormal, toEyeW);
+    }
+    
     return pixelColor;
 }

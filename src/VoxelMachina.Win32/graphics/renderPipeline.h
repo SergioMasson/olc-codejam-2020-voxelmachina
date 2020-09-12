@@ -17,9 +17,10 @@ namespace graphics
 		RenderPipeline();
 		~RenderPipeline();
 		void LoadShader(const BYTE* vertexShader, SIZE_T vertexShaderSize, const BYTE* pixelShader, SIZE_T pixelShaderSize);
-		void StartRender(Camera* camera, Light lights, Light spotLights, Light pointLights);
+		void StartRender(Camera* camera);
 		void RenderMesh(MeshRenderer const& mesh);
 		void SetSkyboxTexture(Texture2D* skybox) { m_skyboxTexture = skybox; };
+		void AddLight(Light* light);
 
 	private:
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vertexShader = nullptr;
@@ -39,6 +40,7 @@ namespace graphics
 		MeshRenderer m_skyboxMeshRenerer;
 		Texture2D* m_skyboxTexture;
 		Camera* m_camera;
+		std::vector<Light*> m_sceneLights;
 
 	private:
 		void CreateSkybox();

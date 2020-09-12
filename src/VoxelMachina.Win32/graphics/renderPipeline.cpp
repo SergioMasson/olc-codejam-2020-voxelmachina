@@ -5,6 +5,8 @@
 #include "SkyboxVS.h"
 #include "SkyboxPS.h"
 
+#define MAX_LIGHTS 10
+
 struct SkyboxConstBuffer
 {
 	DirectX::XMFLOAT4X4 MVP;
@@ -14,13 +16,11 @@ struct SceneConstBuffer
 {
 	SceneConstBuffer() { ZeroMemory(this, sizeof(this)); }
 
-	Light PointLight;
-	Light DirectionalLights;
-	Light SpotLight;
-
 	//Position of the camera in world space.
 	DirectX::XMFLOAT3 eyeWorld;
-	float pad;
+	uint32_t NumberOfLights;
+
+	Light SceneLights[MAX_LIGHTS];
 };
 
 struct ObjectConstBuffer
@@ -79,7 +79,7 @@ void graphics::RenderPipeline::LoadShader(const BYTE* vertexShader, SIZE_T verte
 	ASSERT_SUCCEEDED(hr, "Fail to create input layout");
 }
 
-void graphics::RenderPipeline::StartRender(Camera* camera, Light lights, Light spotLights, Light pointLights)
+void graphics::RenderPipeline::StartRender(Camera* camera)
 {
 	m_camera = camera;
 
@@ -107,15 +107,28 @@ void graphics::RenderPipeline::StartRender(Camera* camera, Light lights, Light s
 
 	DirectX::XMStoreFloat3(&sceneBuffer.eyeWorld, camera->GetPosition());
 
-	sceneBuffer.DirectionalLights = lights;
-	sceneBuffer.SpotLight = spotLights;
-	sceneBuffer.PointLight = pointLights;
+	std::vector<Light*> validLights{};
+
+	auto cameraWorldFrustrum = m_camera->GetWorldFrustum();
+
+	for (auto light : m_sceneLights)
+		if (IsLightInFrustrum(*light, cameraWorldFrustrum))
+			validLights.push_back(light);
+
+	int lightCout = std::min<int>(validLights.size(), MAX_LIGHTS);
+
+	sceneBuffer.NumberOfLights = lightCout;
+
+	for (size_t i = 0; i < lightCout; i++)
+	{
+		sceneBuffer.SceneLights[i] = *validLights[i];
+	}
 
 	//Updates the subresource.
 	graphics::g_d3dImmediateContext->UpdateSubresource(m_sceneConstBuffer.Get(), 0, 0, &sceneBuffer, 0, 0);
 
 	//Bind view projection matrix to slot b1
-	graphics::g_d3dImmediateContext->VSSetConstantBuffers(1, 1, m_sceneConstBuffer.GetAddressOf());
+	//graphics::g_d3dImmediateContext->VSSetConstantBuffers(1, 1, m_sceneConstBuffer.GetAddressOf());
 	graphics::g_d3dImmediateContext->PSSetConstantBuffers(1, 1, m_sceneConstBuffer.GetAddressOf());
 }
 
@@ -158,6 +171,11 @@ void graphics::RenderPipeline::RenderMesh(MeshRenderer const& mesh)
 	graphics::g_d3dImmediateContext->IASetVertexBuffers(0, 1, mesh.m_vertexBuffer.GetAddressOf(), &stride, &offset);
 	graphics::g_d3dImmediateContext->IASetIndexBuffer(mesh.m_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 	graphics::g_d3dImmediateContext->DrawIndexed(static_cast<UINT>(mesh.m_meshData->Indices.size()), 0, 0);
+}
+
+void graphics::RenderPipeline::AddLight(Light* light)
+{
+	m_sceneLights.push_back(light);
 }
 
 void graphics::RenderPipeline::CreateSkybox()

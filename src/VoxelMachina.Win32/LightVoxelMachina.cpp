@@ -12,7 +12,7 @@
 #include "SimpleLightVS.h"
 #include <string>
 
-#define ENEMY_COUNT 10
+#define ENEMY_COUNT 100
 #define PILAR_COUNT 100
 #define WORLD_X  100.0f
 #define WORLD_Y  100.0f
@@ -76,7 +76,7 @@ void LightVoxelMachinaApp::Update(float deltaT)
 
 void LightVoxelMachinaApp::RenderScene(void)
 {
-	m_renderPipeline->StartRender(&m_sceneCamera, m_sceneDirLight, m_sceneSpotLight, m_scenePointLight);
+	m_renderPipeline->StartRender(&m_sceneCamera);
 
 	for (auto renderer : m_sceneMeshRenderer)
 		m_renderPipeline->RenderMesh(*renderer);
@@ -116,13 +116,6 @@ void LightVoxelMachinaApp::CreateCamera()
 
 void LightVoxelMachinaApp::CreateLights()
 {
-	m_sceneDirLight = Light{};
-	//Directional light.
-	m_sceneDirLight.Ambient = 0.1f;
-	m_sceneDirLight.Color = Color::White;
-	m_sceneDirLight.Direction = DirectX::XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
-	m_sceneDirLight.Intensity = 0.0f;
-
 	m_scenePointLight = Light{};
 	// Point light--position is changed every frame to animate in UpdateScene function.
 	m_scenePointLight.Ambient = 0.2f;
@@ -130,6 +123,9 @@ void LightVoxelMachinaApp::CreateLights()
 	m_scenePointLight.Range = 5;
 	m_scenePointLight.Position = DirectX::XMFLOAT3(0.0f, 3.0f, 5.0f);
 	m_scenePointLight.Intensity = 3.0f;
+	m_scenePointLight.LightType = POINT_LIGHT;
+
+	m_renderPipeline->AddLight(&m_scenePointLight);
 
 	m_sceneSpotLight = Light{};
 	// Spot light--position and direction changed every frame to animate in UpdateScene function.
@@ -140,6 +136,9 @@ void LightVoxelMachinaApp::CreateLights()
 	m_sceneSpotLight.Position = DirectX::XMFLOAT3(2.0f, 3.0f, 0.0f);
 	m_sceneSpotLight.Direction = DirectX::XMFLOAT3(0.0f, -1.0f, 0.0f);
 	m_sceneSpotLight.Intensity = 0.3f;
+	m_sceneSpotLight.LightType = SPOT_LIGHT;
+
+	m_renderPipeline->AddLight(&m_sceneSpotLight);
 }
 
 void LightVoxelMachinaApp::CreateObjects()
@@ -314,6 +313,16 @@ void LightVoxelMachinaApp::CheckForEnemyCollision()
 			enemiesLeft--;
 
 			enemy->SetDetected();
+
+			DirectX::XMFLOAT3 enemyPosition;
+
+			DirectX::XMStoreFloat3(&enemyPosition, m_player->GetPosition() + math::Vector3(0, 1, 0));
+
+			Light* light = new Light();
+
+			*light = CreatePointLight(Color::MediumVioletRed, enemyPosition, 3.0f, 0.0f, 10.0f);
+
+			m_renderPipeline->AddLight(light);
 
 			if (enemiesLeft == 0)
 			{

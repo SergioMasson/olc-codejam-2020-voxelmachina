@@ -1,3 +1,8 @@
+#define MAX_LIGHTS 10
+#define DIR_LIGHT 0
+#define SPOT_LIGHT 1
+#define POINT_LIGHT 2
+
 struct Light
 {
     float4 Color;
@@ -10,8 +15,8 @@ struct Light
     
     float Range;
     float Spot;
-    
-    float2 Pad;
+    int LightType;
+    float Pad;
 };
 
 struct Material
