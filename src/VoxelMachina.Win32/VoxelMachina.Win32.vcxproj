@@ -216,6 +216,7 @@
     <ClInclude Include="graphics\UI\guiText.h" />
     <ClInclude Include="hash.h" />
     <ClInclude Include="input.h" />
+    <ClInclude Include="math\boudingBox.h" />
     <ClInclude Include="math\boundingPlane.h" />
     <ClInclude Include="math\boundingSphere.h" />
     <ClInclude Include="math\common.h" />

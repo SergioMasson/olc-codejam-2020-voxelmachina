@@ -122,6 +122,7 @@
     <ClInclude Include="math\frustum.h" />
     <ClInclude Include="hash.h" />
     <ClInclude Include="audio\audioCore.h" />
+    <ClInclude Include="math\boudingBox.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\BoxVS.hlsl" />

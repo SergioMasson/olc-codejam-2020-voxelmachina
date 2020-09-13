@@ -2,6 +2,7 @@
 
 #include "boundingSphere.h"
 #include "boundingPlane.h"
+#include "boudingBox.h"
 
 namespace math
 {
@@ -50,11 +51,16 @@ namespace math
 			{
 				BoundingPlane p = m_FrustumPlanes[i];
 				Vector3 farCorner = Select(minBound, maxBound, p.GetNormal() > Vector3(kZero));
-				if (p.DistanceFromPoint(farCorner) < 0.0f)
+				if (p.DistanceFromPoint(farCorner) >= 0.0f)
 					return false;
 			}
 
 			return true;
+		}
+
+		INLINE bool IntersectBoundingBox(const BoudingBox& box) const
+		{
+			return IntersectBoundingBox(box.m_topCorner, box.m_bottomCorner);
 		}
 
 		INLINE friend Frustum  operator* (const Transform& xform, const Frustum& frustum)

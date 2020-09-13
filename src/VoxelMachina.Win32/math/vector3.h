@@ -125,6 +125,7 @@ namespace math
 	public:
 		INLINE BoolVector(FXMVECTOR vec) { m_vec = vec; }
 		INLINE operator XMVECTOR() const { return m_vec; }
+		INLINE operator bool() const { return DirectX::XMVectorGetW(m_vec) != 0; }
 	protected:
 		XMVECTOR m_vec;
 	};
