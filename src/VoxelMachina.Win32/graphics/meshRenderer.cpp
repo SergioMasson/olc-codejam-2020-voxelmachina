@@ -169,8 +169,7 @@ void BuildCylinderBottomCap(float bottomRadius, float topRadius, float height, U
 
 void graphics::MeshData::CreateBox(float width, float height, float depth, MeshData& meshData)
 {
-	float radius = sqrtf(((width / 2.0f) * (width / 2.0f)) + ((height / 2.0f) * (height / 2.0f)));
-	meshData.BoudingSphere = math::BoundingSphere(math::Vector3(0, 0, 0), radius);
+	meshData.BoudingSphere = math::BoudingBox(math::Vector3(-width * 0.5f, -height * 0.5f, -depth * 0.5f), math::Vector3(width * 0.5f, height * 0.5f, depth * 0.5f));
 
 	Vertex v[24];
 
@@ -249,7 +248,7 @@ void graphics::MeshData::CreateBox(float width, float height, float depth, MeshD
 
 void graphics::MeshData::CreateSphere(float radius, UINT sliceCount, UINT stackCount, MeshData& meshData)
 {
-	meshData.BoudingSphere = math::BoundingSphere(math::Vector3(0, 0, 0), radius);
+	meshData.BoudingSphere = math::BoudingBox(math::Vector3(-radius, -radius, -radius), math::Vector3(radius, radius, radius));
 
 	meshData.Vertices.clear();
 	meshData.Indices.clear();
@@ -364,11 +363,11 @@ void graphics::MeshData::CreateCylinder(float bottomRadius, float topRadius, flo
 	float radius = 0.0f;
 
 	if (bottomRadius > topRadius)
-		radius = sqrtf((bottomRadius * bottomRadius) + ((height / 2.0f) * (height / 2.0f)));
+		radius = bottomRadius;
 	else
-		radius = sqrtf((topRadius * topRadius) + ((height / 2.0f) * (height / 2.0f)));
+		radius = topRadius;
 
-	meshData.BoudingSphere = math::BoundingSphere(math::Vector3(0, 0, 0), radius);
+	meshData.BoudingSphere = math::BoudingBox(math::Vector3(radius, height * 0.5f, radius), math::Vector3(-radius, -height * 0.5f, -radius));
 
 	meshData.Vertices.clear();
 	meshData.Indices.clear();
@@ -475,7 +474,7 @@ void graphics::MeshData::CreateGrid(float width, float depth, UINT m, UINT n, Me
 
 	float radius = sqrtf(halfWidth * halfWidth + halfDepth * halfDepth);
 
-	meshData.BoudingSphere = math::BoundingSphere(math::Vector3(0, 0, 0), radius);
+	meshData.BoudingSphere = math::BoudingBox(math::Vector3(width * 0.5f, 0, depth * 0.5f), math::Vector3(-width * 0.5f, 0, -depth * 0.5f));
 
 	float dx = width / (n - 1);
 	float dz = depth / (m - 1);
@@ -539,7 +538,14 @@ void graphics::MeshData::LoadFromOBJFile(const wchar_t* filename, MeshData& mesh
 	std::string line;
 	std::ifstream in(filename);
 
-	float maxDistance = 0.0f;
+	float maxX = 0.0f;
+	float minX = 0.0f;
+
+	float maxY = 0.0f;
+	float minY = 0.0f;
+
+	float maxZ = 0.0f;
+	float minZ = 0.0f;
 
 	while (std::getline(in, line))                           // read whole line
 	{
@@ -561,10 +567,23 @@ void graphics::MeshData::LoadFromOBJFile(const wchar_t* filename, MeshData& mesh
 			vert.Normal = { 999, 0, 0 };
 			vertex.push_back(vert);
 
-			float distance = math::Length(math::Vector3{ x, y, z });
+			if (x > maxX)
+				maxX = x;
 
-			if (distance > maxDistance)
-				maxDistance = distance;
+			if (x < minX)
+				minX = x;
+
+			if (y > maxY)
+				maxY = y;
+
+			if (y < minY)
+				minY = y;
+
+			if (z > maxZ)
+				maxZ = z;
+
+			if (z < minZ)
+				minZ = z;
 		}
 		else if (header == "VN" || header == "vn")
 		{
@@ -711,7 +730,7 @@ void graphics::MeshData::LoadFromOBJFile(const wchar_t* filename, MeshData& mesh
 
 	meshData.Indices = indexes;
 	meshData.Vertices = vertex;
-	meshData.BoudingSphere = math::BoundingSphere(math::Vector3{ 0, 0, 0 }, maxDistance);
+	meshData.BoudingSphere = math::BoudingBox(math::Vector3{ maxX, maxY, maxZ }, math::Vector3{ minX, minY, minZ });
 
 	in.close();
 }

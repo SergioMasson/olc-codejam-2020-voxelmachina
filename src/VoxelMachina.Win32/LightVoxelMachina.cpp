@@ -59,7 +59,14 @@ void LightVoxelMachinaApp::Update(float deltaT)
 	}
 
 	m_isDone = Input::IsPressed(Input::KeyCode::Key_escape) || (Input::IsPressed(Input::KeyCode::Key_return) && enemiesLeft == 0);
+
+	auto oldPlayerPosition = m_player->GetPosition();
+
 	m_playerController->Update(deltaT);
+
+	if (CheckPillarCollision() || !CheckIfInsideScene())
+		m_player->SetPosition(oldPlayerPosition);
+
 	//m_cameraController->Update(deltaT);
 
 	CheckForEnemyCollision();
@@ -73,7 +80,6 @@ void LightVoxelMachinaApp::Update(float deltaT)
 
 	m_time += deltaT;
 	m_counterText->SetText(L"TOTAL TIME: " + std::to_wstring(m_time));
-
 	m_enemiesLeftText->SetText(L" X " + std::to_wstring(enemiesLeft));
 }
 
@@ -113,7 +119,7 @@ void LightVoxelMachinaApp::CreateCamera()
 	m_sceneCamera.SetEyeAtUp(cameraPosition, target, up);
 
 	auto aspectRation = static_cast<float>(graphics::g_windowWidth) / static_cast<float>(graphics::g_windowHeight);
-	m_sceneCamera.SetPerspectiveMatrix(0.25f * math::Pi, aspectRation, 1.0f, 50.0f);
+	m_sceneCamera.SetPerspectiveMatrix(0.25f * math::Pi, aspectRation, 1.0f, 30.0f);
 	m_sceneCamera.Update();
 }
 
@@ -186,13 +192,13 @@ void LightVoxelMachinaApp::CreateObjects()
 	material2.Specular = 2.0f;
 	material2.Diffuse = 1.0f;
 
-	auto floor = new graphics::MeshRenderer(&quad, material2, math::Vector3(0, 0, 0), math::Quaternion());
-	floor->SetAlbedoTexture(floorTexture);
-	floor->SetNormalMap(floorNormalMap);
-	floor->SetEmissionMap(defaultEmissionMap);
-	floor->SetTextureScale(20, 20);
+	m_floor = new graphics::MeshRenderer(&quad, material2, math::Vector3(0, 0, 0), math::Quaternion());
+	m_floor->SetAlbedoTexture(floorTexture);
+	m_floor->SetNormalMap(floorNormalMap);
+	m_floor->SetEmissionMap(defaultEmissionMap);
+	m_floor->SetTextureScale(20, 20);
 
-	m_sceneMeshRenderer.push_back(floor);
+	m_sceneMeshRenderer.push_back(m_floor);
 }
 
 void LightVoxelMachinaApp::CreateEnemy(graphics::MeshData* enemyData, graphics::Texture2D* enemyTexture, graphics::Texture2D* enemyNormal, graphics::Texture2D* detectedTexture, graphics::Texture2D* emissionMap)
@@ -264,6 +270,7 @@ void LightVoxelMachinaApp::CreatePilars(graphics::MeshData* pilarData, graphics:
 		pilar->SetTextureScale(3, 5);
 		pilar->SetEmissionMap(emissionMap);
 		m_sceneMeshRenderer.push_back(pilar);
+		m_pilars.push_back(pilar);
 	}
 }
 
@@ -308,9 +315,9 @@ void LightVoxelMachinaApp::CheckForEnemyCollision()
 	{
 		Enemy* enemy = *it;
 
-		math::Vector3 distance = enemy->GetPosition() - m_player->GetPosition();
-
-		if (math::Length(distance) <= 1.0f)
+		/*math::Vector3 distance = enemy->GetPosition() - m_player->GetPosition();
+		if (math::Length(distance) <= 1.0f)*/
+		if (enemy->WBoudingBox().IsOverlaping(m_player->GetWorldBoudingSphere()))
 		{
 			it = m_enemiesLeft.erase(it);
 			enemiesLeft--;
@@ -341,6 +348,21 @@ void LightVoxelMachinaApp::CheckForEnemyCollision()
 			++it;
 		}
 	}
+}
+
+bool LightVoxelMachinaApp::CheckPillarCollision()
+{
+	for (auto pilar : m_pilars)
+	{
+		if (pilar->GetWorldBoudingSphere().IsOverlaping(m_player->GetWorldBoudingSphere()))
+			return true;
+	}
+	return false;
+}
+
+bool LightVoxelMachinaApp::CheckIfInsideScene()
+{
+	return m_floor->GetWorldBoudingSphere().IsPointInside(m_player->GetPosition());
 }
 
 void LightVoxelMachinaApp::Cleanup(void)

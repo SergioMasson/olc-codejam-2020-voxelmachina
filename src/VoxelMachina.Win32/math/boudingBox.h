@@ -1,6 +1,10 @@
 #pragma once
 
 #include "vector3.h"
+#include <array>
+
+#undef max
+#undef min
 
 namespace math
 {
@@ -9,6 +13,8 @@ namespace math
 	//An axis-aligned bounding box.
 	class BoudingBox
 	{
+	public:
+		BoudingBox() = default;
 		BoudingBox(Vector3 top, Vector3 bottom) : m_topCorner{ top }, m_bottomCorner{ bottom }{}
 
 		INLINE bool IsPointInside(const Vector3& point)
@@ -25,9 +31,22 @@ namespace math
 		INLINE bool IsOverlaping(const BoudingBox& other)
 		{
 			//TODO(Sergio): Do this using SIMD.
-			return (m_bottomCorner.GetX() <= other.m_topCorner.GetX() && m_topCorner.GetX() >= other.m_bottomCorner.GetX()) &&
-				(m_bottomCorner.GetY() <= other.m_topCorner.GetY() && m_topCorner.GetY() >= other.m_bottomCorner.GetY()) &&
-				(m_bottomCorner.GetZ() <= other.m_topCorner.GetZ() && m_topCorner.GetZ() >= other.m_bottomCorner.GetZ());
+			return (m_bottomCorner.GetX() <= other.m_topCorner.GetX()) &&
+				(m_topCorner.GetX() >= other.m_bottomCorner.GetX()) &&
+				(m_bottomCorner.GetY() <= other.m_topCorner.GetY()) &&
+				(m_topCorner.GetY() >= other.m_bottomCorner.GetY()) &&
+				(m_bottomCorner.GetZ() <= other.m_topCorner.GetZ()) &&
+				(m_topCorner.GetZ() >= other.m_bottomCorner.GetZ());
+		}
+
+		INLINE friend BoudingBox  operator* (const Matrix4& mtx, const BoudingBox& frustum)
+		{
+			Vector3 scale;
+			Vector3 translation;
+			Quaternion Rotation;
+
+			ASSERT(mtx.Decompose(scale, Rotation, translation));
+			return BoudingBox{ (frustum.m_topCorner * scale) + translation , (frustum.m_bottomCorner * scale) + translation };
 		}
 
 	private:

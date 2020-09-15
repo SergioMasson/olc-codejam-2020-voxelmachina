@@ -48,6 +48,7 @@ private:
 	std::vector<graphics::MeshRenderer*> m_sceneMeshRenderer;
 	std::vector<graphics::UI::DrawableElement*> m_sceneGuiElements;
 	std::vector<Enemy*> m_enemiesLeft;
+	std::vector<graphics::MeshRenderer*> m_pilars;
 
 	graphics::UI::GuiText* m_informationText;
 	graphics::UI::GuiText* m_counterText;
@@ -57,6 +58,8 @@ private:
 	uint32_t enemiesLeft;
 
 	graphics::MeshRenderer* m_player;
+	graphics::MeshRenderer* m_floor;
+
 	PlayerController* m_playerController;
 	CameraController* m_cameraController;
 
@@ -72,6 +75,7 @@ private:
 	void CreateEnemy(graphics::MeshData* enemyData, graphics::Texture2D* enemyTexture, graphics::Texture2D* enemyNormal, graphics::Texture2D* detectedTexture, graphics::Texture2D* emissionMap);
 	void CreatePilars(graphics::MeshData* pilarData, graphics::Texture2D* pilarTexture, graphics::Texture2D* pilarNormal, graphics::Texture2D* emissionMap);
 	void CreateGUI();
-
 	void CheckForEnemyCollision();
+	bool CheckPillarCollision();
+	bool CheckIfInsideScene();
 };

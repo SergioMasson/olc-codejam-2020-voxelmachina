@@ -77,6 +77,24 @@ namespace math
 			return Matrix4{ XMMatrixTranspose(A) };
 		}
 
+		INLINE bool Decompose(Vector3& scale, Quaternion& rotation, Vector3& translation) const
+		{
+			DirectX::XMVECTOR lscale;
+			DirectX::XMVECTOR lrotation;
+			DirectX::XMVECTOR ltranslation;
+
+			auto succced = DirectX::XMMatrixDecompose(&lscale, &lrotation, &ltranslation, m_mat);
+
+			if (succced)
+			{
+				scale = Vector3(lscale);
+				rotation = Quaternion(lrotation);
+				translation = Vector3(ltranslation);
+			}
+
+			return succced;
+		}
+
 		INLINE operator DirectX::XMMATRIX() const { return m_mat; }
 
 		INLINE Vector4 operator* (Vector3 vec) const { return Vector4(DirectX::XMVector3Transform(vec, m_mat)); }

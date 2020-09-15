@@ -3,6 +3,7 @@
 #include "coreGraphics.h"
 #include "../mathHelpers.h"
 #include "../math/boundingSphere.h"
+#include "../math/boudingBox.h"
 
 namespace graphics
 {
@@ -30,7 +31,7 @@ namespace graphics
 		std::vector<Vertex> Vertices;
 		std::vector<UINT> Indices;
 
-		math::BoundingSphere BoudingSphere;
+		math::BoudingBox BoudingSphere;
 
 		///<summary>
 		/// Creates a box centered at the origin with the given dimensions.
@@ -81,7 +82,7 @@ namespace graphics
 			m_worldBoudingSphere = m_worldMatrix * m_meshData->BoudingSphere;
 		}
 
-		inline math::BoundingSphere GetWorldBoudingSphere() const
+		inline math::BoudingBox GetWorldBoudingSphere() const
 		{
 			return m_worldBoudingSphere;
 		}
@@ -122,7 +123,7 @@ namespace graphics
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_vertexBuffer = nullptr;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_indexBuffer = nullptr;
 
-		math::BoundingSphere m_worldBoudingSphere;
+		math::BoudingBox m_worldBoudingSphere;
 
 		Material m_material;
 		MeshData* m_meshData;

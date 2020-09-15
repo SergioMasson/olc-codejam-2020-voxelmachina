@@ -135,7 +135,7 @@ void graphics::RenderPipeline::StartRender(Camera* camera)
 void graphics::RenderPipeline::RenderMesh(MeshRenderer const& mesh)
 {
 	//If mesh bouding sphere is not inside camera`s frustum skip this mesh.
-	if (!m_camera->GetWorldFrustum().IntersectSphere(mesh.GetWorldBoudingSphere()))
+	if (!m_camera->GetWorldFrustum().IntersectBoundingBox(mesh.GetWorldBoudingSphere()))
 		return;
 
 	UINT stride = sizeof(Vertex);

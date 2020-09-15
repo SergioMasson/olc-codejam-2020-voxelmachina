@@ -63,7 +63,7 @@ void PlayerController::Update(float deltaT)
 
 	//// don't apply momentum to mouse inputs
 	float rotation = m_RotationSpeed * (
-		Input::GetTimeCorrectedAnalogInput(Input::AnalogInput::kAnalogLeftStickX) +
+		-Input::GetTimeCorrectedAnalogInput(Input::AnalogInput::kAnalogLeftStickX) +
 		(Input::IsPressed(Input::KeyCode::Key_d) ? -deltaT : 0.0f) +
 		(Input::IsPressed(Input::KeyCode::Key_a) ? deltaT : 0.0f)
 		);

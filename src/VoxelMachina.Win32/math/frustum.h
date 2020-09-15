@@ -50,7 +50,11 @@ namespace math
 			for (int i = 0; i < 6; ++i)
 			{
 				BoundingPlane p = m_FrustumPlanes[i];
-				Vector3 farCorner = Select(minBound, maxBound, p.GetNormal() > Vector3(kZero));
+
+				m_FrustumPlanes[i].DistanceFromPoint(minBound);
+
+				Vector3 farCorner = Select(minBound, maxBound, p.GetNormal() > Vector3(0, 0, 0));
+
 				if (p.DistanceFromPoint(farCorner) >= 0.0f)
 					return false;
 			}
