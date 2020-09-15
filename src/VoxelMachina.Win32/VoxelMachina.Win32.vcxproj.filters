@@ -83,6 +83,9 @@
     <ClCompile Include="audio\audioCore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="math\random.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
@@ -123,6 +126,7 @@
     <ClInclude Include="hash.h" />
     <ClInclude Include="audio\audioCore.h" />
     <ClInclude Include="math\boudingBox.h" />
+    <ClInclude Include="math\random.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\BoxVS.hlsl" />

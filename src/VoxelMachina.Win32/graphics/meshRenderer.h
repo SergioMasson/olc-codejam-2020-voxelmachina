@@ -31,7 +31,7 @@ namespace graphics
 		std::vector<Vertex> Vertices;
 		std::vector<UINT> Indices;
 
-		math::BoudingBox BoudingSphere;
+		math::BoudingBox BoudingBox;
 
 		///<summary>
 		/// Creates a box centered at the origin with the given dimensions.
@@ -79,12 +79,12 @@ namespace graphics
 		{
 			m_transform.SetTranslation(worldPos);
 			m_worldMatrix = m_transform;
-			m_worldBoudingSphere = m_worldMatrix * m_meshData->BoudingSphere;
+			m_wBoudingBox = m_worldMatrix * m_meshData->BoudingBox;
 		}
 
-		inline math::BoudingBox GetWorldBoudingSphere() const
+		inline math::BoudingBox WBoudingBox() const
 		{
-			return m_worldBoudingSphere;
+			return m_wBoudingBox;
 		}
 
 		const math::Vector3 GetPosition() const { return m_transform.GetTranslation(); }
@@ -123,7 +123,7 @@ namespace graphics
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_vertexBuffer = nullptr;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_indexBuffer = nullptr;
 
-		math::BoudingBox m_worldBoudingSphere;
+		math::BoudingBox m_wBoudingBox;
 
 		Material m_material;
 		MeshData* m_meshData;

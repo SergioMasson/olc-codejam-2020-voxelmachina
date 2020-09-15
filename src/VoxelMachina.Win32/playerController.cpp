@@ -88,6 +88,8 @@ void PlayerController::Update(float deltaT)
 
 	m_playerMeshRenderer->SetRotation(math::Quaternion{ orientation });
 
+	auto oldCameraOffset = m_cameraOffset;
+
 	if (m_lockCamera)
 	{
 		m_cameraOffset = math::Matrix3(m_WorldEast, m_WorldUp, -m_WorldNorth) * math::Matrix3::MakeYRotation(-rotation) * (totalRotation * m_cameraOffset);
@@ -98,8 +100,18 @@ void PlayerController::Update(float deltaT)
 	}
 
 	math::Vector3 cameraPosition = m_playerMeshRenderer->GetPosition() + m_cameraOffset;
+
 	m_sceneCamera->SetEyeAtUp(cameraPosition, position, math::Vector3(0, 1, 0));
 	m_sceneCamera->Update();
+
+	float cameraFowardDot = math::Dot(m_sceneCamera->GetForwardVec(), m_WorldUp);
+
+	if (cameraFowardDot <= 0.1f || cameraFowardDot > 0.80f)
+	{
+		m_cameraOffset = oldCameraOffset;
+		m_sceneCamera->SetEyeAtUp(cameraPosition, position, math::Vector3(0, 1, 0));
+		m_sceneCamera->Update();
+	}
 
 	m_lastCameraRotationX = cameraRotationX;
 	m_lastCameraRotationY = cameraRotationY;

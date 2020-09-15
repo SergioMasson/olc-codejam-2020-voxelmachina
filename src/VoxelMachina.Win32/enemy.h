@@ -14,7 +14,7 @@ public:
 	void SetDetected();
 	bool IsDetected() { return m_isDetected; }
 	math::Vector3 GetPosition() { return m_meshRenderer->GetPosition(); }
-	math::BoudingBox WBoudingBox() const { return m_meshRenderer->GetWorldBoudingSphere(); }
+	math::BoudingBox WBoudingBox() const { return m_meshRenderer->WBoudingBox(); }
 
 private:
 	graphics::MeshRenderer* m_meshRenderer;

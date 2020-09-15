@@ -6,6 +6,7 @@
 #include "graphics/coreGraphics.h"
 #include "graphics/texture2D.h"
 #include "audio/audioCore.h"
+#include "math/random.h"
 #include "input.h"
 #include "colors.h"
 
@@ -42,7 +43,7 @@ void LightVoxelMachinaApp::Startup(void)
 	m_playerController = new PlayerController(math::Vector3(0, 1, 0), m_player, &m_sceneCamera);
 	m_cameraController = new CameraController(m_sceneCamera, math::Vector3(0, 1, 0));
 
-	audio::PlayAudioFile(L"audioFiles/test.wav", true);
+	//audio::PlayAudioFile(L"audioFiles/test.wav", true);
 }
 
 bool LightVoxelMachinaApp::IsDone()
@@ -210,10 +211,12 @@ void LightVoxelMachinaApp::CreateEnemy(graphics::MeshData* enemyData, graphics::
 	material1.Diffuse = 1.0f;
 	material1.Specular = 2.0f;
 
+	math::RandomNumberGenerator random{};
+
 	for (size_t i = 0; i < ENEMY_COUNT; i++)
 	{
-		float randomX = (rand() % 1000) / 1000.0f;
-		float randomY = rand() % 1000 / 1000.0f;
+		float randomX = random.NextFloat();
+		float randomY = random.NextFloat();
 
 		float enemyX = (randomX * WORLD_X) - ((WORLD_X) / 2.0f);
 		float enemyY = (randomY * WORLD_Y) - ((WORLD_Y) / 2.0f);
@@ -234,6 +237,8 @@ void LightVoxelMachinaApp::CreatePilars(graphics::MeshData* pilarData, graphics:
 	material1.Diffuse = 1.0f;
 	material1.Specular = 2.0f;
 
+	math::RandomNumberGenerator random{};
+
 	for (size_t i = 0; i < PILAR_COUNT; i++)
 	{
 		float pilarX = 0.0f;
@@ -241,36 +246,31 @@ void LightVoxelMachinaApp::CreatePilars(graphics::MeshData* pilarData, graphics:
 
 		math::Vector3 distance;
 
-		bool overlapingEnemy = false;
-
-		do
-		{
-			float randomX = (rand() % 1000) / 1000.0f;
-			float randomY = rand() % 1000 / 1000.0f;
-
-			pilarX = (randomX * (WORLD_X - 3.0f)) - ((WORLD_X - 3.0f) / 2.0f);
-			pilarY = (randomY * (WORLD_Y - 3.0f)) - ((WORLD_Y - 3.0f) / 2.0f);
-
-			distance = m_player->GetPosition() - math::Vector3(pilarX, 0, pilarY);
-
-			for (auto enemy : m_enemiesLeft)
-			{
-				distance = enemy->GetPosition() - math::Vector3(pilarX, 0, pilarY);
-
-				if (math::Length(distance) <= 1.0f)
-					overlapingEnemy = true;
-			}
-		} while (math::Length(distance) <= 10.0f && overlapingEnemy);
-
-		//Check for player
-
-		//Check for enemy
-
-		auto pilar = new graphics::MeshRenderer(pilarData, material1, math::Vector3(pilarX, 5, pilarY), math::Quaternion());
+		auto pilar = new graphics::MeshRenderer(pilarData, material1, math::Vector3(0, 5, 0), math::Quaternion());
 		pilar->SetAlbedoTexture(pilarTexture);
 		pilar->SetNormalMap(pilarNormal);
 		pilar->SetTextureScale(3, 5);
 		pilar->SetEmissionMap(emissionMap);
+
+		bool overlapingEnemy = false;
+
+		do
+		{
+			overlapingEnemy = false;
+
+			pilarX = (random.NextFloat() * (WORLD_X - 3.0f)) - ((WORLD_X - 3.0f) / 2.0f);
+			pilarY = (random.NextFloat() * (WORLD_Y - 3.0f)) - ((WORLD_Y - 3.0f) / 2.0f);
+
+			pilar->SetPosition(math::Vector3(pilarX, 5, pilarY));
+			auto pilarBound = pilar->WBoudingBox();
+
+			for (auto enemy : m_enemiesLeft)
+				overlapingEnemy = overlapingEnemy && enemy->WBoudingBox().IsOverlaping(pilarBound);
+
+			for (auto otherPilar : m_pilars)
+				overlapingEnemy = overlapingEnemy && otherPilar->WBoudingBox().IsOverlaping(pilarBound);
+		} while (math::Length(distance) <= 10.0f && overlapingEnemy);
+
 		m_sceneMeshRenderer.push_back(pilar);
 		m_pilars.push_back(pilar);
 	}
@@ -319,7 +319,7 @@ void LightVoxelMachinaApp::CheckForEnemyCollision()
 
 		/*math::Vector3 distance = enemy->GetPosition() - m_player->GetPosition();
 		if (math::Length(distance) <= 1.0f)*/
-		if (enemy->WBoudingBox().IsOverlaping(m_player->GetWorldBoudingSphere()))
+		if (enemy->WBoudingBox().IsOverlaping(m_player->WBoudingBox()))
 		{
 			it = m_enemiesLeft.erase(it);
 			enemiesLeft--;
@@ -356,7 +356,7 @@ bool LightVoxelMachinaApp::CheckPillarCollision()
 {
 	for (auto pilar : m_pilars)
 	{
-		if (pilar->GetWorldBoudingSphere().IsOverlaping(m_player->GetWorldBoudingSphere()))
+		if (pilar->WBoudingBox().IsOverlaping(m_player->WBoudingBox()))
 			return true;
 	}
 	return false;
@@ -364,7 +364,7 @@ bool LightVoxelMachinaApp::CheckPillarCollision()
 
 bool LightVoxelMachinaApp::CheckIfInsideScene()
 {
-	return m_floor->GetWorldBoudingSphere().IsPointInside(m_player->GetPosition());
+	return m_floor->WBoudingBox().IsPointInside(m_player->GetPosition());
 }
 
 void LightVoxelMachinaApp::Cleanup(void)

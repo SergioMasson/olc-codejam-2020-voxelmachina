@@ -169,7 +169,7 @@ void BuildCylinderBottomCap(float bottomRadius, float topRadius, float height, U
 
 void graphics::MeshData::CreateBox(float width, float height, float depth, MeshData& meshData)
 {
-	meshData.BoudingSphere = math::BoudingBox(math::Vector3(-width * 0.5f, -height * 0.5f, -depth * 0.5f), math::Vector3(width * 0.5f, height * 0.5f, depth * 0.5f));
+	meshData.BoudingBox = math::BoudingBox(math::Vector3(-width * 0.5f, -height * 0.5f, -depth * 0.5f), math::Vector3(width * 0.5f, height * 0.5f, depth * 0.5f));
 
 	Vertex v[24];
 
@@ -248,7 +248,7 @@ void graphics::MeshData::CreateBox(float width, float height, float depth, MeshD
 
 void graphics::MeshData::CreateSphere(float radius, UINT sliceCount, UINT stackCount, MeshData& meshData)
 {
-	meshData.BoudingSphere = math::BoudingBox(math::Vector3(-radius, -radius, -radius), math::Vector3(radius, radius, radius));
+	meshData.BoudingBox = math::BoudingBox(math::Vector3(-radius, -radius, -radius), math::Vector3(radius, radius, radius));
 
 	meshData.Vertices.clear();
 	meshData.Indices.clear();
@@ -367,7 +367,7 @@ void graphics::MeshData::CreateCylinder(float bottomRadius, float topRadius, flo
 	else
 		radius = topRadius;
 
-	meshData.BoudingSphere = math::BoudingBox(math::Vector3(radius, height * 0.5f, radius), math::Vector3(-radius, -height * 0.5f, -radius));
+	meshData.BoudingBox = math::BoudingBox(math::Vector3(radius, height * 0.5f, radius), math::Vector3(-radius, -height * 0.5f, -radius));
 
 	meshData.Vertices.clear();
 	meshData.Indices.clear();
@@ -474,7 +474,7 @@ void graphics::MeshData::CreateGrid(float width, float depth, UINT m, UINT n, Me
 
 	float radius = sqrtf(halfWidth * halfWidth + halfDepth * halfDepth);
 
-	meshData.BoudingSphere = math::BoudingBox(math::Vector3(width * 0.5f, 0, depth * 0.5f), math::Vector3(-width * 0.5f, 0, -depth * 0.5f));
+	meshData.BoudingBox = math::BoudingBox(math::Vector3(width * 0.5f, 0, depth * 0.5f), math::Vector3(-width * 0.5f, 0, -depth * 0.5f));
 
 	float dx = width / (n - 1);
 	float dz = depth / (m - 1);
@@ -730,7 +730,7 @@ void graphics::MeshData::LoadFromOBJFile(const wchar_t* filename, MeshData& mesh
 
 	meshData.Indices = indexes;
 	meshData.Vertices = vertex;
-	meshData.BoudingSphere = math::BoudingBox(math::Vector3{ maxX, maxY, maxZ }, math::Vector3{ minX, minY, minZ });
+	meshData.BoudingBox = math::BoudingBox(math::Vector3{ maxX, maxY, maxZ }, math::Vector3{ minX, minY, minZ });
 
 	in.close();
 }
@@ -741,7 +741,7 @@ graphics::MeshRenderer::MeshRenderer(MeshData* data, Material material, math::Ve
 	m_transform.SetRotation(rotation);
 	m_transform.SetScale(scale);
 	m_worldMatrix = m_transform;
-	m_worldBoudingSphere = m_worldMatrix * data->BoudingSphere;
+	m_wBoudingBox = m_worldMatrix * data->BoudingBox;
 
 	D3D11_BUFFER_DESC vbd;
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;
