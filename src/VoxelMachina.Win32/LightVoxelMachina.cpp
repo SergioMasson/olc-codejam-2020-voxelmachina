@@ -78,7 +78,9 @@ void LightVoxelMachinaApp::Update(float deltaT)
 	DirectX::XMStoreFloat3(&m_sceneSpotLight.Position, lightPosition);
 	DirectX::XMStoreFloat3(&m_sceneSpotLight.Direction, playerFoward);
 
-	m_time += deltaT;
+	if (m_enemiesLeft.size() != 0)
+		m_time += deltaT;
+
 	m_counterText->SetText(L"TOTAL TIME: " + std::to_wstring(m_time));
 	m_enemiesLeftText->SetText(L" X " + std::to_wstring(enemiesLeft));
 }

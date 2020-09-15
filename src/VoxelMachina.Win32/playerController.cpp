@@ -85,6 +85,7 @@ void PlayerController::Update(float deltaT)
 		m_CurrentHeading += DirectX::XM_2PI;
 
 	math::Matrix3 orientation = math::Matrix3(m_WorldEast, m_WorldUp, -m_WorldNorth) * math::Matrix3::MakeYRotation(m_CurrentHeading);
+
 	m_playerMeshRenderer->SetRotation(math::Quaternion{ orientation });
 
 	if (m_lockCamera)

@@ -66,10 +66,10 @@ namespace math
 
 		// If perfect power of two (only one set bit), return index of bit.  Otherwise round up
 		// fractional log by adding 1 to most signicant set bit's index.
-		if (_BitScanReverse64(&mssb, value) > 0 && _BitScanForward64(&lssb, value) > 0)
-			return uint8_t(mssb + (mssb == lssb ? 0 : 1));
-		else
-			return 0;
+		//if (_BitScanReverse64(&mssb, value) > 0 && _BitScanForward64(&lssb, value) > 0)
+		//	return uint8_t(mssb + (mssb == lssb ? 0 : 1));
+		//else
+		return 0;
 	}
 
 	template <typename T> __forceinline T AlignPowerOfTwo(T value)
@@ -105,7 +105,7 @@ namespace math
 	INLINE XMVECTOR CreateZUnitVector(XMVECTOR one = SplatOne())
 	{
 		return _mm_insert_ps(one, one, 0x0B);
-}
+	}
 	INLINE XMVECTOR CreateWUnitVector(XMVECTOR one = SplatOne())
 	{
 		return _mm_insert_ps(one, one, 0x07);

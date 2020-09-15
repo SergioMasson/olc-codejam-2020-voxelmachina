@@ -13,6 +13,10 @@ namespace math
 	//An axis-aligned bounding box.
 	class BoudingBox
 	{
+	private:
+		Vector3 m_topCorner;
+		Vector3 m_bottomCorner;
+
 	public:
 		BoudingBox() = default;
 		BoudingBox(Vector3 top, Vector3 bottom) : m_topCorner{ top }, m_bottomCorner{ bottom }{}
@@ -39,6 +43,7 @@ namespace math
 				(m_topCorner.GetZ() >= other.m_bottomCorner.GetZ());
 		}
 
+		//Apply a transformation matrix to the AABB. (Ignores rotation)
 		INLINE friend BoudingBox  operator* (const Matrix4& mtx, const BoudingBox& frustum)
 		{
 			Vector3 scale;
@@ -48,10 +53,6 @@ namespace math
 			ASSERT(mtx.Decompose(scale, Rotation, translation));
 			return BoudingBox{ (frustum.m_topCorner * scale) + translation , (frustum.m_bottomCorner * scale) + translation };
 		}
-
-	private:
-		Vector3 m_topCorner;
-		Vector3 m_bottomCorner;
 
 		friend Frustum;
 	};
