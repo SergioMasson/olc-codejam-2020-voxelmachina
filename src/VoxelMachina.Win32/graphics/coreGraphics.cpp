@@ -35,7 +35,7 @@ void createD2DRenderTarget(IDXGISurface1* ptr)
 {
 	// specify the desired bitmap properties
 	D2D1_BITMAP_PROPERTIES1 bp;
-	bp.pixelFormat.format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	bp.pixelFormat.format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	bp.pixelFormat.alphaMode = D2D1_ALPHA_MODE_PREMULTIPLIED;
 	bp.dpiX = 96.0f;
 	bp.dpiY = 96.0f;
@@ -125,8 +125,17 @@ void InitializeGraphicsInfra(uint32_t width, uint32_t heigth)
 
 	ComPtr<ID2D1Factory1> m_d2dFactory;
 
-	// Create a Direct2D factory.
+#if defined(DEBUG) || defined(_DEBUG)
+	D2D1_FACTORY_OPTIONS options;
+	options.debugLevel = D2D1_DEBUG_LEVEL_INFORMATION;
+
+	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, options, m_d2dFactory.GetAddressOf());
+
+#else
 	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, m_d2dFactory.GetAddressOf());
+#endif
+
+	// Create a Direct2D factory.
 
 	// Obtain the Direct2D device for 2-D rendering.
 	ASSERT_SUCCEEDED(m_d2dFactory->CreateDevice(dxgiDevice.Get(), g_d2dDevice.GetAddressOf()));
@@ -141,7 +150,7 @@ void InitializeGraphicsInfra(uint32_t width, uint32_t heigth)
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc = { 0 };
 	swapChainDesc.Width = width;                           // use automatic sizing
 	swapChainDesc.Height = heigth;
-	swapChainDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM; // this is the most common swapchain format
+	swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM; // this is the most common swapchain format
 	swapChainDesc.Stereo = false;
 
 	// Use 4X MSAA? --must match swap chain MSAA values.
@@ -191,7 +200,6 @@ void graphics::Resize(uint32_t width, uint32_t heigth)
 
 	g_windowWidth = width;
 	g_windowHeight = heigth;
-
 	g_CurrBackBuffer = 0;
 
 	ASSERT(g_d3dImmediateContext);
@@ -212,7 +220,7 @@ void graphics::Resize(uint32_t width, uint32_t heigth)
 	ASSERT_SUCCEEDED(g_SwapChain->ResizeBuffers(SwapChainBufferCount, g_windowWidth, g_windowHeight, DXGI_FORMAT_R8G8B8A8_UNORM, 0));
 
 	ComPtr<IDXGISurface1> backBuffer;
-	ASSERT_SUCCEEDED(g_SwapChain->GetBuffer(0, __uuidof(IDXGISurface1), reinterpret_cast<void**>(backBuffer.GetAddressOf())));
+	ASSERT_SUCCEEDED(g_SwapChain->GetBuffer(0, __uuidof(IDXGISurface1), &backBuffer));
 
 	ComPtr<IDXGIDevice1> dxgiDevice;
 	// Obtain the underlying DXGI device of the Direct3D11 device.

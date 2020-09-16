@@ -125,7 +125,11 @@ namespace math
 	public:
 		INLINE BoolVector(FXMVECTOR vec) { m_vec = vec; }
 		INLINE operator XMVECTOR() const { return m_vec; }
-		INLINE operator bool() const { return DirectX::XMVectorGetW(m_vec) != 0; }
+		INLINE operator bool() const { return DirectX::XMVectorGetW(DirectX::XMVectorSum(m_vec)) != 0; }
+		INLINE BoolVector operator&& (BoolVector v2) const { return BoolVector(DirectX::XMVectorAndInt(m_vec, v2)); }
+		INLINE BoolVector operator!= (BoolVector v2) const { return BoolVector(DirectX::XMVectorNotEqualInt(m_vec, v2)); }
+		INLINE BoolVector operator== (BoolVector v2) const { return BoolVector(DirectX::XMVectorEqualInt(m_vec, v2)); }
+		INLINE BoolVector operator|| (BoolVector v2) const { return BoolVector(DirectX::XMVectorOrInt(m_vec, v2)); }
 	protected:
 		XMVECTOR m_vec;
 	};

@@ -43,7 +43,7 @@ void LightVoxelMachinaApp::Startup(void)
 	m_playerController = new PlayerController(math::Vector3(0, 1, 0), m_player, &m_sceneCamera);
 	m_cameraController = new CameraController(m_sceneCamera, math::Vector3(0, 1, 0));
 
-	//audio::PlayAudioFile(L"audioFiles/test.wav", true);
+	audio::PlayAudioFile(L"audioFiles/test.wav", true);
 }
 
 bool LightVoxelMachinaApp::IsDone()
@@ -97,20 +97,27 @@ void LightVoxelMachinaApp::RenderScene(void)
 //TODO(Sergio): Implement those things later.
 void LightVoxelMachinaApp::RenderUI(void)
 {
-	graphics::g_d2dDeviceContext->BeginDraw();
+	Microsoft::WRL::ComPtr<ID2D1Image> renderTarget;
 
-	//Draw all GUI elements.
-	for (auto guiElement : m_sceneGuiElements)
-		guiElement->Draw();
+	graphics::g_d2dDeviceContext->GetTarget(renderTarget.GetAddressOf());
 
-	ASSERT_SUCCEEDED(graphics::g_d2dDeviceContext->EndDraw());
+	if (renderTarget != nullptr)
+	{
+		graphics::g_d2dDeviceContext->BeginDraw();
+
+		//Draw all GUI elements.
+		for (auto guiElement : m_sceneGuiElements)
+			guiElement->Draw();
+
+		ASSERT_SUCCEEDED(graphics::g_d2dDeviceContext->EndDraw());
+	}
 }
 
 void LightVoxelMachinaApp::Resize(uint32_t width, uint32_t height)
 {
 	auto aspectRation = static_cast<float>(width) / static_cast<float>(height);
-	//m_sceneCamera.SetPerspectiveMatrix(0.25f * math::Pi, aspectRation, 1.0f, 1000.0f);
-	//m_sceneCamera.Update();
+	m_sceneCamera.SetPerspectiveMatrix(0.25f * math::Pi, aspectRation, 1.0f, 1000.0f);
+	m_sceneCamera.Update();
 }
 
 void LightVoxelMachinaApp::CreateCamera()
