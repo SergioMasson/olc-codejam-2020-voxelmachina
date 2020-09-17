@@ -18,8 +18,8 @@ namespace graphics
 		DirectX::XMFLOAT4 Color;
 		DirectX::XMFLOAT4 Emission;
 
-		float Diffuse;
-		float Specular; // w = SpecPower
+		float Metalness;
+		float Roughness;
 		DirectX::XMFLOAT2 Pad;
 
 		friend RenderPipeline;

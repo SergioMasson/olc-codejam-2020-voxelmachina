@@ -139,6 +139,8 @@
     <FxCompile Include="shaders\SimpleLightPS.hlsl" />
     <FxCompile Include="shaders\SkyboxVS.hlsl" />
     <FxCompile Include="shaders\SkyboxPS.hlsl" />
+    <FxCompile Include="shaders\pbrVS.hlsl" />
+    <FxCompile Include="shaders\pbrPS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\Lights.hlsli" />
@@ -183,6 +185,9 @@
     <Image Include="icons\Title_icon.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="textures\pbr\skybox1_irradiance.dds" />
+    <Image Include="textures\pbr\brdf_lut.dds" />
+    <Image Include="textures\pbr\skybox_specular.dds" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="audioFiles\test.wav">

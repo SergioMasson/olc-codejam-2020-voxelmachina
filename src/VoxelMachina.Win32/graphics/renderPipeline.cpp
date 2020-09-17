@@ -130,6 +130,10 @@ void graphics::RenderPipeline::StartRender(Camera* camera)
 	//Bind view projection matrix to slot b1
 	//graphics::g_d3dImmediateContext->VSSetConstantBuffers(1, 1, m_sceneConstBuffer.GetAddressOf());
 	graphics::g_d3dImmediateContext->PSSetConstantBuffers(1, 1, m_sceneConstBuffer.GetAddressOf());
+
+	graphics::g_d3dImmediateContext->PSSetShaderResources(3, 1, m_specularMapTexture->m_resourceView.GetAddressOf());
+	graphics::g_d3dImmediateContext->PSSetShaderResources(4, 1, m_irradianceMapTexture->m_resourceView.GetAddressOf());
+	graphics::g_d3dImmediateContext->PSSetShaderResources(5, 1, m_BRDF_LUT->m_resourceView.GetAddressOf());
 }
 
 void graphics::RenderPipeline::RenderMesh(MeshRenderer const& mesh)

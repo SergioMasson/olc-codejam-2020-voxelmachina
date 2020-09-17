@@ -10,8 +10,8 @@
 #include "input.h"
 #include "colors.h"
 
-#include "SimpleLightPS.h"
-#include "SimpleLightVS.h"
+#include "pbrPS.h"
+#include "pbrVS.h"
 #include <string>
 
 #define ENEMY_COUNT 10
@@ -25,6 +25,8 @@ graphics::MeshData enemyMesh;
 graphics::MeshData pilarMesh;
 graphics::MeshData trophyMesh;
 
+Light dirLight;
+
 float currentTime;
 
 void LightVoxelMachinaApp::Startup(void)
@@ -33,10 +35,14 @@ void LightVoxelMachinaApp::Startup(void)
 
 	//Create the render pipeline
 	m_renderPipeline = std::make_unique<graphics::RenderPipeline>();
-	m_renderPipeline->LoadShader(g_pSimpleLightVS, sizeof(g_pSimpleLightVS), g_pSimpleLightPS, sizeof(g_pSimpleLightPS));
+	m_renderPipeline->LoadShader(g_ppbrVS, sizeof(g_ppbrVS), g_ppbrPS, sizeof(g_ppbrPS));
 
-	/*m_skybox = new graphics::Texture2D(L"textures/DarkSkyCartoon.dds");
-	m_renderPipeline->SetSkyboxTexture(m_skybox);*/
+	auto irradiance = new graphics::Texture2D(L"textures/pbr/skybox1_irradiance.dds");
+	auto specular = new graphics::Texture2D(L"textures/pbr/skybox_specular.dds");
+	auto brdf_lut = new graphics::Texture2D(L"textures/pbr/brdf_lut.dds");
+	m_renderPipeline->SetIrradianceMapTexture(irradiance);
+	m_renderPipeline->SetSpecularMapTexture(specular);
+	m_renderPipeline->SetBRDLUT(brdf_lut);
 
 	CreateLights();
 	CreateObjects();
@@ -148,26 +154,29 @@ void LightVoxelMachinaApp::CreateLights()
 	m_scenePointLight = Light{};
 	// Point light--position is changed every frame to animate in UpdateScene function.
 	m_scenePointLight.Ambient = 0.3f;
-	m_scenePointLight.Color = Color::GreenYellow;
+	m_scenePointLight.Color = Color::White;
 	m_scenePointLight.Range = 5;
 	m_scenePointLight.Position = DirectX::XMFLOAT3(0.0f, 3.0f, 5.0f);
-	m_scenePointLight.Intensity = 3.0f;
+	m_scenePointLight.Intensity = 2.0f;
 	m_scenePointLight.LightType = POINT_LIGHT;
 
 	m_renderPipeline->AddLight(&m_scenePointLight);
 
-	m_sceneSpotLight = Light{};
-	// Spot light--position and direction changed every frame to animate in UpdateScene function.
-	m_sceneSpotLight.Ambient = 1.0f;
-	m_sceneSpotLight.Color = Color::White;
-	m_sceneSpotLight.Spot = 96.0f;
-	m_sceneSpotLight.Range = 15.0f;
-	m_sceneSpotLight.Position = DirectX::XMFLOAT3(2.0f, 3.0f, 0.0f);
-	m_sceneSpotLight.Direction = DirectX::XMFLOAT3(0.0f, -1.0f, 0.0f);
-	m_sceneSpotLight.Intensity = 0.3f;
-	m_sceneSpotLight.LightType = SPOT_LIGHT;
+	//m_sceneSpotLight = Light{};
+	//// Spot light--position and direction changed every frame to animate in UpdateScene function.
+	//m_sceneSpotLight.Ambient = 1.0f;
+	//m_sceneSpotLight.Color = Color::White;
+	//m_sceneSpotLight.Spot = 96.0f;
+	//m_sceneSpotLight.Range = 15.0f;
+	//m_sceneSpotLight.Position = DirectX::XMFLOAT3(2.0f, 3.0f, 0.0f);
+	//m_sceneSpotLight.Direction = DirectX::XMFLOAT3(0.0f, -1.0f, 0.0f);
+	//m_sceneSpotLight.Intensity = 0.3f;
+	//m_sceneSpotLight.LightType = SPOT_LIGHT;
 
-	m_renderPipeline->AddLight(&m_sceneSpotLight);
+	//m_renderPipeline->AddLight(&m_sceneSpotLight);
+
+	//dirLight = CreateDirectionalLight(Color::White, { -1, -1, 0 }, 10, 0.2);
+	//m_renderPipeline->AddLight(&dirLight);
 }
 
 void LightVoxelMachinaApp::CreateObjects()
@@ -195,12 +204,17 @@ void LightVoxelMachinaApp::CreateObjects()
 	auto defaultEmissionMap = new graphics::Texture2D(L"textures/defaultEmissionMap.dds");
 	auto playerEmissionMap = new graphics::Texture2D(L"textures/newEmissionMap.dds");
 
+	graphics::Material playerMaterial{};
+	playerMaterial.Metalness = 0.2f;
+	playerMaterial.Roughness = 0.15f;
+	playerMaterial.Color = Color::White;
+
 	graphics::Material material1{};
-	material1.Diffuse = 1.0f;
-	material1.Specular = 2.0f;
+	material1.Metalness = 0.2f;
+	material1.Roughness = 0.15f;
 	material1.Color = Color::White;
 
-	m_player = new graphics::MeshRenderer(&playerCharacter, material1, math::Vector3(0, 0, 0), math::Quaternion(), math::Vector3(1, 1, 1));
+	m_player = new graphics::MeshRenderer(&playerCharacter, playerMaterial, math::Vector3(0, 0, 0), math::Quaternion(), math::Vector3(1, 1, 1));
 	m_player->SetAlbedoTexture(playerTexture);
 	m_player->SetNormalMap(normalMap);
 	m_player->SetEmissionMap(playerEmissionMap);
@@ -217,8 +231,8 @@ void LightVoxelMachinaApp::CreateObjects()
 
 	graphics::Material material2{};
 	material2.Color = Color::Silver;
-	material2.Specular = 2.0f;
-	material2.Diffuse = 1.0f;
+	material2.Metalness = 0.2f;
+	material2.Roughness = 0.15f;
 
 	m_floor = new graphics::MeshRenderer(&quad, material2, math::Vector3(0, 0, 0), math::Quaternion());
 	m_floor->SetAlbedoTexture(floorTexture);
@@ -233,8 +247,8 @@ void LightVoxelMachinaApp::CreateEnemy(graphics::MeshData* enemyData, graphics::
 {
 	graphics::Material material1{};
 	material1.Color = Color::White;
-	material1.Diffuse = 1.0f;
-	material1.Specular = 2.0f;
+	material1.Metalness = 0.2f;
+	material1.Roughness = 0.15f;
 
 	math::RandomNumberGenerator random{};
 
@@ -259,8 +273,8 @@ void LightVoxelMachinaApp::CreatePilars(graphics::MeshData* pilarData, graphics:
 {
 	graphics::Material material1{};
 	material1.Color = Color::White;
-	material1.Diffuse = 1.0f;
-	material1.Specular = 2.0f;
+	material1.Metalness = 0.2f;
+	material1.Roughness = 0.15f;
 
 	math::RandomNumberGenerator random{};
 
