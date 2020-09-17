@@ -80,11 +80,11 @@ void PlayerController::Update(float deltaT)
 
 	auto totalRotation = YcameraRotation * ZcameraRotation;
 
-	if (math::Length(motionVector) >= 0.1f)
-	{
-		math::Quaternion snewRotation{ math::Matrix3{DirectX::XMMatrixLookToLH(math::Vector3{0, 0, 0}, math::Normalize(motionVector), m_WorldUp)} };
-		m_playerMeshRenderer->SetRotation(~snewRotation);
-	}
+	float size = math::Length(motionVector);
+
+	math::Quaternion snewRotation{ math::Matrix3{DirectX::XMMatrixLookToLH(math::Vector3{0, 0, 0}, math::Normalize(motionVector), m_WorldUp)} };
+	snewRotation = math::Lerp(m_playerMeshRenderer->GetRotation(), ~snewRotation, size);
+	m_playerMeshRenderer->SetRotation(snewRotation);
 
 	auto oldCameraOffset = m_cameraOffset;
 

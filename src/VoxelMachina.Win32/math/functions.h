@@ -103,4 +103,9 @@ namespace math
 
 	INLINE Matrix4 Transpose(const Matrix4& mat) { return Matrix4(XMMatrixTranspose(mat)); }
 	INLINE Matrix4 Invert(const Matrix4& mat) { return Matrix4(XMMatrixInverse(nullptr, mat)); }
+
+	INLINE Quaternion Lerp(const Quaternion& first, const Quaternion& seccond, float delta)
+	{
+		return Quaternion{ DirectX::XMQuaternionSlerp(first, seccond, delta) };
+	}
 }
