@@ -20,9 +20,6 @@ namespace graphics
 		void StartRender(Camera* camera);
 		void RenderMesh(MeshRenderer const& mesh);
 		void SetSkyboxTexture(Texture2D* skybox) { m_skyboxTexture = skybox; };
-		void SetSpecularMapTexture(Texture2D* specularMap) { m_specularMapTexture = specularMap; }
-		void SetIrradianceMapTexture(Texture2D* irradianceMap) { m_irradianceMapTexture = irradianceMap; }
-		void SetBRDLUT(Texture2D* brdf) { m_BRDF_LUT = brdf; }
 		void AddLight(Light* light);
 
 	private:
@@ -42,10 +39,6 @@ namespace graphics
 
 		MeshRenderer m_skyboxMeshRenerer;
 		Texture2D* m_skyboxTexture;
-
-		Texture2D* m_specularMapTexture;
-		Texture2D* m_irradianceMapTexture;
-		Texture2D* m_BRDF_LUT;
 
 		Camera* m_camera;
 		std::vector<Light*> m_sceneLights;

@@ -32,7 +32,6 @@ struct PixelShaderInput
     float2 texcoord : TEXCOORD;
     float3 NormalW : NORMAL;
     float3 TangentW : TANGENT;
-    float3 BinormalW : BINORMAL;
 };
 
 // Vertex shader
@@ -42,18 +41,9 @@ PixelShaderInput main(VertexIn vin)
     vout.position = mul(float4(vin.PosL, 1.0), gWorld).xyz;
     vout.texcoord = vin.Tex;
 
-	
-    
     //vout.NormalW = mul(vin.NormalL, ((float3x3) gWorldInvTranspose));
     vout.NormalW = mul(vin.NormalL, ((float3x3) gWorldInvTranspose));
     vout.TangentW = mul(vin.TangentL, (float3x3) gWorld);
-    vout.BinormalW = cross(vout.NormalW, vout.TangentW);
-    
-    
-    // Pass tangent space basis vectors (for normal mapping).
-    //float3 b = cross(vin.NormalL, vin.TangentL);
-    //float3x3 TBN = float3x3(vin.TangentL, b, vin.NormalL);
-    //vout.tangentBasis = mul((float3x3) gWorld, transpose(TBN));
     
     vout.pixelPosition = mul(float4(vin.PosL, 1.0f), gWorldViewProj);
     

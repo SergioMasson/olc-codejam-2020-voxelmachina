@@ -44,7 +44,6 @@ struct PixelShaderInput
     float2 texcoord : TEXCOORD;
     float3 NormalW : NORMAL;
     float3 TangentW : TANGENT;
-    float3 BinormalW : BINORMAL;
 };
 
 //Texture2D albedoTexture : register(t0);
@@ -60,10 +59,7 @@ Texture2D gDiffuseMap : register(t0);
 Texture2D gNormalMap : register(t1);
 Texture2D gEmissionMap : register(t2);
 
-//PBR stuff
-TextureCube specularTexture : register(t3);
-TextureCube irradianceTexture : register(t4);
-Texture2D specularBRDF_LUT : register(t5);
+
 
 SamplerState gsamLinear : register(s0);
 
@@ -121,21 +117,11 @@ float3 fresnelSchlick(float3 F0, float cosTheta)
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
-// Returns number of mipmap levels for specular IBL environment map.
-uint querySpecularTextureLevels()
-{
-    uint width, height, levels;
-    specularTexture.GetDimensions(0, width, height, levels);
-    return levels;
-}
-
-
-
 // Pixel shader
 float4 main(PixelShaderInput pin) : SV_Target
 {
 	// Sample input textures to get shading model params.
-    float3 albedo = gDiffuseMap.Sample(gsamLinear, (pin.texcoord * gTextureScale) + gTextureDisplacement).rgb;
+    float3 albedo = gMaterial.Color.rgb * gDiffuseMap.Sample(gsamLinear, (pin.texcoord * gTextureScale) + gTextureDisplacement).rgb;
     float metalness = gMaterial.Metalness;
     float roughness = gMaterial.Roughness;
 
@@ -215,7 +201,7 @@ float4 main(PixelShaderInput pin) : SV_Target
         float3 specularBRDF = (F * D * G) / max(Epsilon, 4.0 * cosLi * cosLo);
 
 		// Total contribution for this light.
-        directLighting += ((diffuseBRDF + specularBRDF) * Lradiance * cosLi) * att * Lights[i].Intensity;
+        directLighting += (((diffuseBRDF + specularBRDF) * Lradiance * cosLi)) * att * Lights[i].Intensity;
     }
 
 	//// Ambient lighting (IBL).
@@ -250,6 +236,9 @@ float4 main(PixelShaderInput pin) : SV_Target
  //       ambientLighting = diffuseIBL + specularIBL;
  //   }
 
+    directLighting += gEmissionMap.Sample(gsamLinear, pin.texcoord).rgb;
+    directLighting += gMaterial.Emission.rgb;
+    
 	// Final fragment color.
     return float4(directLighting, 1.0);
 }

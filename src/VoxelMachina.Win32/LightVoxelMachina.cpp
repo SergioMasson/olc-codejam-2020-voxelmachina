@@ -37,13 +37,6 @@ void LightVoxelMachinaApp::Startup(void)
 	m_renderPipeline = std::make_unique<graphics::RenderPipeline>();
 	m_renderPipeline->LoadShader(g_ppbrVS, sizeof(g_ppbrVS), g_ppbrPS, sizeof(g_ppbrPS));
 
-	auto irradiance = new graphics::Texture2D(L"textures/pbr/skybox1_irradiance.dds");
-	auto specular = new graphics::Texture2D(L"textures/pbr/skybox_specular.dds");
-	auto brdf_lut = new graphics::Texture2D(L"textures/pbr/brdf_lut.dds");
-	m_renderPipeline->SetIrradianceMapTexture(irradiance);
-	m_renderPipeline->SetSpecularMapTexture(specular);
-	m_renderPipeline->SetBRDLUT(brdf_lut);
-
 	CreateLights();
 	CreateObjects();
 	CreateGUI();
@@ -83,11 +76,12 @@ void LightVoxelMachinaApp::Update(float deltaT, float totalTime)
 
 	CheckForEnemyCollision();
 
-	math::Vector3 lightPosition = m_player->GetPosition() + (m_player->GetRotation() * math::Vector3{ 0, 2.5f, 0.6f });
+	math::Vector3 lightPosition1 = m_player->GetPosition() + (m_player->GetRotation() * math::Vector3{ 0, 1.5f, 1.5f });
+	math::Vector3 lightPosition2 = m_player->GetPosition() + (m_player->GetRotation() * math::Vector3{ 0, 2.5f, -1.0f });
 	math::Vector3 playerFoward = math::Matrix3{ m_player->GetRotation() }.GetZ();
 
-	DirectX::XMStoreFloat3(&m_scenePointLight.Position, lightPosition);
-	DirectX::XMStoreFloat3(&m_sceneSpotLight.Position, lightPosition);
+	DirectX::XMStoreFloat3(&m_scenePointLight.Position, lightPosition1);
+	DirectX::XMStoreFloat3(&m_sceneSpotLight.Position, lightPosition2);
 	DirectX::XMStoreFloat3(&m_sceneSpotLight.Direction, playerFoward);
 
 	if (m_enemiesLeft.size() != 0)
@@ -154,7 +148,7 @@ void LightVoxelMachinaApp::CreateLights()
 	m_scenePointLight = Light{};
 	// Point light--position is changed every frame to animate in UpdateScene function.
 	m_scenePointLight.Ambient = 0.3f;
-	m_scenePointLight.Color = Color::White;
+	m_scenePointLight.Color = Color::GreenYellow;
 	m_scenePointLight.Range = 5;
 	m_scenePointLight.Position = DirectX::XMFLOAT3(0.0f, 3.0f, 5.0f);
 	m_scenePointLight.Intensity = 2.0f;
@@ -162,18 +156,17 @@ void LightVoxelMachinaApp::CreateLights()
 
 	m_renderPipeline->AddLight(&m_scenePointLight);
 
-	//m_sceneSpotLight = Light{};
-	//// Spot light--position and direction changed every frame to animate in UpdateScene function.
-	//m_sceneSpotLight.Ambient = 1.0f;
-	//m_sceneSpotLight.Color = Color::White;
-	//m_sceneSpotLight.Spot = 96.0f;
-	//m_sceneSpotLight.Range = 15.0f;
-	//m_sceneSpotLight.Position = DirectX::XMFLOAT3(2.0f, 3.0f, 0.0f);
-	//m_sceneSpotLight.Direction = DirectX::XMFLOAT3(0.0f, -1.0f, 0.0f);
-	//m_sceneSpotLight.Intensity = 0.3f;
-	//m_sceneSpotLight.LightType = SPOT_LIGHT;
+	m_sceneSpotLight = Light{};
+	// Spot light--position and direction changed every frame to animate in UpdateScene function.
+	m_sceneSpotLight.Color = Color::White;
+	m_sceneSpotLight.Spot = 96.0f;
+	m_sceneSpotLight.Range = 15.0f;
+	m_sceneSpotLight.Position = DirectX::XMFLOAT3(2.0f, 3.0f, 0.0f);
+	m_sceneSpotLight.Direction = DirectX::XMFLOAT3(0.0f, -1.0f, 0.0f);
+	m_sceneSpotLight.Intensity = 0.7f;
+	m_sceneSpotLight.LightType = POINT_LIGHT;
 
-	//m_renderPipeline->AddLight(&m_sceneSpotLight);
+	m_renderPipeline->AddLight(&m_sceneSpotLight);
 
 	//dirLight = CreateDirectionalLight(Color::White, { -1, -1, 0 }, 10, 0.2);
 	//m_renderPipeline->AddLight(&dirLight);
@@ -229,12 +222,12 @@ void LightVoxelMachinaApp::CreateObjects()
 	CreateEnemy(&enemyMesh, enemyTexture, normalMap, enemyDetectedTexture, defaultEmissionMap);
 	CreatePilars(&pilarMesh, pilarTexture, pilarNormal, defaultEmissionMap);
 
-	graphics::Material material2{};
-	material2.Color = Color::Silver;
-	material2.Metalness = 0.2f;
-	material2.Roughness = 0.15f;
+	graphics::Material floorMaterial{};
+	floorMaterial.Color = Color::White;
+	floorMaterial.Metalness = 0.3f;
+	floorMaterial.Roughness = 0.1f;
 
-	m_floor = new graphics::MeshRenderer(&quad, material2, math::Vector3(0, 0, 0), math::Quaternion());
+	m_floor = new graphics::MeshRenderer(&quad, floorMaterial, math::Vector3(0, 0, 0), math::Quaternion());
 	m_floor->SetAlbedoTexture(floorTexture);
 	m_floor->SetNormalMap(floorNormalMap);
 	m_floor->SetEmissionMap(defaultEmissionMap);
@@ -369,7 +362,7 @@ void LightVoxelMachinaApp::CheckForEnemyCollision()
 
 			DirectX::XMFLOAT3 enemyPosition;
 
-			DirectX::XMStoreFloat3(&enemyPosition, m_player->GetPosition() + math::Vector3(0, 1, 0));
+			DirectX::XMStoreFloat3(&enemyPosition, enemy->GetPosition() + math::Vector3(0, 0.5f, 0));
 
 			Light* light = new Light();
 
