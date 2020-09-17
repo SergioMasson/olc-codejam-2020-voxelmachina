@@ -63,7 +63,7 @@ float4 ComputeDirectionalLight(Material mat, Light L, float3 normal, float3 toEy
     spec = pow(max(dot(v, toEye), 0.0f), mat.Specular);
     diffuse = diffuseFactor * mat.Diffuse;
     
-    return (ambient + diffuse + spec) * L.Intensity * L.Color;
+    return max((ambient + diffuse + spec) * L.Intensity * L.Color, 0.0f);
 }
 
 //---------------------------------------------------------------------------------------
@@ -108,7 +108,7 @@ float4 ComputePointLight(Material mat, Light L, float3 pos, float3 normal, float
 	// Attenuate
     float att = CalcAttenuation(d, 0, L.Range);
 
-    return (diffuse + spec + ambient) * L.Intensity * att * L.Color;
+    return max((diffuse + spec + ambient) * L.Intensity * att * L.Color, 0.0f);
 }
 
 //---------------------------------------------------------------------------------------
@@ -152,5 +152,5 @@ float4 ComputeSpotLight(Material mat, Light L, float3 pos, float3 normal, float3
     float spot = pow(max(dot(-lightVec, L.Direction), 0.0f), L.Spot);
     float att = CalcAttenuation(d, 0, L.Range);
     
-    return ((ambient + diffuse + spec) * L.Intensity * att) * L.Color;
+    return max(((ambient + diffuse + spec) * L.Intensity * att) * L.Color, 0.0f);
 }

@@ -277,6 +277,11 @@ void Input::SetKey(WPARAM key, bool isDown)
 	}
 }
 
+void Input::SetMouseWheel(float delta)
+{
+	s_Analogs[static_cast<uint32_t>(AnalogInput::kAnalogMouseScroll)] = delta;
+}
+
 void Input::SetTypedChar(WPARAM key)
 {
 	lastHitChar = static_cast<char>(key);

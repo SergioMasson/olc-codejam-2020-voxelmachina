@@ -172,6 +172,7 @@
     <ClCompile Include="enemy.cpp" />
     <ClCompile Include="graphics\coreGraphics.cpp" />
     <ClCompile Include="graphics\dds.cpp" />
+    <ClCompile Include="graphics\graphicsContext.cpp" />
     <ClCompile Include="graphics\lights.cpp" />
     <ClCompile Include="graphics\material.cpp" />
     <ClCompile Include="graphics\meshRenderer.cpp" />
@@ -205,6 +206,7 @@
     <ClInclude Include="graphics\coreGraphics.h" />
     <ClInclude Include="dxassert.h" />
     <ClInclude Include="graphics\dds.h" />
+    <ClInclude Include="graphics\graphicsContext.h" />
     <ClInclude Include="graphics\graphicsUtils.h" />
     <ClInclude Include="graphics\lights.h" />
     <ClInclude Include="graphics\material.h" />
@@ -398,6 +400,9 @@
     <None Include="models\littleRobot.model">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="models\trophy.model">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="shaders\Common.hlsli" />
     <None Include="shaders\Lights.hlsli" />
     <None Include="shaders\NewLightModel.hlsli" />
@@ -407,6 +412,15 @@
       <DeploymentContent>true</DeploymentContent>
     </Image>
     <Image Include="icons\player_icon.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="icons\Title_icon.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="icons\trophy.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="icons\trophy_isometric.png">
       <DeploymentContent>true</DeploymentContent>
     </Image>
     <Image Include="textures\bricks2.dds">

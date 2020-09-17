@@ -196,6 +196,7 @@ namespace Input
 
 	void SetKey(WPARAM key, bool isDown);
 	void SetKey(WPARAM key, bool isDown);
+	void SetMouseWheel(float delta);
 	void SetTypedChar(WPARAM key);
 	void UpdateMousePosition(float x, float y);
 }

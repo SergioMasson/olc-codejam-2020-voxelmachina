@@ -741,7 +741,6 @@ graphics::MeshRenderer::MeshRenderer(MeshData* data, Material material, math::Ve
 	m_transform.SetRotation(rotation);
 	m_transform.SetScale(scale);
 	m_worldMatrix = m_transform;
-	m_wBoudingBox = m_worldMatrix * data->BoudingBox;
 
 	D3D11_BUFFER_DESC vbd;
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;

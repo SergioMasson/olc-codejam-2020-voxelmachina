@@ -63,7 +63,7 @@ namespace graphics
 	class MeshRenderer
 	{
 	public:
-		MeshRenderer(MeshData* data, Material material, math::Vector3 position, math::Quaternion rotation, math::Vector3 scale = { 1, 1, 1 });
+		MeshRenderer(MeshData* data, Material material, math::Vector3 position = math::Vector3(0, 0, 0), math::Quaternion rotation = math::Quaternion(0, 0, 0), math::Vector3 scale = { 1, 1, 1 });
 		MeshRenderer() = default;
 		~MeshRenderer() = default;
 
@@ -79,12 +79,11 @@ namespace graphics
 		{
 			m_transform.SetTranslation(worldPos);
 			m_worldMatrix = m_transform;
-			m_wBoudingBox = m_worldMatrix * m_meshData->BoudingBox;
 		}
 
 		inline math::BoudingBox WBoudingBox() const
 		{
-			return m_wBoudingBox;
+			return GetWorldMatrix() * m_meshData->BoudingBox;
 		}
 
 		const math::Vector3 GetPosition() const { return m_transform.GetTranslation(); }
@@ -119,11 +118,37 @@ namespace graphics
 			m_material.Emission = emission;
 		}
 
+		void SetParent(MeshRenderer* parent)
+		{
+			m_parent = parent;
+		}
+
+		math::Matrix4 GetWorldMatrix() const
+		{
+			if (m_parent != nullptr)
+				return  m_parent->GetWorldMatrix() * m_worldMatrix;
+
+			return m_worldMatrix;
+		}
+
+		const math::Vector3 GetRightVec() const
+		{
+			return math::Matrix3{ GetWorldMatrix() }.GetX();
+		}
+
+		const math::Vector3 GetUpVec() const
+		{
+			return math::Matrix3{ GetWorldMatrix() }.GetY();
+		}
+
+		const math::Vector3 GetForwardVec() const
+		{
+			return -math::Matrix3{ GetWorldMatrix() }.GetZ();
+		}
+
 	private:
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_vertexBuffer = nullptr;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_indexBuffer = nullptr;
-
-		math::BoudingBox m_wBoudingBox;
 
 		Material m_material;
 		MeshData* m_meshData;
@@ -137,6 +162,8 @@ namespace graphics
 
 		DirectX::XMFLOAT2 m_textureScale{ 1, 1 };
 		DirectX::XMFLOAT2 m_textureDisplacement{ 0, 0 };
+
+		MeshRenderer* m_parent{ nullptr };
 
 		friend RenderPipeline;
 	};

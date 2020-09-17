@@ -86,6 +86,9 @@
     <ClCompile Include="math\random.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="graphics\graphicsContext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
@@ -127,6 +130,7 @@
     <ClInclude Include="audio\audioCore.h" />
     <ClInclude Include="math\boudingBox.h" />
     <ClInclude Include="math\random.h" />
+    <ClInclude Include="graphics\graphicsContext.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\BoxVS.hlsl" />
@@ -142,6 +146,7 @@
     <None Include="models\littleRobot.model" />
     <None Include="models\enemy.model" />
     <None Include="shaders\NewLightModel.hlsli" />
+    <None Include="models\trophy.model" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="textures\bricks2.dds" />
@@ -169,6 +174,15 @@
     <Image Include="textures\defaultEmissionMap.dds" />
     <Image Include="textures\emissionMap.dds" />
     <Image Include="textures\newEmissionMap.dds" />
+    <Image Include="icons\trophy.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="icons\trophy_isometric.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="icons\Title_icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Media Include="audioFiles\test.wav">

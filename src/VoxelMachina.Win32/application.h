@@ -14,7 +14,7 @@ public:
 
 	// The update method will be invoked once per frame.  Both state updating and scene
 	// rendering should be handled by this method.
-	virtual void Update(float deltaT) = 0;
+	virtual void Update(float deltaT, float totalTime) = 0;
 
 	// Official rendering pass
 	virtual void RenderScene(void) = 0;

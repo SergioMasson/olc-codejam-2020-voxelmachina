@@ -14,6 +14,7 @@ LONG defaultWidth = 1280;
 LONG defaultHeight = 720;
 
 int64_t previewsFrameTick = 0;
+int64_t initialTick = 0;
 
 HWND g_coreWindow;
 
@@ -33,10 +34,12 @@ bool UpdateApplication(IGameApp& app)
 {
 	auto currentTick = SystemTime::GetCurrentTick();
 	float deltaTime = static_cast<float>(SystemTime::TimeBetweenTicks(previewsFrameTick, currentTick));
+	float totalTIme = static_cast<float>(SystemTime::TimeBetweenTicks(initialTick, currentTick));
+
 	previewsFrameTick = currentTick;
 
 	Input::Update(deltaTime);
-	app.Update(deltaTime);
+	app.Update(deltaTime, totalTIme);
 
 	//Render scene.
 	graphics::BeginDraw();
@@ -92,6 +95,8 @@ void RunApplication(IGameApp& app, HINSTANCE instance, const wchar_t* className)
 
 	ShowWindow(g_coreWindow, SW_SHOWDEFAULT);
 
+	initialTick = SystemTime::GetCurrentTick();
+
 	do
 	{
 		MSG msg = {};
@@ -121,6 +126,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		//This will be called on key first press.
 	case WM_KEYDOWN:
 		Input::SetKey(wParam, true);
+		break;
+
+	case WM_MOUSEWHEEL:
+		Input::SetMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam));
 		break;
 
 	case WM_KEYUP:

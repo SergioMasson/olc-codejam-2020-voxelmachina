@@ -33,8 +33,8 @@ private:
 	float m_lastCameraRotationX;
 	float m_lastCameraRotationY;
 
-	float m_lastPlayerRotation;
 	float m_lastPlayerFoward;
+	float m_lastPlayerFowardX;
 
 	bool m_lockCamera;
 

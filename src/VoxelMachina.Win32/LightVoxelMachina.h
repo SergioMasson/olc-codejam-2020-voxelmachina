@@ -30,7 +30,7 @@ public:
 
 	virtual bool IsDone(void) override;
 
-	virtual void Update(float deltaT) override;
+	virtual void Update(float deltaT, float totalTime) override;
 
 	virtual void RenderScene(void) override;
 
@@ -59,6 +59,7 @@ private:
 
 	graphics::MeshRenderer* m_player;
 	graphics::MeshRenderer* m_floor;
+	graphics::MeshRenderer* m_trophy;
 
 	PlayerController* m_playerController;
 	CameraController* m_cameraController;

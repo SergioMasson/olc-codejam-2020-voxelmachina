@@ -23,6 +23,9 @@ graphics::MeshData quad;
 graphics::MeshData playerCharacter;
 graphics::MeshData enemyMesh;
 graphics::MeshData pilarMesh;
+graphics::MeshData trophyMesh;
+
+float currentTime;
 
 void LightVoxelMachinaApp::Startup(void)
 {
@@ -51,8 +54,10 @@ bool LightVoxelMachinaApp::IsDone()
 	return m_isDone;
 }
 
-void LightVoxelMachinaApp::Update(float deltaT)
+void LightVoxelMachinaApp::Update(float deltaT, float totalTime)
 {
+	currentTime = totalTime;
+
 	if (m_firstFrame)
 	{
 		m_firstFrame = false;
@@ -72,7 +77,7 @@ void LightVoxelMachinaApp::Update(float deltaT)
 
 	CheckForEnemyCollision();
 
-	math::Vector3 lightPosition = m_player->GetPosition() + (m_player->GetRotation() * math::Vector3{ 0, 2.5f, 0.25f });
+	math::Vector3 lightPosition = m_player->GetPosition() + (m_player->GetRotation() * math::Vector3{ 0, 2.5f, 0.6f });
 	math::Vector3 playerFoward = math::Matrix3{ m_player->GetRotation() }.GetZ();
 
 	DirectX::XMStoreFloat3(&m_scenePointLight.Position, lightPosition);
@@ -81,6 +86,11 @@ void LightVoxelMachinaApp::Update(float deltaT)
 
 	if (m_enemiesLeft.size() != 0)
 		m_time += deltaT;
+	else
+	{
+		m_trophy->SetRotation(m_trophy->GetRotation() * math::Quaternion(math::Vector3(0, 1, 0), deltaT * 3));
+		m_trophy->SetPosition(m_trophy->GetPosition() + math::Vector3(0, sin(totalTime) * 0.005, 0));
+	}
 
 	m_counterText->SetText(L"TOTAL TIME: " + std::to_wstring(m_time));
 	m_enemiesLeftText->SetText(L" X " + std::to_wstring(enemiesLeft));
@@ -137,7 +147,7 @@ void LightVoxelMachinaApp::CreateLights()
 {
 	m_scenePointLight = Light{};
 	// Point light--position is changed every frame to animate in UpdateScene function.
-	m_scenePointLight.Ambient = 0.2f;
+	m_scenePointLight.Ambient = 0.3f;
 	m_scenePointLight.Color = Color::GreenYellow;
 	m_scenePointLight.Range = 5;
 	m_scenePointLight.Position = DirectX::XMFLOAT3(0.0f, 3.0f, 5.0f);
@@ -168,6 +178,8 @@ void LightVoxelMachinaApp::CreateObjects()
 
 	graphics::MeshData::LoadFromOBJFile(L"models/enemy.model", enemyMesh);
 
+	graphics::MeshData::LoadFromOBJFile(L"models/trophy.model", trophyMesh);
+
 	graphics::MeshData::CreateCylinder(1, 1, 10, 20, 20, pilarMesh);
 
 	//TODO(Sergio): Load this on a separate thread. Asset loading will take a time...
@@ -193,6 +205,12 @@ void LightVoxelMachinaApp::CreateObjects()
 	m_player->SetNormalMap(normalMap);
 	m_player->SetEmissionMap(playerEmissionMap);
 	m_sceneMeshRenderer.push_back(m_player);
+
+	m_trophy = new graphics::MeshRenderer(&trophyMesh, material1, math::Vector3(0, 1.2f, 0), math::Quaternion(0, 0, 0), math::Vector3(0.5f, 0.5f, 0.5f));
+	m_trophy->SetAlbedoTexture(playerTexture);
+	m_trophy->SetNormalMap(normalMap);
+	m_trophy->SetEmissionMap(defaultEmissionMap);
+	m_trophy->SetParent(m_player);
 
 	CreateEnemy(&enemyMesh, enemyTexture, normalMap, enemyDetectedTexture, defaultEmissionMap);
 	CreatePilars(&pilarMesh, pilarTexture, pilarNormal, defaultEmissionMap);
@@ -271,11 +289,13 @@ void LightVoxelMachinaApp::CreatePilars(graphics::MeshData* pilarData, graphics:
 			pilar->SetPosition(math::Vector3(pilarX, 5, pilarY));
 			auto pilarBound = pilar->WBoudingBox();
 
+			overlapingEnemy = pilarBound.IsOverlaping(m_player->WBoudingBox());
+
 			for (auto enemy : m_enemiesLeft)
-				overlapingEnemy = overlapingEnemy && enemy->WBoudingBox().IsOverlaping(pilarBound);
+				overlapingEnemy = overlapingEnemy || enemy->WBoudingBox().IsOverlaping(pilarBound);
 
 			for (auto otherPilar : m_pilars)
-				overlapingEnemy = overlapingEnemy && otherPilar->WBoudingBox().IsOverlaping(pilarBound);
+				overlapingEnemy = overlapingEnemy || otherPilar->WBoudingBox().IsOverlaping(pilarBound);
 		} while (math::Length(distance) <= 10.0f && overlapingEnemy);
 
 		m_sceneMeshRenderer.push_back(pilar);
@@ -347,9 +367,10 @@ void LightVoxelMachinaApp::CheckForEnemyCollision()
 
 			if (enemiesLeft == 0)
 			{
-				auto congratulationsSprite = new graphics::UI::GuiSprite(nullptr, 0, 0, graphics::g_windowHeight, graphics::g_windowHeight);
-				congratulationsSprite->LoadBitmapFromFile(L"textures/congratulations.png", true);
+				auto congratulationsSprite = new graphics::UI::GuiSprite(nullptr, 0, 30, graphics::g_windowHeight, graphics::g_windowHeight);
+				congratulationsSprite->LoadBitmapFromFile(L"icons/trophy.png", true);
 				m_sceneGuiElements.push_back(congratulationsSprite);
+				m_sceneMeshRenderer.push_back(m_trophy);
 			}
 		}
 		else
