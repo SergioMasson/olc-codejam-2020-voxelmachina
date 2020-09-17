@@ -14,10 +14,10 @@
 #include "pbrVS.h"
 #include <string>
 
-#define ENEMY_COUNT 1
-#define PILAR_COUNT 1
-#define WORLD_X  10.0f
-#define WORLD_Y  10.0f
+#define ENEMY_COUNT 10
+#define PILAR_COUNT 100
+#define WORLD_X  100.0f
+#define WORLD_Y  100.0f
 
 graphics::MeshData quad;
 graphics::MeshData playerCharacter;
@@ -166,7 +166,6 @@ void LightVoxelMachinaApp::CreateLights()
 	m_sceneSpotLight.Direction = DirectX::XMFLOAT3(0.0f, -1.0f, 0.0f);
 	m_sceneSpotLight.Intensity = 2.0f;
 	m_sceneSpotLight.LightType = POINT_LIGHT;
-
 	m_renderPipeline->AddLight(&m_sceneSpotLight);
 }
 
@@ -372,22 +371,28 @@ void LightVoxelMachinaApp::CheckForEnemyCollision()
 
 			if (enemiesLeft == 0)
 			{
-				auto congratulationsSprite = new graphics::UI::GuiSprite(nullptr, 0, 30, graphics::g_windowHeight, graphics::g_windowHeight);
+				m_sceneGuiElements.clear();
+
+				auto congratulationsSprite = new graphics::UI::GuiSprite(nullptr, 0, 0, 0, 0);
 				congratulationsSprite->LoadBitmapFromFile(L"icons/trophy.png", true);
+
+				float imageYPosition = graphics::g_windowHeight - congratulationsSprite->GetHeight();
+
+				m_counterText->SetFontSize(100);
+
+				m_sceneGuiElements.push_back(m_counterText);
+
+				congratulationsSprite->SetLocalPosition(0, imageYPosition / 2.0f);
+
 				m_sceneGuiElements.push_back(congratulationsSprite);
 				m_sceneMeshRenderer.push_back(m_trophy);
 
-				/*Light* light = new Light();
-				*light = CreateDirectionalLight(Color::White, { 0, -1, -1 }, 0.6, 0);
-				m_renderPipeline->AddLight(light);*/
-
-				DirectX::XMFLOAT3 lightPosition;
-
-				DirectX::XMStoreFloat3(&lightPosition, m_player->GetPosition());
-
-				Light* light2 = new Light();
-				*light2 = CreateSpotLight(Color::Red, { 0, -1, -1 }, lightPosition, 1, 0, 10, 10);
-				m_renderPipeline->AddLight(light2);
+				auto pressEnterText = new graphics::UI::GuiText(nullptr, 0, 0, graphics::g_windowWidth, -200, 40);
+				pressEnterText->SetColor(Color::White);
+				pressEnterText->SetAnchorType(graphics::UI::ParentAnchorType::BottomLeft);
+				pressEnterText->SetText(L"Press enter to EXIT");
+				pressEnterText->SetTextAlignment(TextAlignment::Center);
+				m_sceneGuiElements.push_back(pressEnterText);
 			}
 		}
 		else

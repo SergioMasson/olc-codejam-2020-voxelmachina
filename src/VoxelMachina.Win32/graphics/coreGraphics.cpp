@@ -26,7 +26,6 @@ ComPtr<ID3D11Texture2D>			graphics::g_DepthStencilBuffer = nullptr;
 
 ComPtr<ID2D1Device>				graphics::g_d2dDevice = nullptr;
 ComPtr<ID2D1DeviceContext>		graphics::g_d2dDeviceContext = nullptr;
-
 ComPtr<ID2D1Bitmap1> d2dRenderTarget = nullptr;
 
 Color m_cleanColor{ Color::Black };
@@ -251,9 +250,6 @@ void graphics::BeginDraw()
 
 void graphics::Present()
 {
-	if (FXAA::FXAAEnable)
-		FXAA::Render();
-
 	ASSERT_SUCCEEDED(g_SwapChain->Present(1, 0));
 }
 

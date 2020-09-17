@@ -27,9 +27,8 @@ graphics::UI::GuiText::GuiText(DrawableElement* parent, float x, float y, float 
 
 	ASSERT_SUCCEEDED(hr);
 
-	m_writer->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_JUSTIFIED);
+	SetTextAlignment(TextAlignment::Justified);
 	m_writer->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-
 	SetColor(D2D1::ColorF::Black);
 }
 
@@ -46,4 +45,34 @@ void graphics::UI::GuiText::SetColor(Color color)
 	m_brush.Reset();
 	ASSERT_SUCCEEDED(graphics::g_d2dDeviceContext->CreateSolidColorBrush(color, m_brush.GetAddressOf()));
 	m_color = color;
+}
+
+void graphics::UI::GuiText::SetFontSize(float fontSize)
+{
+	m_writer.Reset();
+
+	Microsoft::WRL::ComPtr<IDWriteFactory> m_pDWriteFactory;
+
+	auto hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(m_pDWriteFactory), reinterpret_cast<IUnknown**>(m_pDWriteFactory.GetAddressOf()));
+	ASSERT_SUCCEEDED(hr);
+
+	// Create a DirectWrite text format object.
+	hr = m_pDWriteFactory->CreateTextFormat(
+		msc_fontName,
+		NULL,
+		DWRITE_FONT_WEIGHT_NORMAL,
+		DWRITE_FONT_STYLE_NORMAL,
+		DWRITE_FONT_STRETCH_NORMAL,
+		fontSize,
+		L"", //locale
+		m_writer.GetAddressOf()
+	);
+
+	m_fontSize = fontSize;
+}
+
+void graphics::UI::GuiText::SetTextAlignment(TextAlignment alignment)
+{
+	m_writer->SetTextAlignment(static_cast<DWRITE_TEXT_ALIGNMENT>(alignment));
+	m_alignment = alignment;
 }

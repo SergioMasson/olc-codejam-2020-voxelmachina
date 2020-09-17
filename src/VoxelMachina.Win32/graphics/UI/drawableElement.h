@@ -29,6 +29,15 @@ namespace graphics
 			void SetLocalPosition(float x, float y);
 			void SetAnchorType(ParentAnchorType type) { m_anchorType = type; }
 
+			float GetWidth() const
+			{
+				return m_Width;
+			};
+
+			float GetHeight() const {
+				return m_Height;
+			}
+
 		protected:
 
 			float m_X;

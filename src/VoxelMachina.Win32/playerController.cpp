@@ -66,6 +66,12 @@ void PlayerController::Update(float deltaT)
 
 	math::Vector3 motionVector = m_sceneCamera->GetRotation() * math::Vector3(-forwardX, 0, -forward);
 	motionVector.SetY(0.0f);
+
+	bool hasBoost = Input::IsPressed(Input::KeyCode::XButton) || Input::IsPressed(Input::KeyCode::Key_space);
+
+	if (hasBoost)
+		motionVector = motionVector * 1.5f;
+
 	math::Vector3 position = m_playerMeshRenderer->GetPosition() + motionVector;
 	m_playerMeshRenderer->SetPosition(position);
 
