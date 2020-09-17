@@ -89,6 +89,9 @@
     <ClCompile Include="graphics\graphicsContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="graphics\PostProcessing\FXAA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
@@ -131,6 +134,7 @@
     <ClInclude Include="math\boudingBox.h" />
     <ClInclude Include="math\random.h" />
     <ClInclude Include="graphics\graphicsContext.h" />
+    <ClInclude Include="graphics\PostProcessing\FXAA.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\BoxVS.hlsl" />
@@ -141,6 +145,8 @@
     <FxCompile Include="shaders\SkyboxPS.hlsl" />
     <FxCompile Include="shaders\pbrVS.hlsl" />
     <FxCompile Include="shaders\pbrPS.hlsl" />
+    <FxCompile Include="shaders\PostProcessing\FXAA_VS.hlsl" />
+    <FxCompile Include="shaders\PostProcessing\FXAA_PS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\Lights.hlsli" />
@@ -149,6 +155,9 @@
     <None Include="models\enemy.model" />
     <None Include="shaders\NewLightModel.hlsli" />
     <None Include="models\trophy.model" />
+    <None Include="models\world.model" />
+    <None Include="shaders\PostProcessing\Fxaa3_11.hlsli" />
+    <None Include="shaders\PostProcessing\FXAA_simple.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="textures\bricks2.dds" />

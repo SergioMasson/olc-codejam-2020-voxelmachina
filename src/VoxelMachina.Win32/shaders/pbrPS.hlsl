@@ -238,7 +238,9 @@ float4 main(PixelShaderInput pin) : SV_Target
 
     directLighting += gEmissionMap.Sample(gsamLinear, pin.texcoord).rgb;
     directLighting += gMaterial.Emission.rgb;
+   
+    float luma = (0.2126 * directLighting.r + 0.7152 * directLighting.g + 0.0722 * directLighting.b);
     
 	// Final fragment color.
-    return float4(directLighting, 1.0);
+    return float4(directLighting, luma);
 }

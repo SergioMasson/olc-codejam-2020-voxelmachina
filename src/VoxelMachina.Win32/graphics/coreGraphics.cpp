@@ -4,6 +4,8 @@
 #include "../dxassert.h"
 #include "../colors.h"
 
+#include "PostProcessing/FXAA.h"
+
 using namespace Microsoft::WRL;
 using namespace graphics;
 
@@ -28,8 +30,6 @@ ComPtr<ID2D1DeviceContext>		graphics::g_d2dDeviceContext = nullptr;
 ComPtr<ID2D1Bitmap1> d2dRenderTarget = nullptr;
 
 Color m_cleanColor{ Color::Black };
-
-static int g_CurrBackBuffer;
 
 void createD2DRenderTarget(IDXGISurface1* ptr)
 {
@@ -187,7 +187,9 @@ void InitializeGraphicsInfra(uint32_t width, uint32_t heigth)
 void graphics::Initialize(uint32_t width, uint32_t heigth)
 {
 	InitializeGraphicsInfra(width, heigth);
-	graphics::Resize(g_windowWidth, g_windowHeight);
+
+	graphics::FXAA::Initialize();
+	graphics::FXAA::Resize(g_windowWidth, g_windowHeight);
 }
 
 void graphics::Resize(uint32_t width, uint32_t heigth)
@@ -200,7 +202,6 @@ void graphics::Resize(uint32_t width, uint32_t heigth)
 
 	g_windowWidth = width;
 	g_windowHeight = heigth;
-	g_CurrBackBuffer = 0;
 
 	ASSERT(g_d3dImmediateContext);
 	ASSERT(g_d3dDevice);
@@ -228,21 +229,35 @@ void graphics::Resize(uint32_t width, uint32_t heigth)
 
 	createD3DRenderTarget(backBuffer);
 	createD2DRenderTarget(backBuffer.Get());
+
+	graphics::FXAA::Resize(width, heigth);
 }
 
 void graphics::BeginDraw()
 {
-	g_d3dImmediateContext->OMSetRenderTargets(1, g_RenderTargetView.GetAddressOf(), g_DepthStencilView.Get());
-	g_d3dImmediateContext->ClearRenderTargetView(g_RenderTargetView.Get(), reinterpret_cast<const float*>(&m_cleanColor));
-	g_d3dImmediateContext->ClearDepthStencilView(g_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	if (FXAA::FXAAEnable)
+	{
+		g_d3dImmediateContext->ClearRenderTargetView(g_RenderTargetView.Get(), reinterpret_cast<const float*>(&m_cleanColor));
+		g_d3dImmediateContext->ClearDepthStencilView(g_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		g_d3dImmediateContext->OMSetRenderTargets(1, FXAA::g_pProxyTextureRTV.GetAddressOf(), g_DepthStencilView.Get());
+	}
+	else
+	{
+		g_d3dImmediateContext->ClearRenderTargetView(g_RenderTargetView.Get(), reinterpret_cast<const float*>(&m_cleanColor));
+		g_d3dImmediateContext->ClearDepthStencilView(g_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		g_d3dImmediateContext->OMSetRenderTargets(1, g_RenderTargetView.GetAddressOf(), g_DepthStencilView.Get());
+	}
 }
 
 void graphics::Present()
 {
+	if (FXAA::FXAAEnable)
+		FXAA::Render();
+
 	ASSERT_SUCCEEDED(g_SwapChain->Present(1, 0));
-	g_CurrBackBuffer = (g_CurrBackBuffer + 1) % SwapChainBufferCount;
 }
 
 void graphics::ShutDown()
 {
+	graphics::FXAA::Shutdown();
 }

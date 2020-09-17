@@ -14,16 +14,17 @@
 #include "pbrVS.h"
 #include <string>
 
-#define ENEMY_COUNT 10
-#define PILAR_COUNT 100
-#define WORLD_X  100.0f
-#define WORLD_Y  100.0f
+#define ENEMY_COUNT 1
+#define PILAR_COUNT 1
+#define WORLD_X  10.0f
+#define WORLD_Y  10.0f
 
 graphics::MeshData quad;
 graphics::MeshData playerCharacter;
 graphics::MeshData enemyMesh;
 graphics::MeshData pilarMesh;
 graphics::MeshData trophyMesh;
+graphics::MeshData worldMesh;
 
 Light dirLight;
 
@@ -77,7 +78,7 @@ void LightVoxelMachinaApp::Update(float deltaT, float totalTime)
 	CheckForEnemyCollision();
 
 	math::Vector3 lightPosition1 = m_player->GetPosition() + (m_player->GetRotation() * math::Vector3{ 0, 1.5f, 1.5f });
-	math::Vector3 lightPosition2 = m_player->GetPosition() + (m_player->GetRotation() * math::Vector3{ 0, 2.5f, -1.0f });
+	math::Vector3 lightPosition2 = m_player->GetPosition() + (m_player->GetRotation() * math::Vector3{ 0, 5.5f, -1.0f });
 	math::Vector3 playerFoward = math::Matrix3{ m_player->GetRotation() }.GetZ();
 
 	DirectX::XMStoreFloat3(&m_scenePointLight.Position, lightPosition1);
@@ -88,8 +89,8 @@ void LightVoxelMachinaApp::Update(float deltaT, float totalTime)
 		m_time += deltaT;
 	else
 	{
-		m_trophy->SetRotation(m_trophy->GetRotation() * math::Quaternion(math::Vector3(0, 1, 0), deltaT * 3));
-		m_trophy->SetPosition(m_trophy->GetPosition() + math::Vector3(0, sin(totalTime) * 0.005, 0));
+		m_trophy->SetRotation(m_trophy->GetRotation() * math::Quaternion(math::Vector3(0, 1, 0), deltaT * 2));
+		m_trophy->SetPosition(m_trophy->GetPosition() + math::Vector3(0, 0.8 * sin(1.5 * totalTime) * 0.005, 0));
 	}
 
 	m_counterText->SetText(L"TOTAL TIME: " + std::to_wstring(m_time));
@@ -148,8 +149,8 @@ void LightVoxelMachinaApp::CreateLights()
 	m_scenePointLight = Light{};
 	// Point light--position is changed every frame to animate in UpdateScene function.
 	m_scenePointLight.Ambient = 0.3f;
-	m_scenePointLight.Color = Color::GreenYellow;
-	m_scenePointLight.Range = 5;
+	m_scenePointLight.Color = Color::Aqua;
+	m_scenePointLight.Range = 7;
 	m_scenePointLight.Position = DirectX::XMFLOAT3(0.0f, 3.0f, 5.0f);
 	m_scenePointLight.Intensity = 2.0f;
 	m_scenePointLight.LightType = POINT_LIGHT;
@@ -163,13 +164,10 @@ void LightVoxelMachinaApp::CreateLights()
 	m_sceneSpotLight.Range = 15.0f;
 	m_sceneSpotLight.Position = DirectX::XMFLOAT3(2.0f, 3.0f, 0.0f);
 	m_sceneSpotLight.Direction = DirectX::XMFLOAT3(0.0f, -1.0f, 0.0f);
-	m_sceneSpotLight.Intensity = 0.7f;
+	m_sceneSpotLight.Intensity = 2.0f;
 	m_sceneSpotLight.LightType = POINT_LIGHT;
 
 	m_renderPipeline->AddLight(&m_sceneSpotLight);
-
-	//dirLight = CreateDirectionalLight(Color::White, { -1, -1, 0 }, 10, 0.2);
-	//m_renderPipeline->AddLight(&dirLight);
 }
 
 void LightVoxelMachinaApp::CreateObjects()
@@ -199,13 +197,8 @@ void LightVoxelMachinaApp::CreateObjects()
 
 	graphics::Material playerMaterial{};
 	playerMaterial.Metalness = 0.2f;
-	playerMaterial.Roughness = 0.15f;
+	playerMaterial.Roughness = 0.1f;
 	playerMaterial.Color = Color::White;
-
-	graphics::Material material1{};
-	material1.Metalness = 0.2f;
-	material1.Roughness = 0.15f;
-	material1.Color = Color::White;
 
 	m_player = new graphics::MeshRenderer(&playerCharacter, playerMaterial, math::Vector3(0, 0, 0), math::Quaternion(), math::Vector3(1, 1, 1));
 	m_player->SetAlbedoTexture(playerTexture);
@@ -213,7 +206,12 @@ void LightVoxelMachinaApp::CreateObjects()
 	m_player->SetEmissionMap(playerEmissionMap);
 	m_sceneMeshRenderer.push_back(m_player);
 
-	m_trophy = new graphics::MeshRenderer(&trophyMesh, material1, math::Vector3(0, 1.2f, 0), math::Quaternion(0, 0, 0), math::Vector3(0.5f, 0.5f, 0.5f));
+	graphics::Material trophyMaterial{};
+	trophyMaterial.Metalness = 0.9f;
+	trophyMaterial.Roughness = 0.7f;
+	trophyMaterial.Color = Color::White;
+
+	m_trophy = new graphics::MeshRenderer(&trophyMesh, trophyMaterial, math::Vector3(0, 1.2f, 0), math::Quaternion(0, 0, 0), math::Vector3(0.5f, 0.5f, 0.5f));
 	m_trophy->SetAlbedoTexture(playerTexture);
 	m_trophy->SetNormalMap(normalMap);
 	m_trophy->SetEmissionMap(defaultEmissionMap);
@@ -241,7 +239,7 @@ void LightVoxelMachinaApp::CreateEnemy(graphics::MeshData* enemyData, graphics::
 	graphics::Material material1{};
 	material1.Color = Color::White;
 	material1.Metalness = 0.2f;
-	material1.Roughness = 0.15f;
+	material1.Roughness = 0.1f;
 
 	math::RandomNumberGenerator random{};
 
@@ -266,8 +264,8 @@ void LightVoxelMachinaApp::CreatePilars(graphics::MeshData* pilarData, graphics:
 {
 	graphics::Material material1{};
 	material1.Color = Color::White;
-	material1.Metalness = 0.2f;
-	material1.Roughness = 0.15f;
+	material1.Metalness = 0.3f;
+	material1.Roughness = 0.1f;
 
 	math::RandomNumberGenerator random{};
 
@@ -362,11 +360,11 @@ void LightVoxelMachinaApp::CheckForEnemyCollision()
 
 			DirectX::XMFLOAT3 enemyPosition;
 
-			DirectX::XMStoreFloat3(&enemyPosition, enemy->GetPosition() + math::Vector3(0, 0.5f, 0));
+			DirectX::XMStoreFloat3(&enemyPosition, enemy->GetPosition() + math::Vector3(0, 1.5f, 0));
 
 			Light* light = new Light();
 
-			*light = CreatePointLight(Color::MediumVioletRed, enemyPosition, 3.0f, 0.0f, 10.0f);
+			*light = CreatePointLight(Color::MediumVioletRed, enemyPosition, 7.0f, 0.0f, 10.0f);
 
 			m_renderPipeline->AddLight(light);
 
@@ -378,6 +376,18 @@ void LightVoxelMachinaApp::CheckForEnemyCollision()
 				congratulationsSprite->LoadBitmapFromFile(L"icons/trophy.png", true);
 				m_sceneGuiElements.push_back(congratulationsSprite);
 				m_sceneMeshRenderer.push_back(m_trophy);
+
+				/*Light* light = new Light();
+				*light = CreateDirectionalLight(Color::White, { 0, -1, -1 }, 0.6, 0);
+				m_renderPipeline->AddLight(light);*/
+
+				DirectX::XMFLOAT3 lightPosition;
+
+				DirectX::XMStoreFloat3(&lightPosition, m_player->GetPosition());
+
+				Light* light2 = new Light();
+				*light2 = CreateSpotLight(Color::Red, { 0, -1, -1 }, lightPosition, 1, 0, 10, 10);
+				m_renderPipeline->AddLight(light2);
 			}
 		}
 		else

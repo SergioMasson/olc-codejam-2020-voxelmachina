@@ -24,6 +24,7 @@ private:
 	float m_RotationSpeed;
 	float m_mouseCameraRotationSpeed;
 	float m_xboxCamRotationSpeed;
+	float m_cameraZoomSpeed;
 
 	float m_CurrentHeading;
 
@@ -35,6 +36,8 @@ private:
 
 	float m_lastPlayerFoward;
 	float m_lastPlayerFowardX;
+
+	float m_lastCameraDelta;
 
 	bool m_lockCamera;
 

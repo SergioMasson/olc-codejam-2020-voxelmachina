@@ -18,6 +18,7 @@ PlayerController::PlayerController(math::Vector3 worldUp,
 	m_RotationSpeed = 10.0f;
 	m_mouseCameraRotationSpeed = 10.0f;
 	m_xboxCamRotationSpeed = 1.5f;
+	m_cameraZoomSpeed = 0.01f;
 
 	m_MouseSensitivityX = 0.1f;
 	m_MouseSensitivityY = 0.05f;
@@ -34,10 +35,13 @@ PlayerController::PlayerController(math::Vector3 worldUp,
 
 	m_lastPlayerFoward = 0.0f;
 	m_lastPlayerFowardX = 0.0f;
+
+	m_lastPlayerFoward = 0.0f;
 }
 
 void PlayerController::Update(float deltaT)
 {
+	//Update player position
 	float forward = m_MoveSpeed * (
 		-Input::GetTimeCorrectedAnalogInput(Input::AnalogInput::kAnalogLeftStickY) +
 		(Input::IsPressed(Input::KeyCode::Key_s) ? deltaT : 0.0f) +
@@ -50,6 +54,31 @@ void PlayerController::Update(float deltaT)
 		(Input::IsPressed(Input::KeyCode::Key_d) ? -deltaT : 0.0f)
 		);
 
+	if ((Input::IsPressed(Input::KeyCode::Key_s) || Input::IsPressed(Input::KeyCode::Key_w))
+		&& (Input::IsPressed(Input::KeyCode::Key_a) || Input::IsPressed(Input::KeyCode::Key_d)))
+	{
+		auto tanget = (forward * forward + forwardX * forwardX);
+		auto value = sqrt(tanget) / 2.0f;
+
+		forward = forward >= 0 ? value : -value;
+		forwardX = forwardX >= 0 ? value : -value;
+	}
+
+	math::Vector3 motionVector = m_sceneCamera->GetRotation() * math::Vector3(-forwardX, 0, -forward);
+	motionVector.SetY(0.0f);
+	math::Vector3 position = m_playerMeshRenderer->GetPosition() + motionVector;
+	m_playerMeshRenderer->SetPosition(position);
+
+	//Update player orientation
+	if (math::Length(motionVector) > 0.000001f)
+	{
+		float size = math::Length(motionVector);
+		math::Quaternion snewRotation{ math::Matrix3{DirectX::XMMatrixLookToLH(math::Vector3{0, 0, 0}, math::Normalize(motionVector), m_WorldUp)} };
+		snewRotation = math::Lerp(m_playerMeshRenderer->GetRotation(), ~snewRotation, size);
+		m_playerMeshRenderer->SetRotation(snewRotation);
+	}
+
+	//Update camera rotation
 	float mouseX = 0;
 	float mouseY = 0;
 
@@ -68,23 +97,10 @@ void PlayerController::Update(float deltaT)
 	ApplyMomentum(m_lastCameraRotationX, cameraRotationX, deltaT);
 	ApplyMomentum(m_lastCameraRotationY, cameraRotationY, deltaT);
 
-	math::Vector3 motionVector = m_sceneCamera->GetRotation() * math::Vector3(-forwardX, 0, -forward);
-	motionVector.SetY(0.0f);
-
-	math::Vector3 position = m_playerMeshRenderer->GetPosition() + motionVector;
-
-	m_playerMeshRenderer->SetPosition(position);
-
 	auto YcameraRotation = math::Quaternion(m_playerMeshRenderer->GetRotation() * math::Vector3(0, 1, 0), cameraRotationX);
 	auto ZcameraRotation = math::Quaternion(m_sceneCamera->GetRotation() * math::Vector3(1, 0, 0), cameraRotationY);
 
 	auto totalRotation = YcameraRotation * ZcameraRotation;
-
-	float size = math::Length(motionVector);
-
-	math::Quaternion snewRotation{ math::Matrix3{DirectX::XMMatrixLookToLH(math::Vector3{0, 0, 0}, math::Normalize(motionVector), m_WorldUp)} };
-	snewRotation = math::Lerp(m_playerMeshRenderer->GetRotation(), ~snewRotation, size);
-	m_playerMeshRenderer->SetRotation(snewRotation);
 
 	auto oldCameraOffset = m_cameraOffset;
 
@@ -104,11 +120,18 @@ void PlayerController::Update(float deltaT)
 		m_sceneCamera->Update();
 	}
 
-	m_cameraOffset = m_cameraOffset * (1 + 0.01 * deltaT * Input::GetAnalogInput(Input::AnalogInput::kAnalogMouseScroll));
+	float zoomDelta = m_cameraZoomSpeed * (Input::GetTimeCorrectedAnalogInput(Input::AnalogInput::kAnalogMouseScroll) +
+		(Input::IsPressed(Input::KeyCode::LShoulder) ? deltaT * 75 : 0) +
+		(Input::IsPressed(Input::KeyCode::RShoulder) ? -deltaT * 75 : 0));
+
+	ApplyMomentum(m_lastCameraDelta, zoomDelta, deltaT);
+
+	m_cameraOffset = m_cameraOffset * (1 + zoomDelta);
 	cameraPosition = m_playerMeshRenderer->GetPosition() + m_cameraOffset;
 	m_sceneCamera->SetEyeAtUp(cameraPosition, position, math::Vector3(0, 1, 0));
 	m_sceneCamera->Update();
 
+	m_lastCameraDelta = zoomDelta;
 	m_lastCameraRotationX = cameraRotationX;
 	m_lastCameraRotationY = cameraRotationY;
 	m_lastPlayerFoward = forward;

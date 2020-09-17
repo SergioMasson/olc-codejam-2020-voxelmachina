@@ -42,7 +42,7 @@ PixelShaderInput main(VertexIn vin)
     vout.texcoord = vin.Tex;
 
     //vout.NormalW = mul(vin.NormalL, ((float3x3) gWorldInvTranspose));
-    vout.NormalW = mul(vin.NormalL, ((float3x3) gWorldInvTranspose));
+    vout.NormalW = mul(vin.NormalL, (float3x3) gWorldInvTranspose);
     vout.TangentW = mul(vin.TangentL, (float3x3) gWorld);
     
     vout.pixelPosition = mul(float4(vin.PosL, 1.0f), gWorldViewProj);
