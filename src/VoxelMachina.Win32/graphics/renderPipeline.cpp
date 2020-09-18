@@ -20,7 +20,7 @@ struct SceneConstBuffer
 	DirectX::XMFLOAT3 eyeWorld;
 	uint32_t NumberOfLights;
 
-	Light SceneLights[MAX_LIGHTS];
+	LightData SceneLights[MAX_LIGHTS];
 };
 
 struct ObjectConstBuffer
@@ -104,10 +104,9 @@ void graphics::RenderPipeline::StartRender(Camera* camera)
 	graphics::g_d3dImmediateContext->PSSetShader(m_pixelShader.Get(), nullptr, 0);
 
 	SceneConstBuffer sceneBuffer{};
+	sceneBuffer.eyeWorld = camera->GetPosition();
 
-	DirectX::XMStoreFloat3(&sceneBuffer.eyeWorld, camera->GetPosition());
-
-	std::vector<Light*> validLights{};
+	std::vector<LightData*> validLights{};
 
 	auto cameraWorldFrustrum = m_camera->GetWorldFrustum();
 
@@ -115,7 +114,7 @@ void graphics::RenderPipeline::StartRender(Camera* camera)
 		if (IsLightInFrustrum(*light, cameraWorldFrustrum))
 			validLights.push_back(light);
 
-	int lightCout = std::min<int>(validLights.size(), MAX_LIGHTS);
+	int lightCout = std::min<int>(static_cast<int>(validLights.size()), MAX_LIGHTS);
 
 	sceneBuffer.NumberOfLights = lightCout;
 
@@ -149,10 +148,9 @@ void graphics::RenderPipeline::RenderMesh(MeshRenderer const& mesh)
 	math::Matrix4 worldInvTranspose = meshWorldMatrix.InverseTranspose();
 	math::Matrix4 world = meshWorldMatrix;
 
-	DirectX::XMStoreFloat4x4(&objectBuffer.ObjectModelMatrix, world);
-	DirectX::XMStoreFloat4x4(&objectBuffer.ViewProjectionMatrix, mvpMatrix);
-	DirectX::XMStoreFloat4x4(&objectBuffer.WorldInvTranspose, worldInvTranspose);
-
+	objectBuffer.ObjectModelMatrix = world;
+	objectBuffer.ViewProjectionMatrix = mvpMatrix;
+	objectBuffer.WorldInvTranspose = worldInvTranspose;
 	objectBuffer.ObjectMaterial = mesh.m_material;
 	objectBuffer.TextureScale = mesh.m_textureScale;
 	objectBuffer.TextureDisplacement = mesh.m_textureDisplacement;
@@ -175,7 +173,7 @@ void graphics::RenderPipeline::RenderMesh(MeshRenderer const& mesh)
 	graphics::g_d3dImmediateContext->DrawIndexed(static_cast<UINT>(mesh.m_meshData->Indices.size()), 0, 0);
 }
 
-void graphics::RenderPipeline::AddLight(Light* light)
+void graphics::RenderPipeline::AddLight(LightData* light)
 {
 	m_sceneLights.push_back(light);
 }

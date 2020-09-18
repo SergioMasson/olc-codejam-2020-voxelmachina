@@ -20,7 +20,7 @@ namespace graphics
 		void StartRender(Camera* camera);
 		void RenderMesh(MeshRenderer const& mesh);
 		void SetSkyboxTexture(Texture2D* skybox) { m_skyboxTexture = skybox; };
-		void AddLight(Light* light);
+		void AddLight(LightData* light);
 
 	private:
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vertexShader = nullptr;
@@ -41,7 +41,7 @@ namespace graphics
 		Texture2D* m_skyboxTexture;
 
 		Camera* m_camera;
-		std::vector<Light*> m_sceneLights;
+		std::vector<LightData*> m_sceneLights;
 
 	private:
 		void CreateSkybox();

@@ -4,6 +4,7 @@
 #include "../mathHelpers.h"
 #include "../math/boundingSphere.h"
 #include "../math/boudingBox.h"
+#include "../gameObject.h"
 
 namespace graphics
 {
@@ -66,6 +67,9 @@ namespace graphics
 		MeshRenderer(MeshData* data, Material material, math::Vector3 position = math::Vector3(0, 0, 0), math::Quaternion rotation = math::Quaternion(0, 0, 0), math::Vector3 scale = { 1, 1, 1 });
 		MeshRenderer() = default;
 		~MeshRenderer() = default;
+
+		void SetMaterial(Material material) { m_material = material; }
+		void SetMesh(MeshData* data) { m_meshData = data; };
 
 		void SetRotation(math::Quaternion basisRotation)
 		{

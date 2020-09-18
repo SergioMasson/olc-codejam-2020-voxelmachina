@@ -92,6 +92,9 @@
     <ClCompile Include="graphics\PostProcessing\FXAA.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="gameObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
@@ -135,6 +138,7 @@
     <ClInclude Include="math\random.h" />
     <ClInclude Include="graphics\graphicsContext.h" />
     <ClInclude Include="graphics\PostProcessing\FXAA.h" />
+    <ClInclude Include="gameObject.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\BoxVS.hlsl" />

@@ -41,8 +41,8 @@ public:
 private:
 	Camera m_sceneCamera{};
 
-	Light m_scenePointLight{};
-	Light m_sceneSpotLight{};
+	LightData m_scenePointLight{};
+	LightData m_sceneSpotLight{};
 
 	std::unique_ptr<graphics::RenderPipeline> m_renderPipeline;
 	std::vector<graphics::MeshRenderer*> m_sceneMeshRenderer;

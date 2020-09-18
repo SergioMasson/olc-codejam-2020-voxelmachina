@@ -31,6 +31,12 @@ namespace math
 		INLINE explicit Vector3(DirectX::FXMVECTOR vec) { m_vec = vec; }
 
 		INLINE operator DirectX::XMVECTOR() const { return m_vec; }
+		INLINE operator DirectX::XMFLOAT3() const
+		{
+			DirectX::XMFLOAT3 result;
+			DirectX::XMStoreFloat3(&result, m_vec);
+			return result;
+		}
 
 		INLINE Scalar GetX() const { return Scalar(DirectX::XMVectorSplatX(m_vec)); }
 		INLINE Scalar GetY() const { return Scalar(DirectX::XMVectorSplatY(m_vec)); }
@@ -75,6 +81,12 @@ namespace math
 		INLINE explicit Vector4(DirectX::FXMVECTOR vec) { m_vec = vec; }
 
 		INLINE operator DirectX::XMVECTOR() const { return m_vec; }
+		INLINE operator DirectX::XMFLOAT4() const
+		{
+			DirectX::XMFLOAT4 result;
+			DirectX::XMStoreFloat4(&result, m_vec);
+			return result;
+		}
 
 		INLINE Scalar GetX() const { return Scalar(DirectX::XMVectorSplatX(m_vec)); }
 		INLINE Scalar GetY() const { return Scalar(DirectX::XMVectorSplatY(m_vec)); }

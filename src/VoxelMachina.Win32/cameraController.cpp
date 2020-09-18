@@ -37,35 +37,35 @@ void CameraController::Update(float deltaTime)
 
 	float timeScale = 1.0f;
 
-	if (Input::IsFirstPressed(Input::KeyCode::LThumbClick) || Input::IsFirstPressed(Input::KeyCode::Key_lshift))
+	if (Input::IsFirstPressed(KeyCode::LThumbClick) || Input::IsFirstPressed(KeyCode::Key_lshift))
 		m_FineMovement = !m_FineMovement;
 
-	if (Input::IsFirstPressed(Input::KeyCode::RThumbClick))
+	if (Input::IsFirstPressed(KeyCode::RThumbClick))
 		m_FineRotation = !m_FineRotation;
 
 	float speedScale = (m_FineMovement ? 0.1f : 1.0f) * timeScale;
 	float panScale = (m_FineRotation ? 0.5f : 1.0f) * timeScale;
 
-	float yaw = Input::GetTimeCorrectedAnalogInput(Input::AnalogInput::kAnalogRightStickX) * m_HorizontalLookSensitivity * panScale;
-	float pitch = Input::GetTimeCorrectedAnalogInput(Input::AnalogInput::kAnalogRightStickY) * m_VerticalLookSensitivity * panScale;
+	float yaw = Input::GetTimeCorrectedAnalogInput(AnalogInput::kAnalogRightStickX) * m_HorizontalLookSensitivity * panScale;
+	float pitch = Input::GetTimeCorrectedAnalogInput(AnalogInput::kAnalogRightStickY) * m_VerticalLookSensitivity * panScale;
 
 	float forward = m_MoveSpeed * speedScale * (
-		Input::GetTimeCorrectedAnalogInput(Input::AnalogInput::kAnalogLeftStickY) +
-		(Input::IsPressed(Input::KeyCode::Key_s) ? deltaTime : 0.0f) +
-		(Input::IsPressed(Input::KeyCode::Key_w) ? -deltaTime : 0.0f)
+		Input::GetTimeCorrectedAnalogInput(AnalogInput::kAnalogLeftStickY) +
+		(Input::IsPressed(KeyCode::Key_s) ? deltaTime : 0.0f) +
+		(Input::IsPressed(KeyCode::Key_w) ? -deltaTime : 0.0f)
 		);
 
 	float strafe = m_StrafeSpeed * speedScale * (
-		Input::GetTimeCorrectedAnalogInput(Input::AnalogInput::kAnalogLeftStickX) +
-		(Input::IsPressed(Input::KeyCode::Key_d) ? deltaTime : 0.0f) +
-		(Input::IsPressed(Input::KeyCode::Key_a) ? -deltaTime : 0.0f)
+		Input::GetTimeCorrectedAnalogInput(AnalogInput::kAnalogLeftStickX) +
+		(Input::IsPressed(KeyCode::Key_d) ? deltaTime : 0.0f) +
+		(Input::IsPressed(KeyCode::Key_a) ? -deltaTime : 0.0f)
 		);
 
 	float ascent = m_StrafeSpeed * speedScale * (
-		Input::GetTimeCorrectedAnalogInput(Input::AnalogInput::kAnalogRightTrigger) -
-		Input::GetTimeCorrectedAnalogInput(Input::AnalogInput::kAnalogLeftTrigger) +
-		(Input::IsPressed(Input::KeyCode::Key_e) ? deltaTime : 0.0f) +
-		(Input::IsPressed(Input::KeyCode::Key_q) ? -deltaTime : 0.0f)
+		Input::GetTimeCorrectedAnalogInput(AnalogInput::kAnalogRightTrigger) -
+		Input::GetTimeCorrectedAnalogInput(AnalogInput::kAnalogLeftTrigger) +
+		(Input::IsPressed(KeyCode::Key_e) ? deltaTime : 0.0f) +
+		(Input::IsPressed(KeyCode::Key_q) ? -deltaTime : 0.0f)
 		);
 
 	if (m_Momentum)
@@ -80,10 +80,10 @@ void CameraController::Update(float deltaTime)
 	float mouseX = 0;
 	float mouseY = 0;
 
-	if (Input::IsPressed(Input::KeyCode::MouseRigth))
+	if (Input::IsPressed(KeyCode::MouseRigth))
 	{
-		mouseX = Input::GetAnalogInput(Input::AnalogInput::kAnalogMouseX);
-		mouseY = Input::GetAnalogInput(Input::AnalogInput::kAnalogMouseY);
+		mouseX = Input::GetAnalogInput(AnalogInput::kAnalogMouseX);
+		mouseY = Input::GetAnalogInput(AnalogInput::kAnalogMouseY);
 	}
 
 	//// don't apply momentum to mouse inputs

@@ -37,25 +37,26 @@ PlayerController::PlayerController(math::Vector3 worldUp,
 	m_lastPlayerFowardX = 0.0f;
 
 	m_lastPlayerFoward = 0.0f;
+	m_lastCameraDelta = 0.0f;
 }
 
 void PlayerController::Update(float deltaT)
 {
 	//Update player position
 	float forward = m_MoveSpeed * (
-		-Input::GetTimeCorrectedAnalogInput(Input::AnalogInput::kAnalogLeftStickY) +
-		(Input::IsPressed(Input::KeyCode::Key_s) ? deltaT : 0.0f) +
-		(Input::IsPressed(Input::KeyCode::Key_w) ? -deltaT : 0.0f)
+		-Input::GetTimeCorrectedAnalogInput(AnalogInput::kAnalogLeftStickY) +
+		(Input::IsPressed(KeyCode::Key_s) ? deltaT : 0.0f) +
+		(Input::IsPressed(KeyCode::Key_w) ? -deltaT : 0.0f)
 		);
 
 	float forwardX = m_MoveSpeed * (
-		-Input::GetTimeCorrectedAnalogInput(Input::AnalogInput::kAnalogLeftStickX) +
-		(Input::IsPressed(Input::KeyCode::Key_a) ? deltaT : 0.0f) +
-		(Input::IsPressed(Input::KeyCode::Key_d) ? -deltaT : 0.0f)
+		-Input::GetTimeCorrectedAnalogInput(AnalogInput::kAnalogLeftStickX) +
+		(Input::IsPressed(KeyCode::Key_a) ? deltaT : 0.0f) +
+		(Input::IsPressed(KeyCode::Key_d) ? -deltaT : 0.0f)
 		);
 
-	if ((Input::IsPressed(Input::KeyCode::Key_s) || Input::IsPressed(Input::KeyCode::Key_w))
-		&& (Input::IsPressed(Input::KeyCode::Key_a) || Input::IsPressed(Input::KeyCode::Key_d)))
+	if ((Input::IsPressed(KeyCode::Key_s) || Input::IsPressed(KeyCode::Key_w))
+		&& (Input::IsPressed(KeyCode::Key_a) || Input::IsPressed(KeyCode::Key_d)))
 	{
 		auto tanget = (forward * forward + forwardX * forwardX);
 		auto value = sqrt(tanget) / 2.0f;
@@ -67,7 +68,7 @@ void PlayerController::Update(float deltaT)
 	math::Vector3 motionVector = m_sceneCamera->GetRotation() * math::Vector3(-forwardX, 0, -forward);
 	motionVector.SetY(0.0f);
 
-	bool hasBoost = Input::IsPressed(Input::KeyCode::XButton) || Input::IsPressed(Input::KeyCode::Key_space);
+	bool hasBoost = Input::IsPressed(KeyCode::XButton) || Input::IsPressed(KeyCode::Key_space);
 
 	if (hasBoost)
 		motionVector = motionVector * 1.5f;
@@ -91,14 +92,14 @@ void PlayerController::Update(float deltaT)
 	ApplyMomentum(m_lastPlayerFoward, forward, deltaT);
 	ApplyMomentum(m_lastPlayerFowardX, forwardX, deltaT);
 
-	if (Input::IsPressed(Input::KeyCode::MouseRigth))
+	if (Input::IsPressed(KeyCode::MouseRigth))
 	{
-		mouseX = deltaT * (Input::GetAnalogInput(Input::AnalogInput::kAnalogMouseX));
-		mouseY = deltaT * (Input::GetAnalogInput(Input::AnalogInput::kAnalogMouseY)) * 0.2f;
+		mouseX = deltaT * (Input::GetAnalogInput(AnalogInput::kAnalogMouseX));
+		mouseY = deltaT * (Input::GetAnalogInput(AnalogInput::kAnalogMouseY)) * 0.2f;
 	}
 
-	float cameraRotationX = (mouseX * m_mouseCameraRotationSpeed) + (m_xboxCamRotationSpeed * deltaT * Input::GetAnalogInput(Input::AnalogInput::kAnalogRightStickX));
-	float cameraRotationY = (mouseY * m_mouseCameraRotationSpeed) + (m_xboxCamRotationSpeed * deltaT * Input::GetAnalogInput(Input::AnalogInput::kAnalogRightStickY));
+	float cameraRotationX = (mouseX * m_mouseCameraRotationSpeed) + (m_xboxCamRotationSpeed * deltaT * Input::GetAnalogInput(AnalogInput::kAnalogRightStickX));
+	float cameraRotationY = (mouseY * m_mouseCameraRotationSpeed) + (m_xboxCamRotationSpeed * deltaT * Input::GetAnalogInput(AnalogInput::kAnalogRightStickY));
 
 	ApplyMomentum(m_lastCameraRotationX, cameraRotationX, deltaT);
 	ApplyMomentum(m_lastCameraRotationY, cameraRotationY, deltaT);
@@ -126,9 +127,9 @@ void PlayerController::Update(float deltaT)
 		m_sceneCamera->Update();
 	}
 
-	float zoomDelta = m_cameraZoomSpeed * (Input::GetTimeCorrectedAnalogInput(Input::AnalogInput::kAnalogMouseScroll) +
-		(Input::IsPressed(Input::KeyCode::LShoulder) ? deltaT * 75 : 0) +
-		(Input::IsPressed(Input::KeyCode::RShoulder) ? -deltaT * 75 : 0));
+	float zoomDelta = m_cameraZoomSpeed * (Input::GetTimeCorrectedAnalogInput(AnalogInput::kAnalogMouseScroll) +
+		(Input::IsPressed(KeyCode::LShoulder) ? deltaT * 75 : 0) +
+		(Input::IsPressed(KeyCode::RShoulder) ? -deltaT * 75 : 0));
 
 	ApplyMomentum(m_lastCameraDelta, zoomDelta, deltaT);
 

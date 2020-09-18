@@ -163,7 +163,27 @@ void graphics::FXAA::Initialize()
 
 void graphics::FXAA::Resize(UINT width, UINT height)
 {
+	if (g_pProxyTexture != nullptr)
+		g_pProxyTexture.Reset();
+
+	if (g_pProxyTextureRTV != nullptr)
+		g_pProxyTextureRTV.Reset();
+
+	if (g_pProxyTextureSRV != nullptr)
+		g_pProxyTextureSRV.Reset();
+
 	FxaaIntegrateResource(width, height);
+
+	D3D11_MAPPED_SUBRESOURCE MappedResource;
+
+	auto hr = (graphics::g_d3dImmediateContext->Map(g_pcbFXAA.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedResource));
+	ASSERT_SUCCEEDED(hr, "Fail to map FXAA resource");
+
+	CB_FXAA* pFXAA = (CB_FXAA*)MappedResource.pData;
+	float frameWidth = (float)graphics::g_windowWidth;
+	float frameHeight = (float)graphics::g_windowHeight;
+	pFXAA->m_fxaa = DirectX::XMFLOAT4(1.0f / frameWidth, 1.0f / frameHeight, 0.0f, 0.0f);
+	graphics::g_d3dImmediateContext->Unmap(g_pcbFXAA.Get(), 0);
 }
 
 void graphics::FXAA::Shutdown()
@@ -178,17 +198,6 @@ void graphics::FXAA::Shutdown()
 
 void graphics::FXAA::Render()
 {
-	D3D11_MAPPED_SUBRESOURCE MappedResource;
-
-	auto hr = (graphics::g_d3dImmediateContext->Map(g_pcbFXAA.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedResource));
-	ASSERT_SUCCEEDED(hr, "Fail to map FXAA resource");
-
-	CB_FXAA* pFXAA = (CB_FXAA*)MappedResource.pData;
-	float frameWidth = (float)graphics::g_windowWidth;
-	float frameHeight = (float)graphics::g_windowHeight;
-	pFXAA->m_fxaa = DirectX::XMFLOAT4(1.0f / frameWidth, 1.0f / frameHeight, 0.0f, 0.0f);
-	graphics::g_d3dImmediateContext->Unmap(g_pcbFXAA.Get(), 0);
-
 	ID3D11SamplerState* ppSamplerStates[4] = { g_pSamPointMirror.Get(), g_pSamLinearWrap.Get(), g_pSamPointCmpClamp.Get(), g_pSamAni.Get() };
 	graphics::g_d3dImmediateContext->PSSetSamplers(0, 4, ppSamplerStates);
 

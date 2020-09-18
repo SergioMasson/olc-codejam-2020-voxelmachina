@@ -46,21 +46,9 @@ struct PixelShaderInput
     float3 TangentW : TANGENT;
 };
 
-//Texture2D albedoTexture : register(t0);
-//Texture2D normalTexture : register(t1);
-//Texture2D metalnessTexture : register(t2);
-//Texture2D roughnessTexture : register(t3);
-
-
-//SamplerState defaultSampler : register(s0);
-//SamplerState spBRDF_Sampler : register(s1);
-
 Texture2D gDiffuseMap : register(t0);
 Texture2D gNormalMap : register(t1);
 Texture2D gEmissionMap : register(t2);
-
-
-
 SamplerState gsamLinear : register(s0);
 
 
@@ -122,6 +110,9 @@ float4 main(PixelShaderInput pin) : SV_Target
 {
 	// Sample input textures to get shading model params.
     float3 albedo = gMaterial.Color.rgb * gDiffuseMap.Sample(gsamLinear, (pin.texcoord * gTextureScale) + gTextureDisplacement).rgb;
+    
+    albedo = pow(albedo, 2.2f);
+    
     float metalness = gMaterial.Metalness;
     float roughness = gMaterial.Roughness;
 
@@ -201,7 +192,7 @@ float4 main(PixelShaderInput pin) : SV_Target
         float3 specularBRDF = (F * D * G) / max(Epsilon, 4.0 * cosLi * cosLo);
 
 		// Total contribution for this light.
-        directLighting += (((diffuseBRDF + specularBRDF) * Lradiance * cosLi)) * att * Lights[i].Intensity;
+        directLighting += (((diffuseBRDF + specularBRDF) * Lradiance * cosLi)) * att * att * Lights[i].Intensity;
     }
 
 	//// Ambient lighting (IBL).
@@ -236,9 +227,10 @@ float4 main(PixelShaderInput pin) : SV_Target
  //       ambientLighting = diffuseIBL + specularIBL;
  //   }
 
-    directLighting += gEmissionMap.Sample(gsamLinear, pin.texcoord).rgb;
-    directLighting += gMaterial.Emission.rgb;
+    directLighting += pow(gEmissionMap.Sample(gsamLinear, pin.texcoord).rgb, 2.2f);
+    directLighting += pow(gMaterial.Emission.rgb ,2.2f);
    
+    directLighting = pow(directLighting, 1 / 2.2f);
     float luma = (0.2126 * directLighting.r + 0.7152 * directLighting.g + 0.0722 * directLighting.b);
     
 	// Final fragment color.

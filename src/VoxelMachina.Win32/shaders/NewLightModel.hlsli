@@ -32,8 +32,10 @@ struct Material
 
 float CalcAttenuation(float d, float falloffStart, float falloffEnd)
 {
+    float atenuation = saturate((falloffEnd - d) / (falloffEnd - falloffStart));
+    
     // Linear falloff.
-    return saturate((falloffEnd - d) / (falloffEnd - falloffStart));
+    return atenuation;
 }
 
 //---------------------------------------------------------------------------------------

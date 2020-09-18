@@ -26,9 +26,7 @@ graphics::Texture2D::Texture2D(const wchar_t* filePath)
 	D3D11_SAMPLER_DESC samplerDesc;
 	ZeroMemory(&samplerDesc, sizeof(samplerDesc));
 
-	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-
-	// The sampler does not use anisotropic filtering, so this parameter is ignored.
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;;
 	samplerDesc.MaxAnisotropy = 0;
 
 	// Specify how texture coordinates outside of the range 0..1 are resolved.

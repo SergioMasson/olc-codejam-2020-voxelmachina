@@ -7,7 +7,7 @@
 #define SPOT_LIGHT 1
 #define POINT_LIGHT 2
 
-struct Light
+struct LightData
 {
 	Color Color;
 	DirectX::XMFLOAT3 Position;
@@ -20,9 +20,9 @@ struct Light
 	float Pad;
 };
 
-inline Light CreateDirectionalLight(Color color, DirectX::XMFLOAT3 direction, float Intensity, float Ambient)
+inline LightData CreateDirectionalLight(Color color, DirectX::XMFLOAT3 direction, float Intensity, float Ambient)
 {
-	return Light
+	return LightData
 	{
 		color,
 		DirectX::XMFLOAT3{},
@@ -36,9 +36,9 @@ inline Light CreateDirectionalLight(Color color, DirectX::XMFLOAT3 direction, fl
 	};
 }
 
-inline Light CreatePointLight(Color color, DirectX::XMFLOAT3 position, float Intensity, float Ambient, float range)
+inline LightData CreatePointLight(Color color, DirectX::XMFLOAT3 position, float Intensity, float Ambient, float range)
 {
-	return Light
+	return LightData
 	{
 		color,
 		position,
@@ -52,9 +52,9 @@ inline Light CreatePointLight(Color color, DirectX::XMFLOAT3 position, float Int
 	};
 }
 
-inline Light CreateSpotLight(Color color, DirectX::XMFLOAT3 direction, DirectX::XMFLOAT3 position, float Intensity, float Ambient, float range, float spot)
+inline LightData CreateSpotLight(Color color, DirectX::XMFLOAT3 direction, DirectX::XMFLOAT3 position, float Intensity, float Ambient, float range, float spot)
 {
-	return Light
+	return LightData
 	{
 		color,
 		position,
@@ -68,7 +68,7 @@ inline Light CreateSpotLight(Color color, DirectX::XMFLOAT3 direction, DirectX::
 	};
 }
 
-inline bool IsLightInFrustrum(Light light, math::Frustum frustrum)
+inline bool IsLightInFrustrum(LightData light, math::Frustum frustrum)
 {
 	if (light.Range == 0.0f)
 		return true;

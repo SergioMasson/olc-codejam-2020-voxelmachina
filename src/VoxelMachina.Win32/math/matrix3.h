@@ -48,6 +48,12 @@ namespace math
 		INLINE static Matrix3 MakeScale(Vector3 scale) { return Matrix3(DirectX::XMMatrixScalingFromVector(scale)); }
 
 		INLINE operator DirectX::XMMATRIX() const { return (const DirectX::XMMATRIX&)m_mat; }
+		INLINE operator DirectX::XMFLOAT3X3() const
+		{
+			DirectX::XMFLOAT3X3 result;
+			DirectX::XMStoreFloat3x3(&result, (const DirectX::XMMATRIX&)m_mat);
+			return result;
+		}
 
 		INLINE Vector3 operator* (Vector3 vec) const { return Vector3(DirectX::XMVector3TransformNormal(vec, *this)); }
 		INLINE Matrix3 operator* (const Matrix3& mat) const { return Matrix3(*this * mat.GetX(), *this * mat.GetY(), *this * mat.GetZ()); }

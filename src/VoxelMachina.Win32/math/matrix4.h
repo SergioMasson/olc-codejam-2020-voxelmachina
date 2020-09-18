@@ -96,6 +96,12 @@ namespace math
 		}
 
 		INLINE operator DirectX::XMMATRIX() const { return m_mat; }
+		INLINE operator DirectX::XMFLOAT4X4() const
+		{
+			DirectX::XMFLOAT4X4 result;
+			DirectX::XMStoreFloat4x4(&result, m_mat);
+			return result;
+		}
 
 		INLINE Vector4 operator* (Vector3 vec) const { return Vector4(DirectX::XMVector3Transform(vec, m_mat)); }
 		INLINE Vector4 operator* (Vector4 vec) const { return Vector4(DirectX::XMVector4Transform(vec, m_mat)); }

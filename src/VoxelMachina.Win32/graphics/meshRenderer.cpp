@@ -643,7 +643,7 @@ void graphics::MeshData::LoadFromOBJFile(const wchar_t* filename, MeshData& mesh
 				DirectX::XMStoreFloat3(&newVertex.TangentU, tanget);
 
 				vertex.push_back(newVertex);
-				indexes.push_back(vertex.size() - 1);
+				indexes.push_back(static_cast<UINT>(vertex.size()) - 1);
 			}
 			else
 			{
@@ -676,7 +676,7 @@ void graphics::MeshData::LoadFromOBJFile(const wchar_t* filename, MeshData& mesh
 				DirectX::XMStoreFloat3(&newVertex.TangentU, tanget);
 
 				vertex.push_back(newVertex);
-				indexes.push_back(vertex.size() - 1);
+				indexes.push_back(static_cast<UINT>(vertex.size()) - 1);
 			}
 			else
 			{
@@ -709,7 +709,7 @@ void graphics::MeshData::LoadFromOBJFile(const wchar_t* filename, MeshData& mesh
 				DirectX::XMStoreFloat3(&newVertex.TangentU, tanget);
 
 				vertex.push_back(newVertex);
-				indexes.push_back(vertex.size() - 1);
+				indexes.push_back(static_cast<UINT>(vertex.size()) - 1);
 			}
 			else
 			{

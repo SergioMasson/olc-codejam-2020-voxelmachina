@@ -26,7 +26,7 @@ graphics::MeshData pilarMesh;
 graphics::MeshData trophyMesh;
 graphics::MeshData worldMesh;
 
-Light dirLight;
+LightData dirLight;
 
 float currentTime;
 
@@ -64,7 +64,7 @@ void LightVoxelMachinaApp::Update(float deltaT, float totalTime)
 		return;
 	}
 
-	m_isDone = Input::IsPressed(Input::KeyCode::Key_escape) || (Input::IsPressed(Input::KeyCode::Key_return) && enemiesLeft == 0);
+	m_isDone = Input::IsPressed(KeyCode::Key_escape) || (Input::IsPressed(KeyCode::Key_return) && enemiesLeft == 0);
 
 	auto oldPlayerPosition = m_player->GetPosition();
 
@@ -90,7 +90,7 @@ void LightVoxelMachinaApp::Update(float deltaT, float totalTime)
 	else
 	{
 		m_trophy->SetRotation(m_trophy->GetRotation() * math::Quaternion(math::Vector3(0, 1, 0), deltaT * 2));
-		m_trophy->SetPosition(m_trophy->GetPosition() + math::Vector3(0, 0.8 * sin(1.5 * totalTime) * 0.005, 0));
+		m_trophy->SetPosition(m_trophy->GetPosition() + math::Vector3(0.0f, 0.8f * sin(1.5f * totalTime) * 0.005f, 0));
 	}
 
 	m_counterText->SetText(L"TOTAL TIME: " + std::to_wstring(m_time));
@@ -146,9 +146,9 @@ void LightVoxelMachinaApp::CreateCamera()
 
 void LightVoxelMachinaApp::CreateLights()
 {
-	m_scenePointLight = Light{};
+	m_scenePointLight = LightData{};
 	// Point light--position is changed every frame to animate in UpdateScene function.
-	m_scenePointLight.Ambient = 0.3f;
+	m_scenePointLight.Ambient = 0.01f;
 	m_scenePointLight.Color = Color::Aqua;
 	m_scenePointLight.Range = 7;
 	m_scenePointLight.Position = DirectX::XMFLOAT3(0.0f, 3.0f, 5.0f);
@@ -157,16 +157,16 @@ void LightVoxelMachinaApp::CreateLights()
 
 	m_renderPipeline->AddLight(&m_scenePointLight);
 
-	m_sceneSpotLight = Light{};
+	m_sceneSpotLight = LightData{};
 	// Spot light--position and direction changed every frame to animate in UpdateScene function.
 	m_sceneSpotLight.Color = Color::White;
 	m_sceneSpotLight.Spot = 96.0f;
 	m_sceneSpotLight.Range = 15.0f;
 	m_sceneSpotLight.Position = DirectX::XMFLOAT3(2.0f, 3.0f, 0.0f);
 	m_sceneSpotLight.Direction = DirectX::XMFLOAT3(0.0f, -1.0f, 0.0f);
-	m_sceneSpotLight.Intensity = 2.0f;
+	m_sceneSpotLight.Intensity = 0.15f;
 	m_sceneSpotLight.LightType = POINT_LIGHT;
-	m_renderPipeline->AddLight(&m_sceneSpotLight);
+	//m_renderPipeline->AddLight(&m_sceneSpotLight);
 }
 
 void LightVoxelMachinaApp::CreateObjects()
@@ -196,7 +196,7 @@ void LightVoxelMachinaApp::CreateObjects()
 
 	graphics::Material playerMaterial{};
 	playerMaterial.Metalness = 0.2f;
-	playerMaterial.Roughness = 0.1f;
+	playerMaterial.Roughness = 0.2f;
 	playerMaterial.Color = Color::White;
 
 	m_player = new graphics::MeshRenderer(&playerCharacter, playerMaterial, math::Vector3(0, 0, 0), math::Quaternion(), math::Vector3(1, 1, 1));
@@ -348,8 +348,6 @@ void LightVoxelMachinaApp::CheckForEnemyCollision()
 	{
 		Enemy* enemy = *it;
 
-		/*math::Vector3 distance = enemy->GetPosition() - m_player->GetPosition();
-		if (math::Length(distance) <= 1.0f)*/
 		if (enemy->WBoudingBox().IsOverlaping(m_player->WBoudingBox()))
 		{
 			it = m_enemiesLeft.erase(it);
@@ -357,16 +355,10 @@ void LightVoxelMachinaApp::CheckForEnemyCollision()
 
 			enemy->SetDetected();
 
-			DirectX::XMFLOAT3 enemyPosition;
-
-			DirectX::XMStoreFloat3(&enemyPosition, enemy->GetPosition() + math::Vector3(0, 1.5f, 0));
-
-			Light* light = new Light();
-
-			*light = CreatePointLight(Color::MediumVioletRed, enemyPosition, 7.0f, 0.0f, 10.0f);
+			LightData* light = new LightData();
+			*light = CreatePointLight(Color::MediumVioletRed, enemy->GetPosition() + math::Vector3(0, 0.5f, 0), 7.0f, 0.0f, 10.0f);
 
 			m_renderPipeline->AddLight(light);
-
 			audio::PlayAudioFile(L"audioFiles/enemy.wav");
 
 			if (enemiesLeft == 0)
@@ -387,7 +379,7 @@ void LightVoxelMachinaApp::CheckForEnemyCollision()
 				m_sceneGuiElements.push_back(congratulationsSprite);
 				m_sceneMeshRenderer.push_back(m_trophy);
 
-				auto pressEnterText = new graphics::UI::GuiText(nullptr, 0, 0, graphics::g_windowWidth, -200, 40);
+				auto pressEnterText = new graphics::UI::GuiText(nullptr, 0.0f, 0.0f, static_cast<float>(graphics::g_windowWidth), -200.0f, 40.0f);
 				pressEnterText->SetColor(Color::White);
 				pressEnterText->SetAnchorType(graphics::UI::ParentAnchorType::BottomLeft);
 				pressEnterText->SetText(L"Press enter to EXIT");

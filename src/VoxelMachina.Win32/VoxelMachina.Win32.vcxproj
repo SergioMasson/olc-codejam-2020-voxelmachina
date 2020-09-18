@@ -170,6 +170,7 @@
     <ClCompile Include="cameraController.cpp" />
     <ClCompile Include="color.cpp" />
     <ClCompile Include="enemy.cpp" />
+    <ClCompile Include="gameObject.cpp" />
     <ClCompile Include="graphics\coreGraphics.cpp" />
     <ClCompile Include="graphics\dds.cpp" />
     <ClCompile Include="graphics\graphicsContext.cpp" />
@@ -204,6 +205,7 @@
     <ClInclude Include="cameraController.h" />
     <ClInclude Include="colors.h" />
     <ClInclude Include="enemy.h" />
+    <ClInclude Include="gameObject.h" />
     <ClInclude Include="graphics\coreGraphics.h" />
     <ClInclude Include="dxassert.h" />
     <ClInclude Include="graphics\dds.h" />
