@@ -17,22 +17,28 @@ class GameObject
 {
 public:
 	GameObject(math::Vector3 position = math::Vector3(0, 0, 0), math::Quaternion rotation = math::Quaternion(0, 0, 0), GameObject* parent = nullptr);
-	//template<typename T, typename ... Param> T* const& AddComponent(const Param& ... params)
-	//{
-	//	T* component = new T(this, params);
-	//	uint32_t hash = component->GetHash();
-	//	m_components.insert({ hash, component });
-	//	return component;
-	//}
-	//template<class T> T* GetComponent(ComponentType type)
-	//{
-	//	auto find = m_components.find(type);
 
-	//	if (find != m_components.end())
-	//		return &find;
+	template<typename T, typename ...Param> T* AddComponent(Param... params)
+	{
+		T* component = new T(std::forward<Param>(params)...);
+		component->m_gameObject = this;
+		m_components.push_back(component);
+		return component;
+	}
 
-	//	return nullptr;
-	//}
+	template<class T> T* GetComponent()
+	{
+		for (auto component : m_components)
+		{
+			T* target = dynamic_cast<T*>(component);
+
+			if (target != nullptr)
+				return target;
+		}
+
+		return nullptr;
+	}
+
 	bool IsActive() { return m_isActive; }
 	void SetActive(bool active) { m_isActive = active; }
 
@@ -65,20 +71,19 @@ private:
 	math::Transform m_transform;
 	graphics::MeshRenderer* m_meshRenderer;
 	GameObject* m_parent;
-	std::map<ComponentType, Component*> m_components;
+	std::vector<Component*> m_components;
 	bool m_isActive;
 };
 
 class Component
 {
-public:
-	virtual uint32_t GetHash(void) = 0;
 protected:
-	Component(GameObject* gameobject)
+	Component()
 	{
-		m_gameObject = gameobject;
 		m_active = true;
+		m_gameObject = nullptr;
 	}
+
 protected:
 	GameObject* m_gameObject;
 	bool m_active;

@@ -14,10 +14,10 @@
 #include "pbrVS.h"
 #include <string>
 
-#define ENEMY_COUNT 10
-#define PILAR_COUNT 100
-#define WORLD_X  100.0f
-#define WORLD_Y  100.0f
+#define ENEMY_COUNT 1
+#define PILAR_COUNT 1
+#define WORLD_X  10.0f
+#define WORLD_Y  10.0f
 
 graphics::MeshData quad;
 graphics::MeshData playerCharacter;
@@ -38,14 +38,12 @@ void LightVoxelMachinaApp::Startup(void)
 	m_renderPipeline = std::make_unique<graphics::RenderPipeline>();
 	m_renderPipeline->LoadShader(g_ppbrVS, sizeof(g_ppbrVS), g_ppbrPS, sizeof(g_ppbrPS));
 
-	CreateLights();
 	CreateObjects();
+	CreateLights();
 	CreateGUI();
 	CreateCamera();
 
 	m_playerController = new PlayerController(math::Vector3(0, 1, 0), m_player, &m_sceneCamera);
-	m_cameraController = new CameraController(m_sceneCamera, math::Vector3(0, 1, 0));
-
 	audio::PlayAudioFile(L"audioFiles/test.wav", true);
 }
 
@@ -73,24 +71,14 @@ void LightVoxelMachinaApp::Update(float deltaT, float totalTime)
 	if (CheckPillarCollision() || !CheckIfInsideScene())
 		m_player->SetPosition(oldPlayerPosition);
 
-	//m_cameraController->Update(deltaT);
-
 	CheckForEnemyCollision();
-
-	math::Vector3 lightPosition1 = m_player->GetPosition() + (m_player->GetRotation() * math::Vector3{ 0, 1.5f, 1.5f });
-	math::Vector3 lightPosition2 = m_player->GetPosition() + (m_player->GetRotation() * math::Vector3{ 0, 5.5f, -1.0f });
-	math::Vector3 playerFoward = math::Matrix3{ m_player->GetRotation() }.GetZ();
-
-	DirectX::XMStoreFloat3(&m_scenePointLight.Position, lightPosition1);
-	DirectX::XMStoreFloat3(&m_sceneSpotLight.Position, lightPosition2);
-	DirectX::XMStoreFloat3(&m_sceneSpotLight.Direction, playerFoward);
 
 	if (m_enemiesLeft.size() != 0)
 		m_time += deltaT;
 	else
 	{
-		m_trophy->SetRotation(m_trophy->GetRotation() * math::Quaternion(math::Vector3(0, 1, 0), deltaT * 2));
-		m_trophy->SetPosition(m_trophy->GetPosition() + math::Vector3(0.0f, 0.8f * sin(1.5f * totalTime) * 0.005f, 0));
+		m_trophy->SetRotation(m_trophy->GetLocalRotation() * math::Quaternion(math::Vector3(0, 1, 0), deltaT * 2));
+		m_trophy->SetPosition(m_trophy->GetLocalPosition() + math::Vector3(0.0f, 0.8f * sin(1.5f * totalTime) * 0.005f, 0));
 	}
 
 	m_counterText->SetText(L"TOTAL TIME: " + std::to_wstring(m_time));
@@ -146,39 +134,28 @@ void LightVoxelMachinaApp::CreateCamera()
 
 void LightVoxelMachinaApp::CreateLights()
 {
-	m_scenePointLight = LightData{};
-	// Point light--position is changed every frame to animate in UpdateScene function.
-	m_scenePointLight.Ambient = 0.01f;
-	m_scenePointLight.Color = Color::Aqua;
-	m_scenePointLight.Range = 7;
-	m_scenePointLight.Position = DirectX::XMFLOAT3(0.0f, 3.0f, 5.0f);
-	m_scenePointLight.Intensity = 2.0f;
-	m_scenePointLight.LightType = POINT_LIGHT;
+	m_scenePointLight = new GameObject();
 
-	m_renderPipeline->AddLight(&m_scenePointLight);
+	auto lightComponent = m_scenePointLight->AddComponent<LightComponent>(Color::Aqua, LightType::Point, 2.0f, 7);
 
-	m_sceneSpotLight = LightData{};
+	m_scenePointLight->SetParent(m_player);
+	m_scenePointLight->SetPosition(math::Vector3{ 0, 1.5f, 1.5f });
+	m_renderPipeline->AddLight(lightComponent);
+
+	m_sceneSpotLight = new GameObject();
+	m_sceneSpotLight->SetPosition(math::Vector3{ 0, 5.5f, -1.0f });
+	lightComponent = m_sceneSpotLight->AddComponent<LightComponent>(Color::White, LightType::Point, 0.15f, 15.0f, 96.0f);
 	// Spot light--position and direction changed every frame to animate in UpdateScene function.
-	m_sceneSpotLight.Color = Color::White;
-	m_sceneSpotLight.Spot = 96.0f;
-	m_sceneSpotLight.Range = 15.0f;
-	m_sceneSpotLight.Position = DirectX::XMFLOAT3(2.0f, 3.0f, 0.0f);
-	m_sceneSpotLight.Direction = DirectX::XMFLOAT3(0.0f, -1.0f, 0.0f);
-	m_sceneSpotLight.Intensity = 0.15f;
-	m_sceneSpotLight.LightType = POINT_LIGHT;
-	//m_renderPipeline->AddLight(&m_sceneSpotLight);
+	m_sceneSpotLight->SetParent(m_player);
+	m_renderPipeline->AddLight(lightComponent);
 }
 
 void LightVoxelMachinaApp::CreateObjects()
 {
 	graphics::MeshData::CreateGrid(100, 100, 20, 20, quad);
-
 	graphics::MeshData::LoadFromOBJFile(L"models/littleRobot.model", playerCharacter);
-
 	graphics::MeshData::LoadFromOBJFile(L"models/enemy.model", enemyMesh);
-
 	graphics::MeshData::LoadFromOBJFile(L"models/trophy.model", trophyMesh);
-
 	graphics::MeshData::CreateCylinder(1, 1, 10, 20, 20, pilarMesh);
 
 	//TODO(Sergio): Load this on a separate thread. Asset loading will take a time...
@@ -205,7 +182,6 @@ void LightVoxelMachinaApp::CreateObjects()
 	playerRenderer->SetNormalMap(normalMap);
 	playerRenderer->SetEmissionMap(playerEmissionMap);
 	m_sceneMeshRenderer.push_back(playerRenderer);
-
 	m_activeGameObjects.push_back(m_player);
 
 	graphics::Material trophyMaterial{};
@@ -213,13 +189,15 @@ void LightVoxelMachinaApp::CreateObjects()
 	trophyMaterial.Roughness = 0.7f;
 	trophyMaterial.Color = Color::White;
 
-	m_trophy = new GameObject(math::Vector3(0, 1.2f, 0));
+	m_trophy = new GameObject();
 	auto trophyRenderer = m_trophy->AddMeshRenderer(&trophyMesh, trophyMaterial);
 	trophyRenderer->SetAlbedoTexture(playerTexture);
 	trophyRenderer->SetNormalMap(normalMap);
 	trophyRenderer->SetNormalMap(normalMap);
 	trophyRenderer->SetEmissionMap(defaultEmissionMap);
 	m_trophy->SetParent(m_player);
+	m_trophy->SetPosition(math::Vector3(0, 1.2f, 0));
+	m_trophy->SetScale(math::Vector3(0.5f, 0.5f, 0.5f));
 
 	m_activeGameObjects.push_back(m_trophy);
 
@@ -369,10 +347,13 @@ void LightVoxelMachinaApp::CheckForEnemyCollision()
 
 			enemy->SetDetected();
 
-			LightData* light = new LightData();
-			*light = CreatePointLight(Color::MediumVioletRed, enemy->GetPosition() + math::Vector3(0, 0.5f, 0), 7.0f, 0.0f, 10.0f);
+			GameObject* enemyLight = new GameObject();
+			auto lightComponent = enemyLight->AddComponent<LightComponent>(Color::MediumVioletRed, LightType::Point, 7.0f, 10.0f);
+			enemyLight->SetPosition(enemy->GetPosition() + math::Vector3(0, 0.5f, 0));
+			m_renderPipeline->AddLight(lightComponent);
+			m_activeGameObjects.push_back(enemyLight);
 
-			m_renderPipeline->AddLight(light);
+			//Play audio
 			audio::PlayAudioFile(L"audioFiles/enemy.wav");
 
 			if (enemiesLeft == 0)
@@ -391,7 +372,9 @@ void LightVoxelMachinaApp::CheckForEnemyCollision()
 				congratulationsSprite->SetLocalPosition(0, imageYPosition / 2.0f);
 
 				m_sceneGuiElements.push_back(congratulationsSprite);
-				m_sceneMeshRenderer.push_back(m_trophy->GetMeshRenderer());
+
+				auto meshRenderer = m_trophy->GetMeshRenderer();
+				m_sceneMeshRenderer.push_back(meshRenderer);
 
 				auto pressEnterText = new graphics::UI::GuiText(nullptr, 0.0f, 0.0f, static_cast<float>(graphics::g_windowWidth), -200.0f, 40.0f);
 				pressEnterText->SetColor(Color::White);

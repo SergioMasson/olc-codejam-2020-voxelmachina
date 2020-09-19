@@ -60,8 +60,9 @@ namespace math
 
 		INLINE Vector3 operator* (Vector3 vec) const { return (m_rotation * vec) + m_translation; }
 
-		INLINE Transform operator* (const Transform& xform) const {
-			return Transform(m_rotation * xform.m_rotation, m_rotation * xform.m_translation + m_translation);
+		INLINE Transform operator* (const Transform& xform) const
+		{
+			return Transform(m_rotation * xform.m_rotation, m_rotation * xform.m_translation + m_translation, xform.m_scale * m_scale);
 		}
 
 		INLINE Transform operator~ () const {

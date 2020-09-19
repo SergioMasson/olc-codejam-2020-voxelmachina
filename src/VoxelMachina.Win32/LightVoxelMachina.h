@@ -41,9 +41,6 @@ public:
 private:
 	Camera m_sceneCamera{};
 
-	LightData m_scenePointLight{};
-	LightData m_sceneSpotLight{};
-
 	std::unique_ptr<graphics::RenderPipeline> m_renderPipeline;
 	std::vector<graphics::MeshRenderer*> m_sceneMeshRenderer;
 	std::vector<graphics::UI::DrawableElement*> m_sceneGuiElements;
@@ -63,8 +60,10 @@ private:
 	GameObject* m_floor;
 	GameObject* m_trophy;
 
+	GameObject* m_scenePointLight;
+	GameObject* m_sceneSpotLight;
+
 	PlayerController* m_playerController;
-	CameraController* m_cameraController;
 
 	graphics::Texture2D* m_skybox;
 	math::Vector3 mouse_position;

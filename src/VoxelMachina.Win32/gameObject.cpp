@@ -4,6 +4,7 @@
 
 GameObject::GameObject(math::Vector3 position, math::Quaternion rotation, GameObject* parent) :
 	m_transform{ rotation, position },
+	m_meshRenderer{ nullptr },
 	m_parent{ parent },
 	m_isActive{ true }
 {

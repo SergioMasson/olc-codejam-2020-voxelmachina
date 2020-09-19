@@ -107,13 +107,17 @@ void graphics::RenderPipeline::StartRender(Camera* camera)
 	SceneConstBuffer sceneBuffer{};
 	sceneBuffer.eyeWorld = camera->GetPosition();
 
-	std::vector<LightData*> validLights{};
+	std::vector<LightData> validLights{};
 
 	auto cameraWorldFrustrum = m_camera->GetWorldFrustum();
 
 	for (auto light : m_sceneLights)
-		if (IsLightInFrustrum(*light, cameraWorldFrustrum))
-			validLights.push_back(light);
+	{
+		auto lightData = light->GetData();
+
+		if (IsLightInFrustrum(lightData, cameraWorldFrustrum))
+			validLights.push_back(lightData);
+	}
 
 	int lightCout = std::min<int>(static_cast<int>(validLights.size()), MAX_LIGHTS);
 
@@ -121,7 +125,7 @@ void graphics::RenderPipeline::StartRender(Camera* camera)
 
 	for (size_t i = 0; i < lightCout; i++)
 	{
-		sceneBuffer.SceneLights[i] = *validLights[i];
+		sceneBuffer.SceneLights[i] = validLights[i];
 	}
 
 	//Updates the subresource.
@@ -174,7 +178,7 @@ void graphics::RenderPipeline::RenderMesh(MeshRenderer const& mesh)
 	graphics::g_d3dImmediateContext->DrawIndexed(static_cast<UINT>(mesh.m_meshData->Indices.size()), 0, 0);
 }
 
-void graphics::RenderPipeline::AddLight(LightData* light)
+void graphics::RenderPipeline::AddLight(LightComponent* light)
 {
 	m_sceneLights.push_back(light);
 }
