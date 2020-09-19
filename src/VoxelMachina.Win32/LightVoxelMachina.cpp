@@ -199,22 +199,29 @@ void LightVoxelMachinaApp::CreateObjects()
 	playerMaterial.Roughness = 0.2f;
 	playerMaterial.Color = Color::White;
 
-	m_player = new graphics::MeshRenderer(&playerCharacter, playerMaterial, math::Vector3(0, 0, 0), math::Quaternion(), math::Vector3(1, 1, 1));
-	m_player->SetAlbedoTexture(playerTexture);
-	m_player->SetNormalMap(normalMap);
-	m_player->SetEmissionMap(playerEmissionMap);
-	m_sceneMeshRenderer.push_back(m_player);
+	m_player = new GameObject();
+	auto playerRenderer = m_player->AddMeshRenderer(&playerCharacter, playerMaterial);
+	playerRenderer->SetAlbedoTexture(playerTexture);
+	playerRenderer->SetNormalMap(normalMap);
+	playerRenderer->SetEmissionMap(playerEmissionMap);
+	m_sceneMeshRenderer.push_back(playerRenderer);
+
+	m_activeGameObjects.push_back(m_player);
 
 	graphics::Material trophyMaterial{};
 	trophyMaterial.Metalness = 0.9f;
 	trophyMaterial.Roughness = 0.7f;
 	trophyMaterial.Color = Color::White;
 
-	m_trophy = new graphics::MeshRenderer(&trophyMesh, trophyMaterial, math::Vector3(0, 1.2f, 0), math::Quaternion(0, 0, 0), math::Vector3(0.5f, 0.5f, 0.5f));
-	m_trophy->SetAlbedoTexture(playerTexture);
-	m_trophy->SetNormalMap(normalMap);
-	m_trophy->SetEmissionMap(defaultEmissionMap);
+	m_trophy = new GameObject(math::Vector3(0, 1.2f, 0));
+	auto trophyRenderer = m_trophy->AddMeshRenderer(&trophyMesh, trophyMaterial);
+	trophyRenderer->SetAlbedoTexture(playerTexture);
+	trophyRenderer->SetNormalMap(normalMap);
+	trophyRenderer->SetNormalMap(normalMap);
+	trophyRenderer->SetEmissionMap(defaultEmissionMap);
 	m_trophy->SetParent(m_player);
+
+	m_activeGameObjects.push_back(m_trophy);
 
 	CreateEnemy(&enemyMesh, enemyTexture, normalMap, enemyDetectedTexture, defaultEmissionMap);
 	CreatePilars(&pilarMesh, pilarTexture, pilarNormal, defaultEmissionMap);
@@ -224,13 +231,15 @@ void LightVoxelMachinaApp::CreateObjects()
 	floorMaterial.Metalness = 0.3f;
 	floorMaterial.Roughness = 0.1f;
 
-	m_floor = new graphics::MeshRenderer(&quad, floorMaterial, math::Vector3(0, 0, 0), math::Quaternion());
-	m_floor->SetAlbedoTexture(floorTexture);
-	m_floor->SetNormalMap(floorNormalMap);
-	m_floor->SetEmissionMap(defaultEmissionMap);
-	m_floor->SetTextureScale(20, 20);
+	m_floor = new GameObject();
+	auto floorRenderer = m_floor->AddMeshRenderer(&quad, floorMaterial);
+	floorRenderer->SetAlbedoTexture(floorTexture);
+	floorRenderer->SetNormalMap(floorNormalMap);
+	floorRenderer->SetEmissionMap(defaultEmissionMap);
+	floorRenderer->SetTextureScale(20, 20);
 
-	m_sceneMeshRenderer.push_back(m_floor);
+	m_sceneMeshRenderer.push_back(floorRenderer);
+	m_activeGameObjects.push_back(m_floor);
 }
 
 void LightVoxelMachinaApp::CreateEnemy(graphics::MeshData* enemyData, graphics::Texture2D* enemyTexture, graphics::Texture2D* enemyNormal, graphics::Texture2D* detectedTexture, graphics::Texture2D* emissionMap)
@@ -250,11 +259,14 @@ void LightVoxelMachinaApp::CreateEnemy(graphics::MeshData* enemyData, graphics::
 		float enemyX = (randomX * WORLD_X) - ((WORLD_X) / 2.0f);
 		float enemyY = (randomY * WORLD_Y) - ((WORLD_Y) / 2.0f);
 		auto enemyPosition = math::Vector3(enemyX, 0, enemyY);
-		auto enemy = new graphics::MeshRenderer(enemyData, material1, enemyPosition, math::Quaternion());
-		enemy->SetAlbedoTexture(enemyTexture);
-		enemy->SetNormalMap(enemyNormal);
-		enemy->SetEmissionMap(emissionMap);
-		m_sceneMeshRenderer.push_back(enemy);
+
+		auto enemy = new GameObject(enemyPosition, math::Quaternion());
+
+		auto enemyRenderer = enemy->AddMeshRenderer(enemyData, material1);
+		enemyRenderer->SetAlbedoTexture(enemyTexture);
+		enemyRenderer->SetNormalMap(enemyNormal);
+		enemyRenderer->SetEmissionMap(emissionMap);
+		m_sceneMeshRenderer.push_back(enemyRenderer);
 		m_enemiesLeft.push_back(new Enemy(enemy, detectedTexture));
 	}
 }
@@ -275,11 +287,12 @@ void LightVoxelMachinaApp::CreatePilars(graphics::MeshData* pilarData, graphics:
 
 		math::Vector3 distance;
 
-		auto pilar = new graphics::MeshRenderer(pilarData, material1, math::Vector3(0, 5, 0), math::Quaternion());
-		pilar->SetAlbedoTexture(pilarTexture);
-		pilar->SetNormalMap(pilarNormal);
-		pilar->SetTextureScale(3, 5);
-		pilar->SetEmissionMap(emissionMap);
+		auto pilar = new GameObject(math::Vector3(0, 5, 0), math::Quaternion());
+		auto pilarRenderer = pilar->AddMeshRenderer(pilarData, material1);
+		pilarRenderer->SetAlbedoTexture(pilarTexture);
+		pilarRenderer->SetNormalMap(pilarNormal);
+		pilarRenderer->SetTextureScale(3, 5);
+		pilarRenderer->SetEmissionMap(emissionMap);
 
 		bool overlapingEnemy = false;
 
@@ -291,9 +304,9 @@ void LightVoxelMachinaApp::CreatePilars(graphics::MeshData* pilarData, graphics:
 			pilarY = (random.NextFloat() * (WORLD_Y - 3.0f)) - ((WORLD_Y - 3.0f) / 2.0f);
 
 			pilar->SetPosition(math::Vector3(pilarX, 5, pilarY));
-			auto pilarBound = pilar->WBoudingBox();
+			auto pilarBound = pilarRenderer->WBoudingBox();
 
-			overlapingEnemy = pilarBound.IsOverlaping(m_player->WBoudingBox());
+			overlapingEnemy = pilarBound.IsOverlaping(m_player->GetMeshRenderer()->WBoudingBox());
 
 			for (auto enemy : m_enemiesLeft)
 				overlapingEnemy = overlapingEnemy || enemy->WBoudingBox().IsOverlaping(pilarBound);
@@ -302,8 +315,9 @@ void LightVoxelMachinaApp::CreatePilars(graphics::MeshData* pilarData, graphics:
 				overlapingEnemy = overlapingEnemy || otherPilar->WBoudingBox().IsOverlaping(pilarBound);
 		} while (math::Length(distance) <= 10.0f && overlapingEnemy);
 
-		m_sceneMeshRenderer.push_back(pilar);
-		m_pilars.push_back(pilar);
+		m_sceneMeshRenderer.push_back(pilarRenderer);
+		m_activeGameObjects.push_back(pilar);
+		m_pilars.push_back(pilarRenderer);
 	}
 }
 
@@ -348,7 +362,7 @@ void LightVoxelMachinaApp::CheckForEnemyCollision()
 	{
 		Enemy* enemy = *it;
 
-		if (enemy->WBoudingBox().IsOverlaping(m_player->WBoudingBox()))
+		if (enemy->WBoudingBox().IsOverlaping(m_player->GetMeshRenderer()->WBoudingBox()))
 		{
 			it = m_enemiesLeft.erase(it);
 			enemiesLeft--;
@@ -377,7 +391,7 @@ void LightVoxelMachinaApp::CheckForEnemyCollision()
 				congratulationsSprite->SetLocalPosition(0, imageYPosition / 2.0f);
 
 				m_sceneGuiElements.push_back(congratulationsSprite);
-				m_sceneMeshRenderer.push_back(m_trophy);
+				m_sceneMeshRenderer.push_back(m_trophy->GetMeshRenderer());
 
 				auto pressEnterText = new graphics::UI::GuiText(nullptr, 0.0f, 0.0f, static_cast<float>(graphics::g_windowWidth), -200.0f, 40.0f);
 				pressEnterText->SetColor(Color::White);
@@ -398,7 +412,7 @@ bool LightVoxelMachinaApp::CheckPillarCollision()
 {
 	for (auto pilar : m_pilars)
 	{
-		if (pilar->WBoudingBox().IsOverlaping(m_player->WBoudingBox()))
+		if (pilar->WBoudingBox().IsOverlaping(m_player->GetMeshRenderer()->WBoudingBox()))
 			return true;
 	}
 	return false;
@@ -406,7 +420,7 @@ bool LightVoxelMachinaApp::CheckPillarCollision()
 
 bool LightVoxelMachinaApp::CheckIfInsideScene()
 {
-	return m_floor->WBoudingBox().IsPointInside(m_player->GetPosition());
+	return m_floor->GetMeshRenderer()->WBoudingBox().IsPointInside(m_player->GetPosition());
 }
 
 void LightVoxelMachinaApp::Cleanup(void)

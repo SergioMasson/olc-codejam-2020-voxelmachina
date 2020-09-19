@@ -37,7 +37,7 @@ namespace graphics
 		Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_skyboxRasterizerState = nullptr;
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_skyboxDepthStencilState = nullptr;
 
-		MeshRenderer m_skyboxMeshRenerer;
+		GameObject* m_skyboxMeshRenerer;
 		Texture2D* m_skyboxTexture;
 
 		Camera* m_camera;

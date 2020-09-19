@@ -4,6 +4,7 @@
 #include "graphicsUtils.h"
 #include "SkyboxVS.h"
 #include "SkyboxPS.h"
+#include "../gameObject.h"
 
 #define MAX_LIGHTS 10
 
@@ -209,7 +210,8 @@ void graphics::RenderPipeline::CreateSkybox()
 	MeshData::CreateBox(10000, 10000, 10000, *skyboxMeshFull);
 
 	Material material;
-	m_skyboxMeshRenerer = MeshRenderer(skyboxMeshFull, material, math::Vector3(), math::Quaternion());
+	m_skyboxMeshRenerer = new GameObject();
+	m_skyboxMeshRenerer->AddMeshRenderer(skyboxMeshFull, material);
 
 	D3D11_RASTERIZER_DESC rasterizerStateDesc;
 	ZeroMemory(&rasterizerStateDesc, sizeof(D3D11_RASTERIZER_DESC));
@@ -282,8 +284,12 @@ void graphics::RenderPipeline::RenderSkybox(Camera* camera)
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
 
+	auto vertexBuffer = m_skyboxMeshRenerer->GetMeshRenderer()->m_vertexBuffer.GetAddressOf();
+	auto indexBuffer = m_skyboxMeshRenerer->GetMeshRenderer()->m_indexBuffer.Get();
+	auto indexSize = m_skyboxMeshRenerer->GetMeshRenderer()->m_meshData->Indices.size();
+
 	//Binds vertex buffer and index buffer.
-	graphics::g_d3dImmediateContext->IASetVertexBuffers(0, 1, m_skyboxMeshRenerer.m_vertexBuffer.GetAddressOf(), &stride, &offset);
-	graphics::g_d3dImmediateContext->IASetIndexBuffer(m_skyboxMeshRenerer.m_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-	graphics::g_d3dImmediateContext->DrawIndexed(static_cast<UINT>(m_skyboxMeshRenerer.m_meshData->Indices.size()), 0, 0);
+	graphics::g_d3dImmediateContext->IASetVertexBuffers(0, 1, vertexBuffer, &stride, &offset);
+	graphics::g_d3dImmediateContext->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	graphics::g_d3dImmediateContext->DrawIndexed(static_cast<UINT>(indexSize), 0, 0);
 }

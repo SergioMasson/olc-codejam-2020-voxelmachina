@@ -2,11 +2,12 @@
 
 #include "graphics/meshRenderer.h"
 #include "camera.h"
+#include "gameObject.h"
 
 class PlayerController
 {
 public:
-	PlayerController(math::Vector3 worldUp, graphics::MeshRenderer* playerMesh, Camera* sceneCamera, bool lockCamera = false);
+	PlayerController(math::Vector3 worldUp, GameObject* player, Camera* sceneCamera, bool lockCamera = false);
 	void Update(float deltaT);
 
 private:
@@ -17,7 +18,7 @@ private:
 
 	math::Vector3 m_cameraOffset;
 
-	graphics::MeshRenderer* m_playerMeshRenderer;
+	GameObject* m_player;
 	Camera* m_sceneCamera;
 
 	float m_MoveSpeed;

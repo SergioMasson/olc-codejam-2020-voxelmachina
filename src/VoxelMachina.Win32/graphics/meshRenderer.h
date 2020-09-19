@@ -4,7 +4,8 @@
 #include "../mathHelpers.h"
 #include "../math/boundingSphere.h"
 #include "../math/boudingBox.h"
-#include "../gameObject.h"
+
+class GameObject;
 
 namespace graphics
 {
@@ -64,33 +65,17 @@ namespace graphics
 	class MeshRenderer
 	{
 	public:
-		MeshRenderer(MeshData* data, Material material, math::Vector3 position = math::Vector3(0, 0, 0), math::Quaternion rotation = math::Quaternion(0, 0, 0), math::Vector3 scale = { 1, 1, 1 });
+		MeshRenderer(GameObject* gameObject, MeshData* data, Material material);
 		MeshRenderer() = default;
 		~MeshRenderer() = default;
 
 		void SetMaterial(Material material) { m_material = material; }
 		void SetMesh(MeshData* data) { m_meshData = data; };
 
-		void SetRotation(math::Quaternion basisRotation)
-		{
-			m_transform.SetRotation(math::Quaternion(DirectX::XMQuaternionNormalize(basisRotation)));
-			m_worldMatrix = m_transform;
-		}
-
-		const math::Quaternion GetRotation() const { return m_transform.GetRotation(); }
-
-		void SetPosition(math::Vector3 worldPos)
-		{
-			m_transform.SetTranslation(worldPos);
-			m_worldMatrix = m_transform;
-		}
-
 		inline math::BoudingBox WBoudingBox() const
 		{
 			return GetWorldMatrix() * m_meshData->BoudingBox;
 		}
-
-		const math::Vector3 GetPosition() const { return m_transform.GetTranslation(); }
 
 		void SetAlbedoTexture(Texture2D* texture)
 		{
@@ -122,29 +107,16 @@ namespace graphics
 			m_material.Emission = emission;
 		}
 
-		void SetParent(MeshRenderer* parent)
-		{
-			m_parent = parent;
-		}
-
-		math::Matrix4 GetWorldMatrix() const
-		{
-			if (m_parent != nullptr)
-				return  m_parent->GetWorldMatrix() * m_worldMatrix;
-
-			return m_worldMatrix;
-		}
+		math::Matrix4 GetWorldMatrix() const;
 
 		const math::Vector3 GetRightVec() const
 		{
 			return math::Matrix3{ GetWorldMatrix() }.GetX();
 		}
-
 		const math::Vector3 GetUpVec() const
 		{
 			return math::Matrix3{ GetWorldMatrix() }.GetY();
 		}
-
 		const math::Vector3 GetForwardVec() const
 		{
 			return -math::Matrix3{ GetWorldMatrix() }.GetZ();
@@ -157,9 +129,6 @@ namespace graphics
 		Material m_material;
 		MeshData* m_meshData;
 
-		math::Transform m_transform;
-		math::Matrix4 m_worldMatrix;
-
 		Texture2D* m_albedoTexture;
 		Texture2D* m_normalMap;
 		Texture2D* m_emissionTexture;
@@ -167,7 +136,7 @@ namespace graphics
 		DirectX::XMFLOAT2 m_textureScale{ 1, 1 };
 		DirectX::XMFLOAT2 m_textureDisplacement{ 0, 0 };
 
-		MeshRenderer* m_parent{ nullptr };
+		GameObject* m_gameObject;
 
 		friend RenderPipeline;
 	};

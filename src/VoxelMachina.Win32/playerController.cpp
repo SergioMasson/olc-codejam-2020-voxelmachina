@@ -3,10 +3,10 @@
 #include "input.h"
 
 PlayerController::PlayerController(math::Vector3 worldUp,
-	graphics::MeshRenderer* meshRenderer,
+	GameObject* player,
 	Camera* sceneCamera,
 	bool lockCamera) :
-	m_playerMeshRenderer{ meshRenderer },
+	m_player{ player },
 	m_sceneCamera{ sceneCamera },
 	m_lockCamera{ lockCamera }
 {
@@ -28,7 +28,7 @@ PlayerController::PlayerController(math::Vector3 worldUp,
 	math::Vector3 forward = Normalize(Cross(m_WorldUp, foward));
 	m_CurrentHeading = ATan2(-Dot(forward, m_WorldEast), Dot(forward, m_WorldNorth));
 
-	m_cameraOffset = m_sceneCamera->GetPosition() - m_playerMeshRenderer->GetPosition();
+	m_cameraOffset = m_sceneCamera->GetPosition() - player->GetPosition();
 
 	m_lastCameraRotationX = 0.0f;
 	m_lastCameraRotationY = 0.0f;
@@ -73,16 +73,16 @@ void PlayerController::Update(float deltaT)
 	if (hasBoost)
 		motionVector = motionVector * 1.5f;
 
-	math::Vector3 position = m_playerMeshRenderer->GetPosition() + motionVector;
-	m_playerMeshRenderer->SetPosition(position);
+	math::Vector3 position = m_player->GetPosition() + motionVector;
+	m_player->SetPosition(position);
 
 	//Update player orientation
 	if (math::Length(motionVector) > 0.000001f)
 	{
 		float size = math::Length(motionVector);
 		math::Quaternion snewRotation{ math::Matrix3{DirectX::XMMatrixLookToLH(math::Vector3{0, 0, 0}, math::Normalize(motionVector), m_WorldUp)} };
-		snewRotation = math::Lerp(m_playerMeshRenderer->GetRotation(), ~snewRotation, size);
-		m_playerMeshRenderer->SetRotation(snewRotation);
+		snewRotation = math::Lerp(m_player->GetRotation(), ~snewRotation, size);
+		m_player->SetRotation(snewRotation);
 	}
 
 	//Update camera rotation
@@ -104,7 +104,7 @@ void PlayerController::Update(float deltaT)
 	ApplyMomentum(m_lastCameraRotationX, cameraRotationX, deltaT);
 	ApplyMomentum(m_lastCameraRotationY, cameraRotationY, deltaT);
 
-	auto YcameraRotation = math::Quaternion(m_playerMeshRenderer->GetRotation() * math::Vector3(0, 1, 0), cameraRotationX);
+	auto YcameraRotation = math::Quaternion(m_player->GetRotation() * math::Vector3(0, 1, 0), cameraRotationX);
 	auto ZcameraRotation = math::Quaternion(m_sceneCamera->GetRotation() * math::Vector3(1, 0, 0), cameraRotationY);
 
 	auto totalRotation = YcameraRotation * ZcameraRotation;
@@ -113,7 +113,7 @@ void PlayerController::Update(float deltaT)
 
 	m_cameraOffset = (totalRotation * m_cameraOffset);
 
-	math::Vector3 cameraPosition = m_playerMeshRenderer->GetPosition() + m_cameraOffset;
+	math::Vector3 cameraPosition = m_player->GetPosition() + m_cameraOffset;
 
 	m_sceneCamera->SetEyeAtUp(cameraPosition, position, math::Vector3(0, 1, 0));
 	m_sceneCamera->Update();
@@ -134,7 +134,7 @@ void PlayerController::Update(float deltaT)
 	ApplyMomentum(m_lastCameraDelta, zoomDelta, deltaT);
 
 	m_cameraOffset = m_cameraOffset * (1 + zoomDelta);
-	cameraPosition = m_playerMeshRenderer->GetPosition() + m_cameraOffset;
+	cameraPosition = m_player->GetPosition() + m_cameraOffset;
 	m_sceneCamera->SetEyeAtUp(cameraPosition, position, math::Vector3(0, 1, 0));
 	m_sceneCamera->Update();
 

@@ -50,6 +50,8 @@ private:
 	std::vector<Enemy*> m_enemiesLeft;
 	std::vector<graphics::MeshRenderer*> m_pilars;
 
+	std::vector<GameObject*> m_activeGameObjects;
+
 	graphics::UI::GuiText* m_informationText;
 	graphics::UI::GuiText* m_counterText;
 	graphics::UI::GuiText* m_enemiesLeftText;
@@ -57,9 +59,9 @@ private:
 	float m_time{ 0 };
 	uint32_t enemiesLeft;
 
-	graphics::MeshRenderer* m_player;
-	graphics::MeshRenderer* m_floor;
-	graphics::MeshRenderer* m_trophy;
+	GameObject* m_player;
+	GameObject* m_floor;
+	GameObject* m_trophy;
 
 	PlayerController* m_playerController;
 	CameraController* m_cameraController;

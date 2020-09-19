@@ -8,6 +8,7 @@
 #include <vector>
 #include <map>
 #include "../hash.h"
+#include "../gameObject.h"
 
 using namespace std;
 using namespace DirectX;
@@ -735,13 +736,11 @@ void graphics::MeshData::LoadFromOBJFile(const wchar_t* filename, MeshData& mesh
 	in.close();
 }
 
-graphics::MeshRenderer::MeshRenderer(MeshData* data, Material material, math::Vector3 position, math::Quaternion rotation, math::Vector3 scale) : m_meshData{ data }, m_material{ material }
+graphics::MeshRenderer::MeshRenderer(GameObject* gameObject, MeshData* data, Material material) :
+	m_gameObject{ gameObject },
+	m_meshData{ data },
+	m_material{ material }
 {
-	m_transform.SetTranslation(position);
-	m_transform.SetRotation(rotation);
-	m_transform.SetScale(scale);
-	m_worldMatrix = m_transform;
-
 	D3D11_BUFFER_DESC vbd;
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;
 	vbd.ByteWidth = sizeof(Vertex) * static_cast<UINT>(m_meshData->Vertices.size());
@@ -792,4 +791,9 @@ graphics::MeshRenderer::MeshRenderer(MeshData* data, Material material, math::Ve
 		ASSERT_SUCCEEDED(hr, "Fail to create index buffer.");
 		g_indexBufferTable.insert({ resourceHash,  m_indexBuffer });
 	}
+}
+
+math::Matrix4 graphics::MeshRenderer::GetWorldMatrix() const
+{
+	return m_gameObject->GetTransform();
 }
