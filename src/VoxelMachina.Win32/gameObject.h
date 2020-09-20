@@ -5,6 +5,9 @@
 typedef uint32_t ComponentType;
 
 class Component;
+class BehaviourComponent;
+
+extern std::vector<BehaviourComponent*> g_activeBehaviours;
 
 namespace graphics
 {
@@ -20,8 +23,7 @@ public:
 
 	template<typename T, typename ...Param> T* AddComponent(Param... params)
 	{
-		T* component = new T(std::forward<Param>(params)...);
-		component->m_gameObject = this;
+		T* component = new T(this, std::forward<Param>(params)...);
 		m_components.push_back(component);
 		return component;
 	}
@@ -78,10 +80,9 @@ private:
 class Component
 {
 protected:
-	Component()
+	Component(GameObject* gameObject) : m_gameObject{ gameObject }
 	{
 		m_active = true;
-		m_gameObject = nullptr;
 	}
 
 protected:
@@ -90,9 +91,13 @@ protected:
 	friend GameObject;
 };
 
-class BehaviurComponent : public Component
+class BehaviourComponent : public Component
 {
 public:
-	virtual void Start(void) = 0;
-	virtual void Update(void) = 0;
+	BehaviourComponent(GameObject* gameObject) : Component(gameObject)
+	{
+		g_activeBehaviours.push_back(this);
+	};
+
+	virtual void Update(float daltaT) = 0;
 };

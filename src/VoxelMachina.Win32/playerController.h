@@ -4,22 +4,18 @@
 #include "camera.h"
 #include "gameObject.h"
 
-class PlayerController
+class PlayerController : public BehaviourComponent
 {
 public:
-	PlayerController(math::Vector3 worldUp, GameObject* player, Camera* sceneCamera, bool lockCamera = false);
-	void Update(float deltaT);
+	PlayerController(GameObject* gameObject, math::Vector3 worldUp);
+	void Update(float deltaT) override;
 
 private:
 
 	math::Vector3 m_WorldUp;
 	math::Vector3 m_WorldNorth;
 	math::Vector3 m_WorldEast;
-
 	math::Vector3 m_cameraOffset;
-
-	GameObject* m_player;
-	Camera* m_sceneCamera;
 
 	float m_MoveSpeed;
 	float m_RotationSpeed;
@@ -39,8 +35,6 @@ private:
 	float m_lastPlayerFowardX;
 
 	float m_lastCameraDelta;
-
-	bool m_lockCamera;
 
 private:
 	void ApplyMomentum(float& oldValue, float& newValue, float deltaTime);

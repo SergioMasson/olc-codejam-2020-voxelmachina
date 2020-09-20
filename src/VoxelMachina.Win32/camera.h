@@ -6,7 +6,18 @@
 class Camera
 {
 public:
-	Camera() : m_viewMatrix{}, m_projectionMatrix{}, m_viewProjectionMatrix{}, m_Basis{ }{}
+	Camera() :
+		m_viewMatrix{},
+		m_projectionMatrix{},
+		m_viewProjectionMatrix{}, m_Basis{}
+	{
+		if (MainCamera() == nullptr)
+			this->SetAsMainCamera();
+	}
+
+	static Camera* MainCamera();
+
+	void SetAsMainCamera();
 
 	// Public functions for controlling where the camera is and its orientation
 	void SetEyeAtUp(math::Vector3 eye, math::Vector3 at, math::Vector3 up)

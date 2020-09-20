@@ -2,6 +2,8 @@
 #include "gameObject.h"
 #include "graphics/meshRenderer.h"
 
+std::vector<BehaviourComponent*> g_activeBehaviours;
+
 GameObject::GameObject(math::Vector3 position, math::Quaternion rotation, GameObject* parent) :
 	m_transform{ rotation, position },
 	m_meshRenderer{ nullptr },

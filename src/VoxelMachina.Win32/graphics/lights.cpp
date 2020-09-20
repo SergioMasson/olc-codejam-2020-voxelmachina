@@ -1,9 +1,12 @@
 #include "pch.h"
 #include "lights.h"
 
-LightComponent::LightComponent(Color color,
+LightComponent::LightComponent(GameObject* gameObject, Color color,
 	LightType type,
-	float intensity, float range, float spot) :
+	float intensity,
+	float range,
+	float spot) :
+	Component(gameObject),
 	m_color{ color },
 	m_type{ type },
 	m_intensity{ intensity },

@@ -87,7 +87,7 @@ inline bool IsLightInFrustrum(LightData light, math::Frustum frustrum)
 class LightComponent : public Component
 {
 public:
-	LightComponent(Color Color, LightType type, float intensity, float range = 1.0, float spot = 1.0);
+	LightComponent(GameObject* gameObject, Color Color, LightType type, float intensity, float range = 1.0, float spot = 1.0);
 	LightData GetData();
 
 	void SetIntensity(float intensity) {

@@ -4,6 +4,18 @@
 using namespace DirectX;
 using namespace math;
 
+static Camera* g_mainCamera;
+
+Camera* Camera::MainCamera()
+{
+	return g_mainCamera;
+}
+
+void Camera::SetAsMainCamera()
+{
+	g_mainCamera = this;
+}
+
 void Camera::SetLookDirection(math::Vector3 forward, math::Vector3 up)
 {
 	// Given, but ensure normalization
@@ -33,9 +45,6 @@ void Camera::UpdateProjectionMatrix()
 
 void Camera::UpdateViewMatrix()
 {
-	//This works
-	//m_viewMatrix = math::Matrix4{ V };
-
 	m_viewMatrix = Matrix4(~m_CameraToWorld);
 }
 

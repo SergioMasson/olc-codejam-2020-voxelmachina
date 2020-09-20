@@ -39,7 +39,6 @@ public:
 	virtual void Resize(uint32_t width, uint32_t height) override;
 
 private:
-	Camera m_sceneCamera{};
 
 	std::unique_ptr<graphics::RenderPipeline> m_renderPipeline;
 	std::vector<graphics::MeshRenderer*> m_sceneMeshRenderer;
@@ -62,8 +61,6 @@ private:
 
 	GameObject* m_scenePointLight;
 	GameObject* m_sceneSpotLight;
-
-	PlayerController* m_playerController;
 
 	graphics::Texture2D* m_skybox;
 	math::Vector3 mouse_position;

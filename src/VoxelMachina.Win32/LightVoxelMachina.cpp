@@ -14,10 +14,10 @@
 #include "pbrVS.h"
 #include <string>
 
-#define ENEMY_COUNT 1
-#define PILAR_COUNT 1
-#define WORLD_X  10.0f
-#define WORLD_Y  10.0f
+#define ENEMY_COUNT 10
+#define PILAR_COUNT 100
+#define WORLD_X  100.0f
+#define WORLD_Y  100.0f
 
 graphics::MeshData quad;
 graphics::MeshData playerCharacter;
@@ -43,7 +43,7 @@ void LightVoxelMachinaApp::Startup(void)
 	CreateGUI();
 	CreateCamera();
 
-	m_playerController = new PlayerController(math::Vector3(0, 1, 0), m_player, &m_sceneCamera);
+	m_player->AddComponent<PlayerController>(math::Vector3(0, 1, 0));
 	audio::PlayAudioFile(L"audioFiles/test.wav", true);
 }
 
@@ -66,7 +66,8 @@ void LightVoxelMachinaApp::Update(float deltaT, float totalTime)
 
 	auto oldPlayerPosition = m_player->GetPosition();
 
-	m_playerController->Update(deltaT);
+	for (auto behaviours : g_activeBehaviours)
+		behaviours->Update(deltaT);
 
 	if (CheckPillarCollision() || !CheckIfInsideScene())
 		m_player->SetPosition(oldPlayerPosition);
@@ -87,7 +88,7 @@ void LightVoxelMachinaApp::Update(float deltaT, float totalTime)
 
 void LightVoxelMachinaApp::RenderScene(void)
 {
-	m_renderPipeline->StartRender(&m_sceneCamera);
+	m_renderPipeline->StartRender(Camera::MainCamera());
 
 	for (auto renderer : m_sceneMeshRenderer)
 		m_renderPipeline->RenderMesh(*renderer);
@@ -115,21 +116,21 @@ void LightVoxelMachinaApp::RenderUI(void)
 void LightVoxelMachinaApp::Resize(uint32_t width, uint32_t height)
 {
 	auto aspectRation = static_cast<float>(width) / static_cast<float>(height);
-	m_sceneCamera.SetPerspectiveMatrix(0.25f * math::Pi, aspectRation, 1.0f, 1000.0f);
-	m_sceneCamera.Update();
+	Camera::MainCamera()->SetPerspectiveMatrix(0.25f * math::Pi, aspectRation, 1.0f, 1000.0f);
+	Camera::MainCamera()->Update();
 }
 
 void LightVoxelMachinaApp::CreateCamera()
 {
-	m_sceneCamera = Camera();
+	auto mainCamera = new Camera();
 	math::Vector3 cameraPosition{ 0.0f, 2.0f, 10.0f };
 	math::Vector3 target{ 0, 0, 0 };
 	math::Vector3 up{ 0.0f, 1.0f, 0.0f };
-	m_sceneCamera.SetEyeAtUp(cameraPosition, target, up);
+	mainCamera->SetEyeAtUp(cameraPosition, target, up);
 
 	auto aspectRation = static_cast<float>(graphics::g_windowWidth) / static_cast<float>(graphics::g_windowHeight);
-	m_sceneCamera.SetPerspectiveMatrix(0.25f * math::Pi, aspectRation, 1.0f, 30.0f);
-	m_sceneCamera.Update();
+	mainCamera->SetPerspectiveMatrix(0.25f * math::Pi, aspectRation, 1.0f, 30.0f);
+	mainCamera->Update();
 }
 
 void LightVoxelMachinaApp::CreateLights()
