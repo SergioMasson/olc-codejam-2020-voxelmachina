@@ -105,6 +105,19 @@ public:
 	math::Frustum GetViewFrustum() const { return m_viewFrustum; };
 	inline math::Frustum GetWorldFrustum() const { return m_worldFrustum; };
 
+	void SetRenderTarget(Microsoft::WRL::ComPtr<ID3D11RenderTargetView> renderTarget)
+	{
+		m_renderTarget = renderTarget;
+	}
+
+	void SetDepthStencil(Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthStencilView)
+	{
+		m_depthStencilView = depthStencilView;
+	}
+
+	ID3D11RenderTargetView* GetRenderTarget() const { return m_renderTarget.Get(); }
+	ID3D11DepthStencilView* GetDepthStencil() const { return m_depthStencilView.Get(); }
+
 private:
 	void SetLookDirection(math::Vector3 forward, math::Vector3 up);
 	void UpdateProjectionMatrix();
@@ -127,6 +140,9 @@ private:
 	float m_AspectRatio = 0;
 	float m_NearClip = 0;
 	float m_FarClip = 0;
+
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_renderTarget;
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_depthStencilView;
 
 public:
 };

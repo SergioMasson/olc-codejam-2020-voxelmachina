@@ -2,14 +2,14 @@
 
 namespace graphics
 {
-	namespace FXAA
+	namespace bloom
 	{
 		void Initialize();
 		void Resize(UINT width, UINT height);
 		void Shutdown();
 		void Render(ID3D11RenderTargetView* const* target);
 
-		extern bool FXAAEnable;
-		extern Microsoft::WRL::ComPtr<ID3D11RenderTargetView> g_pProxyTextureRTV;
+		extern bool Enable;
+		extern Microsoft::WRL::ComPtr<ID3D11RenderTargetView> g_inputRenderTarget;
 	}
 }

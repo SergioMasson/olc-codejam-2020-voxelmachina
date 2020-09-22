@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "camera.h"
+#include "graphics/coreGraphics.h"
 
 using namespace DirectX;
 using namespace math;
@@ -14,6 +15,8 @@ Camera* Camera::MainCamera()
 void Camera::SetAsMainCamera()
 {
 	g_mainCamera = this;
+	this->SetRenderTarget(graphics::g_ScreenRenderTargetView);
+	this->SetDepthStencil(graphics::g_ScreenDepthStencilView);
 }
 
 void Camera::SetLookDirection(math::Vector3 forward, math::Vector3 up)

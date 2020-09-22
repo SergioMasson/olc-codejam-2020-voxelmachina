@@ -5,6 +5,8 @@
 #include "graphics/renderPipeline.h"
 #include "graphics/coreGraphics.h"
 #include "graphics/texture2D.h"
+#include "graphics/PostProcessing/Bloom.h"
+#include "graphics/PostProcessing/FXAA.h"
 #include "audio/audioCore.h"
 #include "math/random.h"
 #include "input.h"
@@ -55,6 +57,16 @@ bool LightVoxelMachinaApp::IsDone()
 void LightVoxelMachinaApp::Update(float deltaT, float totalTime)
 {
 	currentTime = totalTime;
+
+	if (Input::IsPressed(KeyCode::Key_p))
+		graphics::bloom::Enable = true;
+	else if (Input::IsPressed(KeyCode::Key_c))
+		graphics::bloom::Enable = false;
+
+	if (Input::IsPressed(KeyCode::Key_f))
+		graphics::FXAA::FXAAEnable = true;
+	else if (Input::IsPressed(KeyCode::Key_g))
+		graphics::FXAA::FXAAEnable = false;
 
 	if (m_firstFrame)
 	{
@@ -183,7 +195,6 @@ void LightVoxelMachinaApp::CreateObjects()
 	playerRenderer->SetNormalMap(normalMap);
 	playerRenderer->SetEmissionMap(playerEmissionMap);
 	m_sceneMeshRenderer.push_back(playerRenderer);
-	m_activeGameObjects.push_back(m_player);
 
 	graphics::Material trophyMaterial{};
 	trophyMaterial.Metalness = 0.9f;
@@ -199,8 +210,6 @@ void LightVoxelMachinaApp::CreateObjects()
 	m_trophy->SetParent(m_player);
 	m_trophy->SetPosition(math::Vector3(0, 1.2f, 0));
 	m_trophy->SetScale(math::Vector3(0.5f, 0.5f, 0.5f));
-
-	m_activeGameObjects.push_back(m_trophy);
 
 	CreateEnemy(&enemyMesh, enemyTexture, normalMap, enemyDetectedTexture, defaultEmissionMap);
 	CreatePilars(&pilarMesh, pilarTexture, pilarNormal, defaultEmissionMap);
@@ -218,7 +227,6 @@ void LightVoxelMachinaApp::CreateObjects()
 	floorRenderer->SetTextureScale(20, 20);
 
 	m_sceneMeshRenderer.push_back(floorRenderer);
-	m_activeGameObjects.push_back(m_floor);
 }
 
 void LightVoxelMachinaApp::CreateEnemy(graphics::MeshData* enemyData, graphics::Texture2D* enemyTexture, graphics::Texture2D* enemyNormal, graphics::Texture2D* detectedTexture, graphics::Texture2D* emissionMap)
@@ -239,14 +247,15 @@ void LightVoxelMachinaApp::CreateEnemy(graphics::MeshData* enemyData, graphics::
 		float enemyY = (randomY * WORLD_Y) - ((WORLD_Y) / 2.0f);
 		auto enemyPosition = math::Vector3(enemyX, 0, enemyY);
 
-		auto enemy = new GameObject(enemyPosition, math::Quaternion());
+		auto enemyGO = new GameObject(enemyPosition, math::Quaternion());
 
-		auto enemyRenderer = enemy->AddMeshRenderer(enemyData, material1);
+		auto enemyRenderer = enemyGO->AddMeshRenderer(enemyData, material1);
 		enemyRenderer->SetAlbedoTexture(enemyTexture);
 		enemyRenderer->SetNormalMap(enemyNormal);
 		enemyRenderer->SetEmissionMap(emissionMap);
 		m_sceneMeshRenderer.push_back(enemyRenderer);
-		m_enemiesLeft.push_back(new Enemy(enemy, detectedTexture));
+		enemyGO->AddComponent<Enemy>(detectedTexture);
+		m_enemiesLeft.push_back(enemyGO);
 	}
 }
 
@@ -288,14 +297,13 @@ void LightVoxelMachinaApp::CreatePilars(graphics::MeshData* pilarData, graphics:
 			overlapingEnemy = pilarBound.IsOverlaping(m_player->GetMeshRenderer()->WBoudingBox());
 
 			for (auto enemy : m_enemiesLeft)
-				overlapingEnemy = overlapingEnemy || enemy->WBoudingBox().IsOverlaping(pilarBound);
+				overlapingEnemy = overlapingEnemy || enemy->GetMeshRenderer()->WBoudingBox().IsOverlaping(pilarBound);
 
 			for (auto otherPilar : m_pilars)
 				overlapingEnemy = overlapingEnemy || otherPilar->WBoudingBox().IsOverlaping(pilarBound);
 		} while (math::Length(distance) <= 10.0f && overlapingEnemy);
 
 		m_sceneMeshRenderer.push_back(pilarRenderer);
-		m_activeGameObjects.push_back(pilar);
 		m_pilars.push_back(pilarRenderer);
 	}
 }
@@ -339,7 +347,8 @@ void LightVoxelMachinaApp::CheckForEnemyCollision()
 
 	while (it != m_enemiesLeft.end())
 	{
-		Enemy* enemy = *it;
+		GameObject* gameObject = *it;
+		Enemy* enemy = gameObject->GetComponent<Enemy>();
 
 		if (enemy->WBoudingBox().IsOverlaping(m_player->GetMeshRenderer()->WBoudingBox()))
 		{
@@ -352,7 +361,7 @@ void LightVoxelMachinaApp::CheckForEnemyCollision()
 			auto lightComponent = enemyLight->AddComponent<LightComponent>(Color::MediumVioletRed, LightType::Point, 7.0f, 10.0f);
 			enemyLight->SetPosition(enemy->GetPosition() + math::Vector3(0, 0.5f, 0));
 			m_renderPipeline->AddLight(lightComponent);
-			m_activeGameObjects.push_back(enemyLight);
+			gameObject->RemoveComponent<Enemy>();
 
 			//Play audio
 			audio::PlayAudioFile(L"audioFiles/enemy.wav");

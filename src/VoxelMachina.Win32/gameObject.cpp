@@ -2,7 +2,8 @@
 #include "gameObject.h"
 #include "graphics/meshRenderer.h"
 
-std::vector<BehaviourComponent*> g_activeBehaviours;
+std::set<BehaviourComponent*> g_activeBehaviours;
+std::set<GameObject*> g_activeGameObjects;
 
 GameObject::GameObject(math::Vector3 position, math::Quaternion rotation, GameObject* parent) :
 	m_transform{ rotation, position },
@@ -10,6 +11,18 @@ GameObject::GameObject(math::Vector3 position, math::Quaternion rotation, GameOb
 	m_parent{ parent },
 	m_isActive{ true }
 {
+	g_activeGameObjects.insert(this);
+}
+
+GameObject::~GameObject()
+{
+	for (Component* component : m_components)
+		delete component;
+
+	if (m_meshRenderer != nullptr)
+		delete m_meshRenderer;
+
+	g_activeGameObjects.erase(this);
 }
 
 math::Vector3 GameObject::GetLocalPosition() const

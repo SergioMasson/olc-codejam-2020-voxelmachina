@@ -95,6 +95,12 @@
     <ClCompile Include="gameObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="graphics\PostProcessing\postProcessingEffects.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\PostProcessing\Bloom.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
@@ -139,6 +145,8 @@
     <ClInclude Include="graphics\graphicsContext.h" />
     <ClInclude Include="graphics\PostProcessing\FXAA.h" />
     <ClInclude Include="gameObject.h" />
+    <ClInclude Include="graphics\PostProcessing\postProcessingEffects.h" />
+    <ClInclude Include="graphics\PostProcessing\Bloom.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\BoxVS.hlsl" />
@@ -151,6 +159,11 @@
     <FxCompile Include="shaders\pbrPS.hlsl" />
     <FxCompile Include="shaders\PostProcessing\FXAA_VS.hlsl" />
     <FxCompile Include="shaders\PostProcessing\FXAA_PS.hlsl" />
+    <FxCompile Include="shaders\PostProcessing\Bloom_VS.hlsl" />
+    <FxCompile Include="shaders\PostProcessing\Bloom_PS.hlsl" />
+    <FxCompile Include="shaders\PostProcessing\BloomCutOff_PS.hlsl" />
+    <FxCompile Include="shaders\PostProcessing\BloomBlur_PS.hlsl" />
+    <FxCompile Include="shaders\PostProcessing\BloomMerge_PS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\Lights.hlsli" />

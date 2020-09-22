@@ -132,7 +132,7 @@ void FxaaIntegrateResource(UINT width, UINT height)
 	D3D11_TEXTURE2D_DESC desc;
 	ZeroMemory(&desc, sizeof(desc));
 	desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	desc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
 	desc.Height = height;
 	desc.Width = width;
 	desc.ArraySize = 1;
@@ -196,7 +196,7 @@ void graphics::FXAA::Shutdown()
 	g_pPixelShaderFXAA.Reset();
 }
 
-void graphics::FXAA::Render()
+void graphics::FXAA::Render(ID3D11RenderTargetView* const* target)
 {
 	ID3D11SamplerState* ppSamplerStates[4] = { g_pSamPointMirror.Get(), g_pSamLinearWrap.Get(), g_pSamPointCmpClamp.Get(), g_pSamAni.Get() };
 	graphics::g_d3dImmediateContext->PSSetSamplers(0, 4, ppSamplerStates);
@@ -204,9 +204,7 @@ void graphics::FXAA::Render()
 	graphics::g_d3dImmediateContext->RSSetState(g_pCullBack.Get());
 	graphics::g_d3dImmediateContext->PSSetConstantBuffers(1, 1, g_pcbFXAA.GetAddressOf());
 
-	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pRTV = graphics::g_RenderTargetView;
-
-	graphics::g_d3dImmediateContext->OMSetRenderTargets(1, pRTV.GetAddressOf(), nullptr);
+	graphics::g_d3dImmediateContext->OMSetRenderTargets(1, target, nullptr);
 	graphics::g_d3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	graphics::g_d3dImmediateContext->VSSetShader(g_pVertexShaderFXAA.Get(), NULL, 0);
 	graphics::g_d3dImmediateContext->PSSetShader(g_pPixelShaderFXAA.Get(), NULL, 0);

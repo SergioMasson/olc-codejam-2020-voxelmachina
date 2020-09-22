@@ -9,6 +9,10 @@ class GameObject;
 
 namespace graphics
 {
+	class MeshRenderer;
+
+	extern std::set<MeshRenderer*> g_activeMeshRenderers;
+
 	struct Vertex
 	{
 		Vertex() { ZeroMemory(this, sizeof(this)); }
@@ -66,8 +70,7 @@ namespace graphics
 	{
 	public:
 		MeshRenderer(GameObject* gameObject, MeshData* data, Material material);
-		MeshRenderer() = default;
-		~MeshRenderer() = default;
+		~MeshRenderer();
 
 		void SetMaterial(Material material) { m_material = material; }
 		void SetMesh(MeshData* data) { m_meshData = data; };

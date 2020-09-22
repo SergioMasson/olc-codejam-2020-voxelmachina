@@ -227,9 +227,12 @@ float4 main(PixelShaderInput pin) : SV_Target
  //       ambientLighting = diffuseIBL + specularIBL;
  //   }
 
-    directLighting += pow(gEmissionMap.Sample(gsamLinear, pin.texcoord).rgb, 2.2f);
-    directLighting += pow(gMaterial.Emission.rgb ,2.2f);
+    //directLighting += pow(gEmissionMap.Sample(gsamLinear, pin.texcoord).rgb, 2.2f);
+    //directLighting += pow(gMaterial.Emission.rgb ,2.2f);
    
+    directLighting += gEmissionMap.Sample(gsamLinear, pin.texcoord).rgb;
+    directLighting += gMaterial.Emission.rgb;
+    
     directLighting = pow(directLighting, 1 / 2.2f);
     float luma = (0.2126 * directLighting.r + 0.7152 * directLighting.g + 0.0722 * directLighting.b);
     

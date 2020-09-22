@@ -43,10 +43,8 @@ private:
 	std::unique_ptr<graphics::RenderPipeline> m_renderPipeline;
 	std::vector<graphics::MeshRenderer*> m_sceneMeshRenderer;
 	std::vector<graphics::UI::DrawableElement*> m_sceneGuiElements;
-	std::vector<Enemy*> m_enemiesLeft;
+	std::vector<GameObject*> m_enemiesLeft;
 	std::vector<graphics::MeshRenderer*> m_pilars;
-
-	std::vector<GameObject*> m_activeGameObjects;
 
 	graphics::UI::GuiText* m_informationText;
 	graphics::UI::GuiText* m_counterText;

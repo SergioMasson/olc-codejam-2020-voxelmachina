@@ -4,7 +4,7 @@
 #include "../dxassert.h"
 #include "../colors.h"
 
-#include "PostProcessing/FXAA.h"
+#include "PostProcessing/PostProcessingEffects.h"
 
 using namespace Microsoft::WRL;
 using namespace graphics;
@@ -17,8 +17,9 @@ D3D11_VIEWPORT					graphics::g_ScreenViewport;
 D3D_DRIVER_TYPE					graphics::g_d3dDriverType = D3D_DRIVER_TYPE_HARDWARE;
 bool							graphics::g_Enable4xMsaa = false;
 
-ComPtr<ID3D11RenderTargetView>  graphics::g_RenderTargetView;
-ComPtr<ID3D11DepthStencilView>	graphics::g_DepthStencilView = nullptr;
+ComPtr<ID3D11RenderTargetView>  graphics::g_ScreenRenderTargetView;
+ComPtr<ID3D11DepthStencilView>	graphics::g_ScreenDepthStencilView = nullptr;
+
 ComPtr<ID3D11Device>			graphics::g_d3dDevice = nullptr;
 ComPtr<ID3D11DeviceContext>		graphics::g_d3dImmediateContext = nullptr;
 ComPtr<IDXGISwapChain1>			graphics::g_SwapChain = nullptr;
@@ -54,7 +55,7 @@ void createD3DRenderTarget(ComPtr<IDXGISurface1> ptr)
 
 	ptr.As(&d3dbackBuffer);
 
-	ASSERT_SUCCEEDED(g_d3dDevice->CreateRenderTargetView(d3dbackBuffer.Get(), nullptr, g_RenderTargetView.GetAddressOf()));
+	ASSERT_SUCCEEDED(g_d3dDevice->CreateRenderTargetView(d3dbackBuffer.Get(), nullptr, g_ScreenRenderTargetView.GetAddressOf()));
 
 	// Create the depth/stencil buffer and view.
 	D3D11_TEXTURE2D_DESC depthStencilDesc;
@@ -75,7 +76,7 @@ void createD3DRenderTarget(ComPtr<IDXGISurface1> ptr)
 	ASSERT_SUCCEEDED(g_d3dDevice->CreateTexture2D(&depthStencilDesc, nullptr, g_DepthStencilBuffer.GetAddressOf()));
 
 	//Create a view to the depth and stencil buffer.
-	ASSERT_SUCCEEDED(g_d3dDevice->CreateDepthStencilView(g_DepthStencilBuffer.Get(), nullptr, g_DepthStencilView.GetAddressOf()));
+	ASSERT_SUCCEEDED(g_d3dDevice->CreateDepthStencilView(g_DepthStencilBuffer.Get(), nullptr, g_ScreenDepthStencilView.GetAddressOf()));
 
 	// Set the viewport transform.
 	g_ScreenViewport.TopLeftX = 0;
@@ -187,8 +188,8 @@ void graphics::Initialize(uint32_t width, uint32_t heigth)
 {
 	InitializeGraphicsInfra(width, heigth);
 
-	graphics::FXAA::Initialize();
-	graphics::FXAA::Resize(g_windowWidth, g_windowHeight);
+	graphics::PostEffects::Initialize();
+	graphics::PostEffects::Resize(g_windowWidth, g_windowHeight);
 }
 
 void graphics::Resize(uint32_t width, uint32_t heigth)
@@ -209,8 +210,8 @@ void graphics::Resize(uint32_t width, uint32_t heigth)
 	// Release the old views, as they hold references to the buffers we
 	// will be destroying.  Also release the old depth/stencil buffer.
 
-	g_RenderTargetView.Reset();
-	g_DepthStencilView.Reset();
+	g_ScreenRenderTargetView.Reset();
+	g_ScreenDepthStencilView.Reset();
 	g_DepthStencilBuffer.Reset();
 	d2dRenderTarget.Reset();
 	g_d2dDeviceContext->SetTarget(nullptr);
@@ -229,23 +230,14 @@ void graphics::Resize(uint32_t width, uint32_t heigth)
 	createD3DRenderTarget(backBuffer);
 	createD2DRenderTarget(backBuffer.Get());
 
-	graphics::FXAA::Resize(width, heigth);
+	graphics::PostEffects::Resize(width, heigth);
 }
 
 void graphics::BeginDraw()
 {
-	if (FXAA::FXAAEnable)
-	{
-		g_d3dImmediateContext->ClearRenderTargetView(g_RenderTargetView.Get(), reinterpret_cast<const float*>(&m_cleanColor));
-		g_d3dImmediateContext->ClearDepthStencilView(g_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-		g_d3dImmediateContext->OMSetRenderTargets(1, FXAA::g_pProxyTextureRTV.GetAddressOf(), g_DepthStencilView.Get());
-	}
-	else
-	{
-		g_d3dImmediateContext->ClearRenderTargetView(g_RenderTargetView.Get(), reinterpret_cast<const float*>(&m_cleanColor));
-		g_d3dImmediateContext->ClearDepthStencilView(g_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-		g_d3dImmediateContext->OMSetRenderTargets(1, g_RenderTargetView.GetAddressOf(), g_DepthStencilView.Get());
-	}
+	g_d3dImmediateContext->ClearRenderTargetView(g_ScreenRenderTargetView.Get(), reinterpret_cast<const float*>(&m_cleanColor));
+	g_d3dImmediateContext->ClearDepthStencilView(g_ScreenDepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	g_d3dImmediateContext->OMSetRenderTargets(1, graphics::PostEffects::GetInitialRenderTarget().GetAddressOf(), g_ScreenDepthStencilView.Get());
 }
 
 void graphics::Present()
@@ -255,5 +247,5 @@ void graphics::Present()
 
 void graphics::ShutDown()
 {
-	graphics::FXAA::Shutdown();
+	graphics::PostEffects::Shutdown();
 }

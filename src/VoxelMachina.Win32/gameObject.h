@@ -2,12 +2,9 @@
 
 #include "math/transform.h"
 
-typedef uint32_t ComponentType;
-
 class Component;
 class BehaviourComponent;
-
-extern std::vector<BehaviourComponent*> g_activeBehaviours;
+class GameObject;
 
 namespace graphics
 {
@@ -16,21 +13,25 @@ namespace graphics
 	struct MeshData;
 }
 
+extern std::set<BehaviourComponent*> g_activeBehaviours;
+extern std::set<GameObject*> g_activeGameObjects;
+
 class GameObject
 {
 public:
 	GameObject(math::Vector3 position = math::Vector3(0, 0, 0), math::Quaternion rotation = math::Quaternion(0, 0, 0), GameObject* parent = nullptr);
+	~GameObject();
 
 	template<typename T, typename ...Param> T* AddComponent(Param... params)
 	{
 		T* component = new T(this, std::forward<Param>(params)...);
-		m_components.push_back(component);
+		m_components.insert(component);
 		return component;
 	}
 
 	template<class T> T* GetComponent()
 	{
-		for (auto component : m_components)
+		for (Component* component : m_components)
 		{
 			T* target = dynamic_cast<T*>(component);
 
@@ -39,6 +40,28 @@ public:
 		}
 
 		return nullptr;
+	}
+
+	template<class T> void RemoveComponent()
+	{
+		Component* target = nullptr;
+
+		for (Component* component : m_components)
+		{
+			T* localTarget = dynamic_cast<T*>(component);
+
+			if (localTarget != nullptr)
+			{
+				target = localTarget;
+				break;
+			}
+		}
+
+		if (target != nullptr)
+		{
+			m_components.erase(target);
+			delete target;
+		}
 	}
 
 	bool IsActive() { return m_isActive; }
@@ -73,7 +96,7 @@ private:
 	math::Transform m_transform;
 	graphics::MeshRenderer* m_meshRenderer;
 	GameObject* m_parent;
-	std::vector<Component*> m_components;
+	std::set<Component*> m_components;
 	bool m_isActive;
 };
 
@@ -84,6 +107,8 @@ protected:
 	{
 		m_active = true;
 	}
+
+	virtual ~Component() {}
 
 protected:
 	GameObject* m_gameObject;
@@ -96,7 +121,7 @@ class BehaviourComponent : public Component
 public:
 	BehaviourComponent(GameObject* gameObject) : Component(gameObject)
 	{
-		g_activeBehaviours.push_back(this);
+		g_activeBehaviours.insert(this);
 	};
 
 	virtual void Update(float daltaT) = 0;

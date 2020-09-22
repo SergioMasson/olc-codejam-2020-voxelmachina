@@ -14,6 +14,8 @@ using namespace std;
 using namespace DirectX;
 using namespace graphics;
 
+std::set<MeshRenderer*> graphics::g_activeMeshRenderers;
+
 std::map<size_t, Microsoft::WRL::ComPtr<ID3D11Buffer>> g_vertexBufferTable{};
 std::map<size_t, Microsoft::WRL::ComPtr<ID3D11Buffer>> g_indexBufferTable{};
 
@@ -791,6 +793,15 @@ graphics::MeshRenderer::MeshRenderer(GameObject* gameObject, MeshData* data, Mat
 		ASSERT_SUCCEEDED(hr, "Fail to create index buffer.");
 		g_indexBufferTable.insert({ resourceHash,  m_indexBuffer });
 	}
+
+	g_activeMeshRenderers.insert(this);
+}
+
+graphics::MeshRenderer::~MeshRenderer()
+{
+	g_activeMeshRenderers.erase(this);
+	m_vertexBuffer.Reset();
+	m_indexBuffer.Reset();
 }
 
 math::Matrix4 graphics::MeshRenderer::GetWorldMatrix() const

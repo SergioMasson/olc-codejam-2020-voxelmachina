@@ -7,7 +7,7 @@
 #include "systemTime.h"
 #include <iostream>
 #include <string>
-#include "graphics/PostProcessing/FXAA.h"
+#include "graphics/PostProcessing/postProcessingEffects.h"
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
@@ -46,8 +46,7 @@ bool UpdateApplication(IGameApp& app)
 	graphics::BeginDraw();
 	app.RenderScene();
 
-	if (graphics::FXAA::FXAAEnable)
-		graphics::FXAA::Render();
+	graphics::PostEffects::Render();
 
 	app.RenderUI();
 	graphics::Present();
