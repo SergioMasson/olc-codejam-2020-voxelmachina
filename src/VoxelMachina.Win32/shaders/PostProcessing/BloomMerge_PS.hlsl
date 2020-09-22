@@ -27,9 +27,9 @@ float4 main(BloomVS_Output Input) : SV_TARGET
 
     // tone mapping
     float3 result = float3(1.0, 1.0, 1.0) - exp(-hdrColor * exposure);
-    float3 oneOverGama = float3(1.0 / gamma, 1.0 / gamma, 1.0 / gamma);
+    //float3 oneOverGama = float3(1.0 / gamma, 1.0 / gamma, 1.0 / gamma);
     
     // also gamma correct while we're at it       
-    result = pow(result, oneOverGama);
+    //result = pow(result, oneOverGama);
     return float4(result, 1.0);
 }
